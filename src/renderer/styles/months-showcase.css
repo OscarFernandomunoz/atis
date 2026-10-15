@@ -1,0 +1,158 @@
+/* Carrusel de paisajes de Colombia por mes, al estilo de las tarjetas de Spotify. */
+
+.months-showcase {
+  width: 100%;
+  margin: 2px 0 var(--section-gap);
+  padding: 0 clamp(20px, 5vw, 64px);
+}
+
+.months-showcase-heading {
+  margin-bottom: 14px;
+}
+
+.months-showcase-title {
+  margin-top: 6px;
+  font-size: clamp(17px, 1.6vw, 21px);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.months-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 6px 4px 14px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 26%, transparent) transparent;
+}
+
+.months-track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.months-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.months-track::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  border-radius: 999px;
+}
+
+.month-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 198px;
+  overflow: hidden;
+  border-radius: 16px;
+  scroll-snap-align: start;
+  background: var(--surface-muted);
+  border: 1px solid color-mix(in srgb, var(--border) 68%, transparent);
+  box-shadow: var(--shadow-soft);
+  transition: transform 380ms var(--ease-out), box-shadow 380ms var(--ease-out), border-color 380ms var(--ease-out);
+}
+
+.month-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 55%, transparent);
+  box-shadow: var(--shadow);
+}
+
+.month-card-media {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.month-card-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 640ms var(--ease-out);
+}
+
+.month-card:hover .month-card-photo {
+  transform: scale(1.07);
+}
+
+.month-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.52);
+  color: #ffffff;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.month-card-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.month-card-label {
+  display: block;
+  padding: 9px 13px;
+  background: var(--card-accent, var(--accent-soft));
+  color: #17170f;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+}
+
+/* Paleta de franjas: una tonalidad pastel distinta por mes. */
+.month-card:nth-child(12n + 1) {
+  --card-accent: #f7b8ce;
+}
+
+.month-card:nth-child(12n + 2) {
+  --card-accent: #bfe7cd;
+}
+
+.month-card:nth-child(12n + 3) {
+  --card-accent: #cbc6f6;
+}
+
+.month-card:nth-child(12n + 4) {
+  --card-accent: #aadcf1;
+}
+
+.month-card:nth-child(12n + 5) {
+  --card-accent: #f6d7a1;
+}
+
+.month-card:nth-child(12n + 6) {
+  --card-accent: #b7e3b1;
+}
+
+.month-card:nth-child(12n + 7) {
+  --card-accent: #f6c39b;
+}
+
+.month-card:nth-child(12n + 8) {
+  --card-accent: #f2b3a3;
+}
+
+.month-card:nth-child(12n + 9) {
+  --card-accent: #d5c0f3;
+}
+
+.month-card:nth-child(12n + 10) {
+  --card-accent: #a6e1d6;
+}
+
+.month-card:nth-child(12n + 11) {
+  --card-accent: #d0e2a2;
+}
+
+.month-card:nth-child(12n + 12) {
+  --card-accent: #f6caa8;
+}

@@ -98,9 +98,6 @@ html.icons-ready .app-icon {
 .svg-icon-path,
 .svg-cloud,
 .svg-arrow,
-.svg-moon,
-.svg-sun,
-.svg-sun-rays,
 .svg-weather-cloud,
 .svg-clock-hands,
 .svg-check {
@@ -168,28 +165,11 @@ html.icons-ready .app-icon {
     svg-breath 2.4s ease-in-out 1.5s infinite;
 }
 
-.app-icon.is-visible .svg-sun {
-  transform-origin: 9px 13px;
-  animation: svg-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 500ms both;
-}
-
-.app-icon.is-visible .svg-sun-rays {
-  transform-origin: 9px 13px;
-  animation: svg-draw 700ms var(--ease-out) 300ms forwards,
-    svg-rotate 18s linear 1.4s infinite;
-}
-
 .app-icon.is-visible .svg-weather-cloud {
   stroke-dasharray: 200;
   stroke-dashoffset: 200;
   animation: svg-draw 700ms var(--ease-out) 500ms forwards,
     svg-cloud-drift 5s ease-in-out 1.4s infinite;
-}
-
-.app-icon.is-visible .svg-moon {
-  stroke-dasharray: 180;
-  stroke-dashoffset: 180;
-  animation: svg-draw 620ms var(--ease-out) forwards;
 }
 
 @keyframes svg-pop {
@@ -372,12 +352,6 @@ html.icons-ready .app-icon {
   animation: svg-rotate 22s linear infinite;
   stroke-dasharray: 30;
   stroke-dashoffset: 30;
-}
-
-.theme-toggle .theme-icon {
-  width: 14px;
-  height: 14px;
-  color: currentColor;
 }
 
 .panel-status .app-icon {

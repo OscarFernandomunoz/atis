@@ -56,6 +56,12 @@ async function build(): Promise<void> {
     }
   }
 
+  // Fotografías de paisajes que usa el carrusel de meses.
+  const landscapesSrc = resolve(rootDir, 'public/images/landscapes');
+  if (existsSync(landscapesSrc)) {
+    cpSync(landscapesSrc, resolve(distImagesDir, 'landscapes'), { recursive: true });
+  }
+
   // 5. Configuración compartida
   const sharedConfig: esbuild.BuildOptions = {
     bundle: true,

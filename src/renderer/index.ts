@@ -1,8 +1,9 @@
 import { initFileHandling } from './components/excel-preview.js';
 import { initLiveContext, initClock } from './components/live-context.js';
+import { initMonthsShowcase } from './components/months-showcase.js';
 import { initSubmit } from './components/submit.js';
 import { initTitleBar } from './components/title-bar.js';
-import { initTheme } from './theme/index.js';
+import { initDynamicBackground } from './theme/index.js';
 import type { AppElements, FileUploadState } from './types.js';
 
 function getElements(): AppElements {
@@ -22,14 +23,13 @@ function getElements(): AppElements {
     inputPass: document.getElementById('password') as HTMLInputElement,
     inputStartDate: document.getElementById('fechaInicio') as HTMLInputElement,
     inputEndDate: document.getElementById('fechaFin') as HTMLInputElement,
-    themeToggle: document.getElementById('themeToggle') as HTMLButtonElement,
   };
 }
 
 function enforceSvgIconVisibility(): void {
   const selectors = [
-    '.svg-icon-path', '.svg-cloud', '.svg-arrow', '.svg-moon',
-    '.svg-sun', '.svg-sun-rays', '.svg-weather-cloud', '.svg-clock-hands', '.svg-check',
+    '.svg-icon-path', '.svg-cloud', '.svg-arrow',
+    '.svg-weather-cloud', '.svg-clock-hands', '.svg-check',
     '.svg-lock-core', '.svg-cal-dot',
   ];
   document.querySelectorAll<SVGElement | HTMLElement>(selectors.join(',')).forEach((el) => {
@@ -41,7 +41,7 @@ function enforceSvgIconVisibility(): void {
       el.style.setProperty('display', '', 'important');
     }
   });
-  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .status-icon, .btn-icon, .theme-icon, .cloud-icon, .upload-arrow-icon').forEach((svg) => {
+  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .status-icon, .btn-icon, .cloud-icon, .upload-arrow-icon').forEach((svg) => {
     svg.style.setProperty('opacity', '1', 'important');
     svg.style.setProperty('visibility', 'visible', 'important');
     svg.style.removeProperty('animation-play-state');
@@ -50,7 +50,7 @@ function enforceSvgIconVisibility(): void {
 
 function initIconScrollAnimations(): void {
   const icons = Array.from(document.querySelectorAll<HTMLElement>(
-    '.app-icon, .theme-icon, .status-icon, .input-icon, .dropzone-icon .cloud-icon, .dropzone-icon .upload-arrow-icon, .btn-icon',
+    '.app-icon, .status-icon, .input-icon, .dropzone-icon .cloud-icon, .dropzone-icon .upload-arrow-icon, .btn-icon',
   ));
   if (!icons.length) return;
 
@@ -90,63 +90,18 @@ function initIconScrollAnimations(): void {
   }, true);
 }
 
-function initMouseLightEffect(): void {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const header = document.querySelector<HTMLElement>('.content-header');
-  let headerBounds = header?.getBoundingClientRect();
-  let framePending = false;
-  let targetX = window.innerWidth / 2;
-  let targetY = window.innerHeight / 3;
-  let currentX = targetX;
-  let currentY = targetY;
-
-  const updateLightPosition = (): void => {
-    currentX += (targetX - currentX) * 0.18;
-    currentY += (targetY - currentY) * 0.18;
-    document.documentElement.style.setProperty('--mouse-x', `${currentX}px`);
-    document.documentElement.style.setProperty('--mouse-y', `${currentY}px`);
-    if (headerBounds) {
-      document.documentElement.style.setProperty('--header-mouse-x', `${currentX - headerBounds.left}px`);
-      document.documentElement.style.setProperty('--header-mouse-y', `${currentY - headerBounds.top}px`);
-    }
-
-    const distance = Math.hypot(targetX - currentX, targetY - currentY);
-    if (distance > 0.5) {
-      window.requestAnimationFrame(updateLightPosition);
-      return;
-    }
-
-    currentX = targetX;
-    currentY = targetY;
-    framePending = false;
-  };
-
-  const handleMouseMove = (event: MouseEvent): void => {
-    if (document.documentElement.dataset.theme !== 'dark') return;
-    targetX = event.clientX;
-    targetY = event.clientY;
-    if (framePending) return;
-    framePending = true;
-    window.requestAnimationFrame(updateLightPosition);
-  };
-
-  window.addEventListener('resize', () => { headerBounds = header?.getBoundingClientRect(); }, { passive: true });
-  document.addEventListener('mousemove', handleMouseMove, { passive: true });
-}
-
 function initApp(): void {
   const elements = getElements();
   const state: FileUploadState = { file: null, firstIdentification: null, identifications: [], isUploading: false, currentIdentification: null };
 
-  initTheme(elements);
+  initDynamicBackground();
   initTitleBar();
+  initMonthsShowcase();
   initClock(elements);
   void initLiveContext(elements);
   initFileHandling(elements, state);
   initSubmit(elements, state);
   initIconScrollAnimations();
-  initMouseLightEffect();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

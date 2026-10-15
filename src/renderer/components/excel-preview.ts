@@ -41,24 +41,28 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
   elements.excelPreview.textContent = 'Leyendo información del Excel...';
   try {
     const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-    const sheets = workbook.SheetNames.map((sheetName) => {
+    // Detectar si alguna hoja tiene filtro autofilter aplicado (Excel nativo)
+    const sheetFilterInfos = workbook.SheetNames.map((sheetName) => {
       const sheet = workbook.Sheets[sheetName];
+      const autofilter = sheet ? sheet['!autofilter'] : null;
       return {
         sheetName,
+        autofilter,
         rows: sheet ? XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '' }) : [],
       };
     });
-    const validationResults = sheets.map(({ sheetName, rows }) => validateRequiredColumn(rows, sheetName));
+    const validationResults = sheetFilterInfos.map(({ sheetName, rows }) => validateRequiredColumn(rows, sheetName));
     const validSheetCount = validationResults.filter((result) => result === null).length;
     if (validSheetCount === 0) {
       rejectFile(elements, state, validationResults.find(Boolean) ?? `Ninguna hoja contiene ${REQUIRED_COLUMN_LABEL} con datos válidos.`);
       return;
     }
-    const identifications = [...new Set(sheets
+    const identifications = [...new Set(sheetFilterInfos
       .flatMap(({ rows }) => getAllIdentifications(rows)))];
     const firstIdentification = identifications[0] ?? null;
     const fragment = document.createDocumentFragment();
-    sheets.forEach(({ sheetName, rows }) => {
+    sheetFilterInfos.forEach(({ sheetName, rows }, sheetIndex) => {
+      const filterInfo = sheetFilterInfos[sheetIndex];
       const section = document.createElement('section');
       const title = document.createElement('h3');
       title.textContent = sheetName;
@@ -69,11 +73,19 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
         section.appendChild(empty);
       } else {
         const table = createTable(rows, findRequiredColumnIndex(rows)?.columnIndex ?? -1);
+        // Agregar barra de filtros que respeta filas ocultas
         section.appendChild(createFilterBar(table));
         const wrapper = document.createElement('div');
         wrapper.className = 'excel-table-wrapper';
         wrapper.appendChild(table);
         section.appendChild(wrapper);
+        // Si el archivo tiene filtro autofilter nativo, agregar indicación visual
+        if (filterInfo?.autofilter) {
+          const filterNote = document.createElement('p');
+          filterNote.className = 'excel-filter-note';
+          filterNote.textContent = `• Hoja tiene filtro autofilter aplicado (rango: ${filterInfo.autofilter.ref})`;
+          section.appendChild(filterNote);
+        }
       }
       fragment.appendChild(section);
     });

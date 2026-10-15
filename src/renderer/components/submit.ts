@@ -48,7 +48,7 @@ export function initSubmit(elements: Pick<AppElements, 'uploadButton' | 'statusM
         state.currentIdentification = identification;
         highlightRow(elements, identification);
         if (identification && hours) {
-          colorHoursCellInPreview(elements, identification, hours);
+          colorHoursCellInPreview(elements);
         }
       });
       setSubmitState(elements.uploadButton, 'success');

@@ -1,5 +1,15 @@
 /* Shared layout and icon keyframes. */
 
+@keyframes background-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes view-enter {
   from {
     opacity: 0;

@@ -1,6 +1,6 @@
 import type { FileUploadState } from '../../types.js';
-import { refreshExcelPreview, type FileElements } from '../excel-preview.js';
-import { editOriginalWorkbookMultiple } from './exceljs-edit.js';
+import { refreshExcelPreview, type FileElements, getVisibleIdentifications } from '../excel-preview.js';
+import { editOriginalWorkbookMultiple, highlightAllHoursCells } from './exceljs-edit.js';
 import { rebuildFromRowsMultiple } from './xls-rebuild.js';
 import { HOURS_THRESHOLD } from './helpers.js';
 import { colorHoursCellInPreview } from './preview-color.js';
@@ -102,19 +102,71 @@ export async function writeHoursIntoExcel(
     return false;
   }
 
+  // Filtrar el archivo solo con las filas visibles en la preview
+  // Pero preservando el diseño según la ruta utilizada:
+  // - 'com': Excel COM preserva diseño al 100%
+  // - 'exceljs': ExcelJS conserva estilos y filtros
+  // - 'rebuild': SheetJS reconstruye, puede perder diseño
+  let filteredBuffer: ArrayBuffer = updatedBuffer;
+  const visibleIds = getVisibleIdentifications(elements);
+  if (visibleIds.length > 0) {
+    if (usedRoute === 'rebuild') {
+      // Usar rebuildFromRowsMultiple solo en la ruta de reconstrucción
+      // (esta ruta puede perder diseño, pero es la única opción disponible)
+      const rebuilt: ArrayBuffer | null = await rebuildFromRowsMultiple(updatedBuffer, visibleIds.map(id => ({ identification: id, totalHours: '' })));
+      if (rebuilt) {
+        filteredBuffer = rebuilt;
+        console.log('[AIA][Excel] Archivo filtrado usando ruta rebuild');
+      } else {
+        console.warn('[AIA][Excel] No se pudo reconstruir el archivo con las filas visibles');
+      }
+    } else if (usedRoute === 'exceljs') {
+      // Usar rebuildFromRowsMultiple sobre el buffer ExcelJS
+      // ExcelJS conserva estilos, pero la reconstrucción puede cambiar algo
+      const rebuilt: ArrayBuffer | null = await rebuildFromRowsMultiple(updatedBuffer, visibleIds.map(id => ({ identification: id, totalHours: '' })));
+      if (rebuilt) {
+        filteredBuffer = rebuilt;
+        console.log('[AIA][Excel] Archivo filtrado usando ruta exceljs');
+      } else {
+        console.warn('[AIA][Excel] No se pudo filtrar usando ExcelJS; se conserva buffer original');
+        // Se conserva el buffer original con diseño preservado
+      }
+    } else if (usedRoute === 'com') {
+      // La ruta COM preserva diseño al 100%.
+      // No reconstruimos el archivo; en su lugar filtramos las cédulas visibles
+      // manteniendo la estructura del archivo original.
+      // Para este caso, obtenemos las cédulas visibles pero no reconstruimos
+      // para no romper el diseño que Excel COM ya preservó.
+      console.log('[AIA][Excel] Ruta COM: conservación diseño; download incluirá filas con horas aplicadas');
+      // No filtramos reconstruyendo; el buffer original de COM ya tiene el diseño
+      // y aplicaremos el filtrado simple manteniendo el buffer tal cual
+    } else {
+      // Ruta desconocida, intentemos filtrar conservando lo más posible
+      const rebuilt: ArrayBuffer | null = await rebuildFromRowsMultiple(updatedBuffer, visibleIds.map(id => ({ identification: id, totalHours: '' })));
+      if (rebuilt) {
+        filteredBuffer = rebuilt;
+      }
+    }
+  }
+
   const baseName = state.file.name.replace(/\.[^.]+$/, '');
   const ext = usedRoute === 'rebuild' ? '.xlsx' : (state.file.name.match(/\.[^.]+$/)?.[0] ?? '.xlsx');
   const isXls = ext.toLowerCase() === '.xls';
-  console.log(`[AIA][Excel] Buffer final: ${updatedBuffer.byteLength} bytes, ruta: ${usedRoute}`);
-  const updatedFile = new File([updatedBuffer], `${baseName}-actualizado${ext}`, {
+  console.log(`[AIA][Excel] Buffer final: ${filteredBuffer.byteLength} bytes, ruta: ${usedRoute}`);
+  const updatedFile = new File([filteredBuffer], `${baseName}-actualizado${ext}`, {
     type: isXls ? 'application/vnd.ms-excel' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
   console.log('[AIA][Excel] Archivo generado, refrescando vista previa...');
   state.file = updatedFile;
   await refreshExcelPreview(updatedFile, elements, state);
-  for (const { identification, totalHours } of targets) {
-    colorHoursCellInPreview(elements, identification, totalHours);
-  }
+  // Colorar TODAS las celdas "Horas Adicionales" en el preview (una sola llamada)
+  colorHoursCellInPreview(elements);
+  const highlightedBuffer = await highlightAllHoursCells(updatedBuffer);
+  state.file = new File([highlightedBuffer || updatedBuffer], `${baseName}-actualizado${ext}`, {
+    type: isXls ? 'application/vnd.ms-excel' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  console.log('[AIA][Excel] Archivo con resaltado de "Horas académicas" generado');
+  console.log('[AIA][Excel] Vista previa refrescada y coloreada.');
   console.log('[AIA][Excel] Vista previa refrescada y coloreada.');
   showDownloadButton(elements, () => {
     const url = URL.createObjectURL(updatedFile);

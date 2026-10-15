@@ -86,3 +86,70 @@ function paintHoursCell(workbook: ExcelJS.Workbook, cedula: string, hours: strin
 
   return found;
 }
+
+// NUEVA FUNCIÓN: Busca TODAS las celdas con "Horas académicas" en todo el libro
+// y las pinta de rojo. Retorna el buffer modificado.
+// Busca considerando mayúsculas, minúsculas, acentos y variantes comunes.
+export async function highlightAllHoursCells(data: ArrayBuffer): Promise<ArrayBuffer | null> {
+  const workbook = new ExcelJS.Workbook();
+  try {
+    await workbook.xlsx.load(data);
+  } catch (e) {
+    console.warn('[AIA][Excel] Error loading workbook:', e);
+    return null;
+  }
+
+  let highlighted = false;
+  const cellsFound: Array<{row: number, col: number, text: string}> = [];
+
+  // Palabras clave para buscar (variantes comunes, mayúsculas)
+  const keyTerms = [
+    'HORAS ACADÉMICAS',
+    'HORAS ACADÉMICAS',  
+    'HORAS ACAD',
+    'HORAS ACADÉMICAS',
+    'ACADEMICAS',
+    'ACADEMICAS'
+  ];
+
+  workbook.eachSheet((worksheet) => {
+    worksheet.eachRow((row, rowNumber) => {
+      row.eachCell((cell) => {
+        const cellText = cell.text ?? '';
+        const upper = cellText.toUpperCase().trim();
+        
+        // Register cell for debug (use rowNumber and a simple col counter)
+        cellsFound.push({ row: rowNumber, col: 0, text: cellText });
+        
+        // 1. Búsqueda por variaciones de las palabras clave (mayúsculas)
+        for (const term of keyTerms) {
+          if (upper.includes(term)) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: RED_FILL } };
+            highlighted = true;
+            break;
+          }
+        }
+        
+        // 2. También intentar normalización de acentos (sameHeader)
+        // Solo si aún no hemos encontrado nada
+        if (!highlighted) {
+          // sameHeader ya hace mayúsculas y normaliza acentos internamente
+          if (sameHeader(cellText, HOURS_COLUMN_NAME)) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: RED_FILL } };
+            highlighted = true;
+          }
+        }
+      });
+    });
+  });
+
+  console.log('[AIA][Excel] DEBUG: Total cells checked=' + cellsFound.length + ', highlighted=' + highlighted);
+  if (highlighted) {
+    console.log('[AIA][Excel] DEBUG: First 3 found - ' +
+      cellsFound.slice(0, 3).map(c => 'Row=' + c.row + ' Col=' + c.col + ' Text=' + c.text).join('; '));
+  }
+
+  if (!highlighted) return null;
+
+  return (await workbook.xlsx.writeBuffer()) as unknown as ArrayBuffer;
+}

@@ -30,24 +30,7 @@
   z-index: 10;
 }
 
-.content-header::before {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(circle 190px at var(--header-mouse-x, 50%) var(--header-mouse-y, 50%), rgba(255, 255, 255, 0.1), transparent 72%);
-  transition: opacity 300ms var(--ease-smooth);
-}
-
-:root[data-theme='dark'] .content-header {
-  background: var(--surface);
-}
-
-:root[data-theme='dark'] .content-header::before {
-  opacity: 0;
-}
+/* content-header::before removido - ya no necesario, el gradient ahora es en body::before */
 
 .content-header>* {
   position: relative;
@@ -98,11 +81,6 @@
 }
 
 :root[data-theme='dark'] .dashboard-panel {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-:root[data-theme='light'] .dashboard-panel {
   border-color: transparent;
   box-shadow: none;
 }

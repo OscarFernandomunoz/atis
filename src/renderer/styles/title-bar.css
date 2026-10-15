@@ -19,10 +19,6 @@
   border-bottom-color: var(--surface);
 }
 
-:root[data-theme='light'] .title-bar {
-  border-bottom-color: var(--bg);
-}
-
 .title-bar-app-icon {
   position: relative;
   z-index: 2;

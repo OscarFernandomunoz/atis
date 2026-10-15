@@ -1,10 +1,10 @@
 /* Tokens, color variables and theme foundations. */
 
 :root {
-  color-scheme: light;
-  --bg: #f7f7f5;
-  --surface: #f7f7f5;
-  --surface-muted: #eeeeeb;
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #000000;
+  --surface-muted: #000000;
   --border: #d4d4d0;
   --border-strong: #ababa6;
   --text: #151515;
@@ -36,6 +36,10 @@
   --required-column-header-hover: #454545;
   --required-column-body-hover: #d8d8d4;
   --background-gradient: #f5f5f3;
+  /* Degradado ambiental; el renderer lo reemplaza al azar en cada arranque.
+     Solo capas de imagen: el negro de base lo pinta `background-color` (--bg). */
+  --app-gradient: radial-gradient(120% 80% at 8% -8%, hsl(0 88% 52% / 0.4) 0%, transparent 80%),
+    radial-gradient(120% 80% at 92% 0%, hsl(288 88% 52% / 0.36) 0%, transparent 80%);
   --shadow: 0 18px 44px rgba(0, 0, 0, 0.09);
   --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.07);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -46,15 +50,15 @@
   --title-bar-height: 36px;
   --title-bar-overlay-width: 138px;
   --title-bar-overlay-center-offset: 69px;
-  --title-bar-bg: #f7f7f5;
+  --title-bar-bg: #000000;
   --title-bar-text: #5f5f5b;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #181818;
-  --surface: #181818;
-  --surface-muted: #1e1e1e;
+  --bg: #000000;
+  --surface: #000000;
+  --surface-muted: #000000;
   --border: #303030;
   --border-strong: #505050;
   --text: #f1f1ef;
@@ -88,6 +92,6 @@
   --background-gradient: #090909;
   --shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
   --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.36);
-  --title-bar-bg: #181818;
+  --title-bar-bg: #000000;
   --title-bar-text: #c7c7c4;
 }
