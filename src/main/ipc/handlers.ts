@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { openSofiaPlus, type InstructorHours, type SofiaCredentials } from '../services/sofia-plus/index.js';
+import { setAutomationPaused } from '../services/sofia-plus/flow/pause-gate.js';
 import { applyHoursWithExcel, type ApplyHoursPayload } from '../services/excel/apply-hours.js';
 import { applyHoursMultipleWithExcel, type ApplyHoursMultiplePayload } from '../services/excel/apply-hours-multiple.js';
 import { applyTitleBarTheme } from '../windows/appearance.js';
@@ -22,6 +23,13 @@ export function registerIpcHandlers(): void {
         console.error('[AIA][SofiaPlus] No se pudo completar el flujo de automatización.', error);
         throw error;
       }
+    });
+
+    // Pausa o reanuda la automatización en curso sin cortarla: el flujo se detiene en la
+    // próxima frontera de paso y continúa desde ese mismo punto.
+    ipcMain.on('sofia:set-paused', (_event, paused: unknown) => {
+      if (typeof paused !== 'boolean') return;
+      setAutomationPaused(paused);
     });
 
     // Escribe las horas en el Excel con Excel real (COM) preservando diseño y filtros.

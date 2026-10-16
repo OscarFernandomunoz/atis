@@ -16,7 +16,33 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
   // La barra del reproductor monta el botón; si aún no está, no hay nada que inicializar.
   if (!button) return;
 
+  // Mientras la automatización corre el botón no se deshabilita: pasa a pausar y reanudar.
+  let running = false;
+  // Solo el flujo de SofiaPlus es pausable; el volcado posterior al Excel no.
+  let pausable = false;
+  let isPaused = false;
+  let statusBeforePause = '';
+
+  const applyPause = (value: boolean): void => {
+    isPaused = value;
+    window.electronAPI.setAutomationPaused(value);
+    setPlayerState(elements, value ? 'paused' : 'loading');
+    elements.playerTrack.classList.toggle('is-paused', value);
+    if (value) {
+      statusBeforePause = elements.statusMessage.textContent ?? '';
+      elements.statusMessage.textContent = 'Automatización en pausa. Vuelve a pulsar el botón para reanudar donde quedó.';
+    } else {
+      elements.statusMessage.textContent = statusBeforePause || 'Reanudando la automatización...';
+    }
+  };
+
   button.addEventListener('click', async () => {
+    // Con la automatización en marcha el botón pausa o reanuda en lugar de reiniciar.
+    if (running) {
+      if (pausable) applyPause(!isPaused);
+      return;
+    }
+
     if (!elements.inputUser.value || !elements.inputPass.value) { alert('Ingrese las credenciales de acceso.'); return; }
     if (!state.file) {
       elements.dropzone.classList.add('dropzone-error');
@@ -47,7 +73,9 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
     setPlayerProgress(elements, 0, total);
 
     state.isUploading = true;
-    button.disabled = true;
+    running = true;
+    pausable = true;
+    isPaused = false;
     setPlayerState(elements, 'loading');
     elements.statusMessage.textContent = 'Abriendo SofiaPlus, llenando los campos e iniciando sesión...';
     try {
@@ -70,6 +98,9 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
           setPlayerProgress(elements, processedIds.size, total);
         }
       });
+      // Terminó el flujo de SofiaPlus: se cierra la pausa mientras se vuelca al Excel.
+      pausable = false;
+      button.disabled = true;
       setPlayerState(elements, 'success');
       const found = results.filter((r) => r.totalHours);
       console.log('[AIA][Excel] Resultados SofiaPlus:', results);
@@ -94,7 +125,15 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
       alert(userMessage);
     } finally {
       state.isUploading = false;
+      running = false;
+      pausable = false;
       button.disabled = false;
+      // Si algo termina con la automatización en pausa, se libera la puerta del proceso principal.
+      if (isPaused) {
+        isPaused = false;
+        window.electronAPI.setAutomationPaused(false);
+      }
+      elements.playerTrack.classList.remove('is-paused');
       window.setTimeout(() => setPlayerState(elements, 'idle'), 2800);
     }
   });

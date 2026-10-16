@@ -9,4 +9,4 @@ export type PlayerProgressElements = Pick<
 >;
 
 // Estados visuales del botón de play durante la automatización.
-export type PlayerState = 'idle' | 'loading' | 'success' | 'error';
+export type PlayerState = 'idle' | 'loading' | 'paused' | 'success' | 'error';

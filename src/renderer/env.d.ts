@@ -12,6 +12,9 @@ export interface IElectronAPI {
     identifications?: string[];
   }, onProgress?: (identification: string | null, hours: string | null) => void) => Promise<Array<{ identification: string; totalHours: string | null }>>;
 
+  // Pausa o reanuda la automatización en curso; al reanudar continúa donde quedó.
+  setAutomationPaused: (paused: boolean) => void;
+
   // Aplica las horas al Excel con Excel real, conservando diseño y filtros.
   // Devuelve null si Excel no está disponible (se puede usar el fallback).
   applyHoursToExcel: (payload: { data: ArrayBuffer; fileName: string; cedula: string; hours: string }) => Promise<ArrayBuffer | null>;

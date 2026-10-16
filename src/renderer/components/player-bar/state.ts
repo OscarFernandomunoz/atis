@@ -3,7 +3,8 @@ import type { PlayerButtonElements, PlayerState } from './types.js';
 // La etiqueta accesible anuncia qué hace el play en cada estado del proceso.
 const LABELS: Record<PlayerState, string> = {
   idle: 'Iniciar la automatización de SofiaPlus',
-  loading: 'Automatización de SofiaPlus en curso',
+  loading: 'Pausar la automatización de SofiaPlus',
+  paused: 'Reanudar la automatización de SofiaPlus',
   success: 'Automatización de SofiaPlus completada',
   error: 'La automatización falló. Intenta de nuevo',
 };

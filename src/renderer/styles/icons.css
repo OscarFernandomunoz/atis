@@ -134,12 +134,6 @@ html.icons-ready .app-icon {
   }
 }
 
-@keyframes svg-rotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes svg-spin {
   from {
     transform: rotate(-40deg) scale(0.7);

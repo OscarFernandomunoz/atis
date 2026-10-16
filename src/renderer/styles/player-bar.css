@@ -25,6 +25,19 @@
   }
 }
 
+/* Latido suave del botón cuando la automatización está en pausa. */
+@keyframes player-paused-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 6px 16px var(--primary-shadow);
+  }
+
+  50% {
+    box-shadow: 0 6px 16px var(--primary-shadow), 0 0 0 7px color-mix(in srgb, var(--accent) 24%, transparent);
+  }
+}
+
 .player-bar {
   position: relative;
   z-index: 2;
@@ -209,11 +222,10 @@
   stroke: none;
 }
 
-.player-glyph-loading {
+.player-glyph-pause {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-dasharray: 34 16;
+  stroke-width: 3;
   stroke-linecap: round;
 }
 
@@ -230,12 +242,22 @@
   display: block;
 }
 
-.player-play[data-state='loading'] .player-play-svg {
-  animation: svg-rotate 0.9s linear infinite;
+/* En curso el botón pausa: se dibujan las barras de pausa. */
+.player-play[data-state='loading'] {
+  background: var(--primary-hover-start);
 }
 
-.player-play[data-state='loading'] .player-glyph-loading {
+.player-play[data-state='loading'] .player-glyph-pause {
   display: block;
+}
+
+/* En pausa el botón ofrece reanudar y late para que se note. */
+.player-play[data-state='paused'] .player-glyph-play {
+  display: block;
+}
+
+.player-play[data-state='paused'] {
+  animation: player-paused-pulse 1.9s var(--ease-smooth) infinite;
 }
 
 .player-play[data-state='success'] {
@@ -301,6 +323,11 @@
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 55%, transparent), transparent);
   content: "";
   animation: player-fill-shimmer 1.4s linear infinite;
+}
+
+/* Con la automatización en pausa el reflejo se congela. */
+.player-track.is-paused .player-track-fill::after {
+  animation-play-state: paused;
 }
 
 .player-track.is-complete .player-track-fill {
