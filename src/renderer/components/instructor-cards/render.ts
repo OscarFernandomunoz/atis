@@ -1,6 +1,6 @@
-import { HOURS_THRESHOLD, parseHoursValue } from '../excel-update/helpers.js';
 import { createInstructorCard } from './card.js';
 import { buildProgramFilter } from './filter.js';
+import { effectiveHours, hoursKind } from './hours.js';
 import { buildHoursFilter, type HoursFilter } from './hours-filter.js';
 import { programColors } from './palette.js';
 import { parseInstructors } from './parse.js';
@@ -17,14 +17,6 @@ export interface CardBoard {
   selectAll: HTMLInputElement;
   count: HTMLElement;
   empty: HTMLElement;
-}
-
-type HoursKind = 'ok' | 'low' | 'none';
-
-function hoursKind(hours: string): HoursKind {
-  const value = parseHoursValue(hours);
-  if (hours === '' || !Number.isFinite(value)) return 'none';
-  return value < HOURS_THRESHOLD ? 'low' : 'ok';
 }
 
 // Reconstruye el tablero de carnets a partir de las filas de cada hoja del Excel.
@@ -47,7 +39,7 @@ export function renderInstructorCards(
   // La casilla "seleccionar todo" actúa sobre las credenciales visibles de cada filtro.
   bindSelection(board.grid, board.selectAll);
 
-  const kinds = instructors.map((instructor) => hoursKind(instructor.hours));
+  const kinds = instructors.map((instructor) => hoursKind(effectiveHours(instructor)));
   const index = instructors.map((instructor) => normalizeText(
     `${instructor.name} ${instructor.identification} ${instructor.program}`,
   ));

@@ -18,11 +18,12 @@
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
 }
 
-/* Atmósfera de la app. El degradado es parte del contenido: nace en la parte
-   alta y se desplaza con el scroll en vez de quedarse fijo a la ventana. */
+/* Atmósfera de la app: el degradado queda fijo a la ventana, arranca bajo la
+   barra de título y no acompaña al scroll, así los focos de color permanecen
+   quietos mientras se recorre el contenido. */
 .main-content::before {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  inset: var(--title-bar-height) 0 0 0;
   z-index: -1;
   content: "";
   pointer-events: none;

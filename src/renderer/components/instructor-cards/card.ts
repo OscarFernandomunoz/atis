@@ -1,6 +1,6 @@
-import { HOURS_THRESHOLD, parseHoursValue } from '../excel-update/helpers.js';
 import type { Instructor } from './parse.js';
 import { createSelectionCheckbox } from './selection.js';
+import { effectiveHours, hoursView } from './hours.js';
 
 // Retrato genérico para credenciales sin foto de perfil (estilo intranet).
 const PHOTO_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
@@ -15,12 +15,23 @@ function el(tag: string, className: string, text?: string): HTMLElement {
   return node;
 }
 
+// Insignia de horas con su color según el umbral; un guion si no hay dato.
+function createHoursBadge(hours: string): HTMLElement {
+  const view = hoursView(hours);
+  const badge = el('span', `carnet-hours is-${view.kind}`);
+  badge.appendChild(el('span', 'carnet-hours-value', view.text));
+  if (view.hasHours) badge.appendChild(el('span', 'carnet-hours-unit', 'h'));
+  return badge;
+}
+
 export function createInstructorCard(instructor: Instructor, accent: string): HTMLElement {
   const card = el('article', 'carnet');
   // Color propio del programa, para el relleno y los acentos de la credencial.
   card.style.setProperty('--card-accent', accent);
   // El programa se guarda en el dataset para que el filtro pueda ocultar/mostrar la credencial.
   card.dataset.program = instructor.program;
+  // La cédula queda a mano para refrescar las horas del portal en vivo.
+  card.dataset.identification = instructor.identification;
   card.appendChild(el('span', 'carnet-band'));
 
   const top = el('div', 'carnet-top');
@@ -36,14 +47,7 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
 
   const meta = el('div', 'carnet-meta');
   meta.appendChild(el('span', 'carnet-doc', `C.C. ${instructor.identification}`));
-
-  const hoursValue = parseHoursValue(instructor.hours);
-  const hasHours = instructor.hours !== '' && Number.isFinite(hoursValue);
-  const hours = el('span', 'carnet-hours');
-  hours.classList.add(hasHours ? (hoursValue < HOURS_THRESHOLD ? 'is-low' : 'is-ok') : 'is-none');
-  hours.appendChild(el('span', 'carnet-hours-value', hasHours ? instructor.hours : '—'));
-  if (hasHours) hours.appendChild(el('span', 'carnet-hours-unit', 'h'));
-  meta.appendChild(hours);
+  meta.appendChild(createHoursBadge(effectiveHours(instructor)));
   card.appendChild(meta);
 
   const foot = el('div', 'carnet-foot');
@@ -52,4 +56,13 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   card.appendChild(foot);
 
   return card;
+}
+
+// Repinta las horas de las credenciales de una cédula (puede haber varias por programa).
+export function updateCardHours(grid: HTMLElement, identification: string, hours: string): void {
+  Array.from(grid.children).forEach((node) => {
+    if (!(node instanceof HTMLElement) || node.dataset.identification !== identification) return;
+    const badge = node.querySelector('.carnet-hours');
+    if (badge) badge.replaceWith(createHoursBadge(hours));
+  });
 }

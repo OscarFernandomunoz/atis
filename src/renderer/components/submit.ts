@@ -2,7 +2,7 @@ import type { AppElements, FileUploadState } from '../types.js';
 import { writeHoursIntoExcel } from './excel-update/index.js';
 import { highlightRow, getVisibleIdentifications } from './excel-preview.js';
 import { colorHoursCellInPreview } from './excel-update/preview-color.js';
-import { findInstructorName, selectedIdentifications } from './instructor-cards/index.js';
+import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from './instructor-cards/index.js';
 import { setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
 
 type SubmitElements = Pick<AppElements,
@@ -91,6 +91,9 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
         setPlayerTrack(elements, identification, identification ? findInstructorName(identification) : null);
         highlightRow(elements, identification);
         if (identification && hours) {
+          // El carnet pasa a mostrar las horas que reporta SofiaPlus (el span del reporte).
+          rememberLiveHours(identification, hours);
+          updateCardHours(elements.cardsGrid, identification, hours);
           colorHoursCellInPreview(elements);
         }
         if (identification) {

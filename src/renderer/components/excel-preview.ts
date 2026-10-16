@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import type { AppElements, FileUploadState } from '../types.js';
-import { clearInstructorCards, renderInstructorCards, type CardBoard } from './instructor-cards/index.js';
+import { clearInstructorCards, forgetLiveHours, renderInstructorCards, type CardBoard } from './instructor-cards/index.js';
 
 const REQUIRED_COLUMN_NUMBER = 3;
 const REQUIRED_COLUMN_NAME = `Columna ${REQUIRED_COLUMN_NUMBER}`;
@@ -46,6 +46,8 @@ function validateAndSetFile(file: File, elements: FileElements, state: FileUploa
   if (extension !== 'xls' && extension !== 'xlsx') { alert('Solo se permiten archivos Excel en formato .xls o .xlsx'); return; }
   elements.dropzoneText.innerHTML = `Archivo seleccionado: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
   elements.statusMessage.textContent = `Archivo "${file.name}" cargado. Validando ${REQUIRED_COLUMN_NAME}...`;
+  // Un archivo nuevo empieza sin horas leídas del portal.
+  forgetLiveHours();
   void refreshExcelPreview(file, elements, state);
 }
 

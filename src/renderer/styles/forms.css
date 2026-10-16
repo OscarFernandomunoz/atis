@@ -46,13 +46,43 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 18px;
+  gap: 24px 26px;
+}
+
+/* Divisor con rótulo: separa las credenciales del rango de fechas para que los
+   campos no se lean como un único bloque apretado. */
+.form-separator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 30px 0 24px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.form-separator::before,
+.form-separator::after {
+  height: 1px;
+  background: color-mix(in srgb, #fff 10%, transparent);
+  content: "";
+}
+
+.form-separator::before {
+  width: 26px;
+  flex: 0 0 auto;
+}
+
+.form-separator::after {
+  flex: 1;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 9px;
   min-width: 0;
 }
 

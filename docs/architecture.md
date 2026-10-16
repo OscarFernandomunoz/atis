@@ -70,10 +70,18 @@ src/
 │   │   │   ├── render.ts                 # Render y combinación de filtros
 │   │   │   ├── filter.ts                 # Filtro por programa
 │   │   │   ├── hours-filter.ts           # Filtro por horas
+│   │   │   ├── hours.ts                  # Horas del portal (en vivo) y su clasificación
 │   │   │   ├── search.ts                 # Búsqueda por nombre o documento
 │   │   │   ├── selection.ts              # Casillas y "seleccionar todo"
 │   │   │   ├── palette.ts                # Color por programa
 │   │   │   └── roster.ts                 # Cédula -> nombre para la barra
+│   │   ├── months-showcase/              # Carrusel de paisajes y rango de fechas
+│   │   │   ├── index.ts                  # API pública del carrusel
+│   │   │   ├── showcase.ts               # Montaje y sincronización con las fechas
+│   │   │   ├── card.ts                   # Tarjeta y selector de cada mes
+│   │   │   ├── months.ts                 # Datos de los doce meses
+│   │   │   ├── selection.ts              # Rango de meses contiguo
+│   │   │   └── date-range.ts             # Vuelca el rango en los inputs de fecha
 │   │   ├── player-bar/                   # Barra tipo reproductor (cédula, play y progreso)
 │   │   │   ├── index.ts                  # API pública de la barra
 │   │   │   ├── player-bar.ts             # Inicialización de la barra

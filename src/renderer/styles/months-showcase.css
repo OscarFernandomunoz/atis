@@ -20,7 +20,7 @@
 
 .months-track {
   display: flex;
-  gap: 18px;
+  gap: 40px;
   overflow-x: auto;
   padding: 6px 4px 14px;
   scroll-snap-type: x proximity;
@@ -78,24 +78,51 @@
   transform: scale(1.07);
 }
 
-.month-card-badge {
+/* Selector del mes: casilla redonda glass sobre la foto, en la esquina. */
+.month-card-select {
   position: absolute;
   top: 10px;
   left: 10px;
   display: grid;
   place-items: center;
-  width: 27px;
-  height: 27px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.52);
-  color: #ffffff;
+  background: rgba(0, 0, 0, 0.46);
   backdrop-filter: blur(6px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: background-color 200ms var(--ease-smooth), border-color 200ms var(--ease-smooth), color 200ms var(--ease-smooth), transform 200ms var(--ease-out);
 }
 
-.month-card-badge svg {
-  width: 16px;
-  height: 16px;
+.month-card-select svg {
+  width: 17px;
+  height: 17px;
+}
+
+.month-card-select:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.08);
+}
+
+.month-card-select:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.month-card-select.is-selected {
+  color: #17170f;
+  border-color: var(--card-accent);
+  background: var(--card-accent);
+}
+
+/* Realce de la tarjeta cuyo mes entra en el rango. */
+.month-card.is-selected {
+  border-color: var(--card-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--card-accent) 60%, transparent), var(--shadow);
 }
 
 .month-card-label {

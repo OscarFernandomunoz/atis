@@ -5,7 +5,8 @@
  * sobre una base negra flotan focos de color difuminados, sesgados hacia la
  * parte superior como el encabezado de la app. El resultado se publica en la
  * variable CSS `--app-gradient` y es el CSS quien decide dónde pintarlo
- * (`body::before`); así este módulo no depende del layout ni del tema activo.
+ * (`.main-content::before`, fijo a la ventana); así este módulo no depende del
+ * layout ni del tema activo.
  */
 
 /** Familias de tono base; cada foco se deriva de una de ellas con leves desvíos. */
@@ -69,7 +70,7 @@ function createBlobs(): Blob[] {
     radiusY: randomInt(55, 95),
     fadeStop: randomInt(72, 90),
     hue: (baseHue + randomInt(-60, 60) + 360) % 360,
-    alpha: Number(randomInRange(0.14, 0.26).toFixed(2)),
+    alpha: Number(randomInRange(0.07, 0.14).toFixed(2)),
   }));
 }
 

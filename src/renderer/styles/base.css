@@ -18,8 +18,8 @@ body {
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
 }
 
-/* El degradado ambiental vive dentro del contenido (`.main-content`), no aquí:
-   así acompaña al scroll en lugar de quedarse clavado a la ventana. */
+/* El degradado ambiental lo pinta `.main-content::before` en posición fija:
+   se mantiene quieto a la ventana mientras el contenido hace scroll. */
 
 html {
   width: 100%;
