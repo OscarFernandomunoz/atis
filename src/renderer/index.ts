@@ -1,6 +1,7 @@
 import { initFileHandling } from './components/excel-preview.js';
-import { initLiveContext, initClock } from './components/live-context.js';
 import { initMonthsShowcase } from './components/months-showcase.js';
+import { initPreviewModal } from './components/preview-modal.js';
+import { initPlayerBar } from './components/player-bar/index.js';
 import { initSubmit } from './components/submit.js';
 import { initTitleBar } from './components/title-bar.js';
 import { initDynamicBackground } from './theme/index.js';
@@ -8,16 +9,29 @@ import type { AppElements, FileUploadState } from './types.js';
 
 function getElements(): AppElements {
   return {
-    clock: document.getElementById('clock') as HTMLElement,
-    date: document.getElementById('currentDate') as HTMLElement,
-    city: document.getElementById('currentCity') as HTMLElement,
-    weather: document.getElementById('weather') as HTMLElement,
-    weatherIcon: document.getElementById('weatherIcon') as HTMLElement,
     dropzone: document.getElementById('dropzone') as HTMLElement,
     fileInput: document.getElementById('fileInput') as HTMLInputElement,
     dropzoneText: document.getElementById('dropzoneText') as HTMLElement,
     excelPreview: document.getElementById('excelPreview') as HTMLElement,
-    uploadButton: document.getElementById('btnUpload') as HTMLButtonElement,
+    previewOpenButton: document.getElementById('previewOpenButton') as HTMLButtonElement,
+    previewModal: document.getElementById('previewModal') as HTMLElement,
+    previewBackdrop: document.getElementById('previewBackdrop') as HTMLElement,
+    previewCloseButton: document.getElementById('previewCloseButton') as HTMLButtonElement,
+    playerTableButton: document.getElementById('playerTableButton') as HTMLButtonElement,
+    cardsGrid: document.getElementById('cardsGrid') as HTMLElement,
+    programFilter: document.getElementById('programFilter') as HTMLElement,
+    hoursFilter: document.getElementById('hoursFilter') as HTMLElement,
+    cardsSearch: document.getElementById('cardsSearch') as HTMLInputElement,
+    cardsSelectAll: document.getElementById('cardsSelectAll') as HTMLInputElement,
+    cardsCount: document.getElementById('cardsCount') as HTMLElement,
+    cardsEmpty: document.getElementById('cardsEmpty') as HTMLElement,
+    playButton: document.getElementById('playerPlay') as HTMLButtonElement | null,
+    playerIdentification: document.getElementById('playerIdentification') as HTMLElement,
+    playerInstructorName: document.getElementById('playerInstructorName') as HTMLElement,
+    playerProgressCurrent: document.getElementById('playerProgressCurrent') as HTMLElement,
+    playerProgressTotal: document.getElementById('playerProgressTotal') as HTMLElement,
+    playerTrack: document.getElementById('playerTrack') as HTMLElement,
+    playerProgressFill: document.getElementById('playerProgressFill') as HTMLElement,
     statusMessage: document.getElementById('statusMessage') as HTMLElement,
     inputUser: document.getElementById('usuario') as HTMLInputElement,
     inputPass: document.getElementById('password') as HTMLInputElement,
@@ -29,8 +43,7 @@ function getElements(): AppElements {
 function enforceSvgIconVisibility(): void {
   const selectors = [
     '.svg-icon-path', '.svg-cloud', '.svg-arrow',
-    '.svg-weather-cloud', '.svg-clock-hands', '.svg-check',
-    '.svg-lock-core', '.svg-cal-dot',
+    '.svg-check', '.svg-lock-core', '.svg-cal-dot',
   ];
   document.querySelectorAll<SVGElement | HTMLElement>(selectors.join(',')).forEach((el) => {
     if (el instanceof SVGElement || el instanceof HTMLElement) {
@@ -41,7 +54,7 @@ function enforceSvgIconVisibility(): void {
       el.style.setProperty('display', '', 'important');
     }
   });
-  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .status-icon, .btn-icon, .cloud-icon, .upload-arrow-icon').forEach((svg) => {
+  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .btn-icon, .cloud-icon, .upload-arrow-icon').forEach((svg) => {
     svg.style.setProperty('opacity', '1', 'important');
     svg.style.setProperty('visibility', 'visible', 'important');
     svg.style.removeProperty('animation-play-state');
@@ -50,7 +63,7 @@ function enforceSvgIconVisibility(): void {
 
 function initIconScrollAnimations(): void {
   const icons = Array.from(document.querySelectorAll<HTMLElement>(
-    '.app-icon, .status-icon, .input-icon, .dropzone-icon .cloud-icon, .dropzone-icon .upload-arrow-icon, .btn-icon',
+    '.app-icon, .input-icon, .dropzone-icon .cloud-icon, .dropzone-icon .upload-arrow-icon, .btn-icon',
   ));
   if (!icons.length) return;
 
@@ -97,9 +110,9 @@ function initApp(): void {
   initDynamicBackground();
   initTitleBar();
   initMonthsShowcase();
-  initClock(elements);
-  void initLiveContext(elements);
+  initPlayerBar(elements);
   initFileHandling(elements, state);
+  initPreviewModal(elements);
   initSubmit(elements, state);
   initIconScrollAnimations();
 }

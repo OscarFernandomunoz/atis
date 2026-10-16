@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import type { AppElements, FileUploadState } from '../types.js';
+import { clearInstructorCards, renderInstructorCards, type CardBoard } from './instructor-cards/index.js';
 
 const REQUIRED_COLUMN_NUMBER = 3;
 const REQUIRED_COLUMN_NAME = `Columna ${REQUIRED_COLUMN_NUMBER}`;
@@ -8,7 +9,19 @@ const REQUIRED_COLUMN_NAMES = [REQUIRED_COLUMN_NAME, ALTERNATIVE_COLUMN_NAME];
 const REQUIRED_COLUMN_LABEL = `${REQUIRED_COLUMN_NAME} o ${ALTERNATIVE_COLUMN_NAME}`;
 const DROPZONE_HINT = `Arrastra y suelta tu archivo de nómina aquí (.xls, .xlsx). Obligatorio. Debe incluir ${REQUIRED_COLUMN_LABEL}.`;
 
-export type FileElements = Pick<AppElements, 'dropzone' | 'fileInput' | 'dropzoneText' | 'excelPreview' | 'statusMessage'>;
+export type FileElements = Pick<AppElements, 'dropzone' | 'fileInput' | 'dropzoneText' | 'excelPreview' | 'cardsGrid' | 'programFilter' | 'hoursFilter' | 'cardsSearch' | 'cardsSelectAll' | 'cardsCount' | 'cardsEmpty' | 'statusMessage'>;
+
+function cardBoard(elements: FileElements): CardBoard {
+  return {
+    grid: elements.cardsGrid,
+    programFilter: elements.programFilter,
+    hoursFilter: elements.hoursFilter,
+    search: elements.cardsSearch,
+    selectAll: elements.cardsSelectAll,
+    count: elements.cardsCount,
+    empty: elements.cardsEmpty,
+  };
+}
 
 export function initFileHandling(elements: FileElements, state: FileUploadState): void {
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
@@ -39,6 +52,7 @@ function validateAndSetFile(file: File, elements: FileElements, state: FileUploa
 export async function refreshExcelPreview(file: File, elements: FileElements, state: FileUploadState): Promise<void> {
   elements.excelPreview.replaceChildren();
   elements.excelPreview.textContent = 'Leyendo información del Excel...';
+  clearInstructorCards(cardBoard(elements));
   try {
     const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
     // Detectar si alguna hoja tiene filtro autofilter aplicado (Excel nativo)
@@ -98,6 +112,10 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     elements.dropzone.classList.remove('dropzone-error');
     elements.dropzone.classList.add('dropzone-valid');
     elements.excelPreview.replaceChildren(fragment);
+    // Con las tablas ya montadas, el filtro de carnets oculta las filas que no aplican.
+    renderInstructorCards(cardBoard(elements), sheetFilterInfos.map(({ rows }) => rows), (visible) => {
+      applyCardFilter(elements, visible);
+    });
     if (!firstIdentification) {
       elements.statusMessage.textContent = `Información de ${file.name} lista para revisar. ${REQUIRED_COLUMN_LABEL} presente, pero no se encontraron cédulas válidas.`;
     }
@@ -168,6 +186,8 @@ export function highlightRow(elements: FileElements, identification: string | nu
     return cells.some((cell) => cell === identification || cell.includes(identification));
   });
   target?.classList.add('excel-row-active');
+  // La tabla vive en una ventana interna: al resaltar hay que acercar la fila.
+  target?.scrollIntoView({ block: 'nearest' });
 }
 
 function rejectFile(elements: FileElements, state: FileUploadState, message: string): void {
@@ -178,6 +198,7 @@ function rejectFile(elements: FileElements, state: FileUploadState, message: str
   elements.dropzone.classList.add('dropzone-error');
   elements.dropzoneText.textContent = DROPZONE_HINT;
   elements.excelPreview.textContent = message;
+  clearInstructorCards(cardBoard(elements));
   elements.statusMessage.textContent = message;
   alert(message);
 }
@@ -194,10 +215,34 @@ function createTable(rows: unknown[][], requiredColumnIndex: number): HTMLTableE
       if (cellIndex === requiredColumnIndex) tableCell.classList.add('excel-required-column');
       tableRow.appendChild(tableCell);
     });
+    // Se guarda la cédula de la fila para que el filtro de carnets pueda ocultarla.
+    if (rowIndex > 0 && requiredColumnIndex >= 0) {
+      const identification = String((row ?? [])[requiredColumnIndex] ?? '').trim();
+      if (identification.replace(/\D/g, '').length >= 6) tableRow.dataset.identification = identification;
+    }
     (rowIndex === 0 ? head : body).appendChild(tableRow);
   });
   table.append(head, body);
   return table;
+}
+
+// Una fila del preview se oculta por el filtro de carnets o por el buscador de la tabla.
+function isRowHidden(row: HTMLTableRowElement): boolean {
+  return row.dataset.cardHidden === 'true' || row.dataset.searchHidden === 'true';
+}
+
+// Oculta en la vista previa las filas cuya cédula no pasó el filtro de carnets.
+// `visible === null` significa que no hay filtro activo y se muestran todas las filas.
+function applyCardFilter(elements: FileElements, visible: string[] | null): void {
+  const allowed = visible === null ? null : new Set(visible);
+  elements.excelPreview.querySelectorAll('table').forEach((table) => {
+    Array.from(table.tBodies[0]?.rows ?? []).forEach((row) => {
+      const identification = row.dataset.identification ?? '';
+      const shownByCards = allowed === null || (identification !== '' && allowed.has(identification));
+      row.dataset.cardHidden = shownByCards ? 'false' : 'true';
+      row.hidden = isRowHidden(row);
+    });
+  });
 }
 
 function createFilterBar(table: HTMLTableElement): HTMLDivElement {
@@ -239,9 +284,11 @@ function createFilterBar(table: HTMLTableElement): HTMLDivElement {
       rowsCollection.forEach((row, rowIndex) => {
         const values = rowValues[rowIndex] ?? [];
         const cellVal = selectedColumn !== null ? values[selectedColumn] : undefined;
-        row.hidden = Boolean(value) && !(selectedColumn === null
+        const matches = !value || (selectedColumn === null
           ? values.some((cellValue) => cellValue.includes(value))
           : Boolean(cellVal?.includes(value)));
+        row.dataset.searchHidden = matches ? 'false' : 'true';
+        row.hidden = isRowHidden(row);
       });
     });
   };

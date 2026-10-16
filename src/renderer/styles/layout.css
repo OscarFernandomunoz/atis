@@ -10,11 +10,27 @@
 }
 
 .main-content {
+  position: relative;
   flex: 1;
   min-width: 0;
   overflow-y: auto;
   background: transparent;
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
+}
+
+/* Atmósfera de la app. El degradado es parte del contenido: nace en la parte
+   alta y se desplaza con el scroll en vez de quedarse fijo a la ventana. */
+.main-content::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  will-change: background;
+  background-color: var(--bg);
+  background-image: var(--app-gradient);
+  transition: background 300ms var(--ease-smooth);
+  animation: background-fade 900ms var(--ease-out) both;
 }
 
 .content-header {
@@ -30,7 +46,7 @@
   z-index: 10;
 }
 
-/* content-header::before removido - ya no necesario, el gradient ahora es en body::before */
+/* El encabezado vive por encima del degradado ambiental; no necesita fondo propio. */
 
 .content-header>* {
   position: relative;
@@ -69,20 +85,12 @@
 }
 
 .dashboard-panel {
-  width: min(100% - clamp(40px, 10vw, 128px), 980px);
-  margin: 0 auto 30px;
-  padding: clamp(24px, 4vw, 44px);
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  border-top-color: transparent;
-  border-radius: 18px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  transition: background-color 260ms var(--ease-smooth), border-color 260ms var(--ease-smooth), box-shadow 260ms var(--ease-smooth);
-}
-
-:root[data-theme='dark'] .dashboard-panel {
-  border-color: transparent;
-  box-shadow: none;
+  /* Sin fondo ni borde propios: el degradado ambiental pasa por detrás, igual
+     que en las secciones de paisajes y carnets. Solo aporta el margen lateral
+     compartido para que formulario, vista previa y carnets quedan alineados. */
+  width: 100%;
+  margin: 0 auto var(--section-gap);
+  padding: 0 clamp(20px, 5vw, 64px);
 }
 
 .panel-heading {

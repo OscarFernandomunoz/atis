@@ -13,51 +13,22 @@
 }
 
 @media (max-width: 900px) {
-  .status-bar {
-    gap: 8px;
-    padding-inline: 10px;
-  }
-
-  .status-items {
-    gap: 6px;
-  }
-
-  .status-label {
-    display: none;
-  }
-
-  .status-item {
-    gap: 7px;
-    padding-right: 8px;
-  }
-
-  .status-value,
-  .status-date-item .status-value {
-    max-width: 155px;
-  }
-
-  .status-message {
-    max-width: 22%;
-    padding-inline: 9px;
+  .player-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 14px;
+    padding-inline: 12px;
   }
 }
 
-@media (max-width: 780px) {
-  .status-date-item,
-  .status-date-item + .status-divider {
-    display: none;
-  }
-
-  .status-location-item .status-value,
-  .status-weather-item .status-value {
-    max-width: 125px;
+@media (max-width: 760px) {
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
   :root {
     --section-gap: 28px;
-    --excel-preview-gap: 36px;
   }
 
   .content-header {
@@ -66,8 +37,7 @@
   }
 
   .dashboard-panel {
-    width: calc(100% - 40px);
-    padding: 22px 16px;
+    padding: 0 20px;
   }
 
   .panel-heading {
@@ -76,22 +46,6 @@
 
   .panel-status {
     margin-top: 12px;
-  }
-
-  .access-card {
-    padding: 16px 12px;
-  }
-
-  .form-group {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .form-group label {
-    width: auto;
-    padding: 0;
-    text-align: left;
   }
 
   .dropzone {
@@ -119,15 +73,21 @@
     min-width: 0;
   }
 
-  .status-bar {
-    gap: 8px;
-    min-height: 44px;
-    padding: 4px 10px;
-    overflow: hidden;
+  .player-bar {
+    gap: 12px;
+    min-height: 60px;
+    padding: 8px 12px;
   }
 
-  .status-bar .status-message,
-  .status-bar .status-divider:last-of-type {
+  .player-artwork {
+    display: none;
+  }
+
+  .player-progress {
+    gap: 8px;
+  }
+
+  .player-time-total {
     display: none;
   }
 }

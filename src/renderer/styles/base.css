@@ -13,26 +13,13 @@ body {
   flex-direction: column;
   overflow: hidden;
   background: var(--bg);
-  background-attachment: fixed;
   color: var(--text);
   font-family: "Aptos", "Segoe UI", sans-serif;
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
 }
 
-body::before {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  content: "";
-  pointer-events: none;
-  will-change: background;
-  background-color: var(--bg);
-  background-image: var(--app-gradient);
-  transition: background 300ms var(--ease-smooth);
-  animation: background-fade 900ms var(--ease-out) both;
-}
-
-/* El gradiente es la atmósfera de la app; el contenido vive por encima en z-index 1. */
+/* El degradado ambiental vive dentro del contenido (`.main-content`), no aquí:
+   así acompaña al scroll en lugar de quedarse clavado a la ventana. */
 
 html {
   width: 100%;
@@ -42,8 +29,7 @@ html {
 
 /* Anillo de foco compartido por los controles interactivos principales. */
 .btn-submit:focus-visible,
-.dropzone:focus-visible,
-.input-control:focus-visible {
+.dropzone:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent) 30%, transparent);
   outline-offset: 2px;
 }

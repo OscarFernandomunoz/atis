@@ -2,23 +2,21 @@ import type { AppElements, FileUploadState } from '../types.js';
 import { writeHoursIntoExcel } from './excel-update/index.js';
 import { highlightRow, getVisibleIdentifications } from './excel-preview.js';
 import { colorHoursCellInPreview } from './excel-update/preview-color.js';
+import { findInstructorName, selectedIdentifications } from './instructor-cards/index.js';
+import { setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
 
-function setSubmitState(button: HTMLButtonElement, state: 'idle' | 'loading' | 'success' | 'error'): void {
-  const label = button.querySelector<HTMLSpanElement>('.btn-label');
-  button.classList.remove('is-loading', 'is-success');
-  if (state === 'loading') {
-    button.classList.add('is-loading');
-    if (label) label.textContent = 'Iniciando sesión...';
-  } else if (state === 'success') {
-    button.classList.add('is-success');
-    if (label) label.textContent = 'Sesión abierta correctamente';
-  } else if (label) {
-    label.textContent = 'Iniciar sesión en SofiaPlus';
-  }
-}
+type SubmitElements = Pick<AppElements,
+  | 'playButton' | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent' | 'playerProgressTotal' | 'playerTrack' | 'playerProgressFill'
+  | 'statusMessage' | 'dropzone' | 'dropzoneText' | 'fileInput' | 'excelPreview' | 'cardsGrid'
+  | 'programFilter' | 'hoursFilter' | 'cardsSearch' | 'cardsSelectAll' | 'cardsCount' | 'cardsEmpty'
+  | 'inputUser' | 'inputPass' | 'inputStartDate' | 'inputEndDate'>;
 
-export function initSubmit(elements: Pick<AppElements, 'uploadButton' | 'statusMessage' | 'dropzone' | 'dropzoneText' | 'fileInput' | 'excelPreview' | 'inputUser' | 'inputPass' | 'inputStartDate' | 'inputEndDate'>, state: FileUploadState): void {
-  elements.uploadButton.addEventListener('click', async () => {
+export function initSubmit(elements: SubmitElements, state: FileUploadState): void {
+  const button = elements.playButton;
+  // La barra del reproductor monta el botón; si aún no está, no hay nada que inicializar.
+  if (!button) return;
+
+  button.addEventListener('click', async () => {
     if (!elements.inputUser.value || !elements.inputPass.value) { alert('Ingrese las credenciales de acceso.'); return; }
     if (!state.file) {
       elements.dropzone.classList.add('dropzone-error');
@@ -32,9 +30,25 @@ export function initSubmit(elements: Pick<AppElements, 'uploadButton' | 'statusM
       alert('No hay cédulas visibles con el filtro actual. Ajusta o limpia el filtro para continuar.');
       return;
     }
+
+    // La automatización solo procesa lo marcado con las casillas (dentro de lo visible).
+    const selected = selectedIdentifications(elements.cardsGrid);
+    const targets = visibleIdentifications.filter((identification) => selected.has(identification));
+    if (targets.length === 0) {
+      elements.statusMessage.textContent = 'Marca con la casilla los instructores que quieres procesar.';
+      alert('Selecciona al menos un instructor para iniciar la automatización.');
+      return;
+    }
+
+    // El progreso se cuenta por cédula única: onProgress avisa dos veces por instructor.
+    const total = targets.length;
+    const processedIds = new Set<string>();
+    setPlayerTrack(elements, null);
+    setPlayerProgress(elements, 0, total);
+
     state.isUploading = true;
-    elements.uploadButton.disabled = true;
-    setSubmitState(elements.uploadButton, 'loading');
+    button.disabled = true;
+    setPlayerState(elements, 'loading');
     elements.statusMessage.textContent = 'Abriendo SofiaPlus, llenando los campos e iniciando sesión...';
     try {
       const results = await window.electronAPI.openSofiaAndFill({
@@ -42,16 +56,21 @@ export function initSubmit(elements: Pick<AppElements, 'uploadButton' | 'statusM
         password: elements.inputPass.value,
         startDate: elements.inputStartDate.value,
         endDate: elements.inputEndDate.value,
-        identification: visibleIdentifications[0] ?? '',
-        identifications: visibleIdentifications,
+        identification: targets[0] ?? '',
+        identifications: targets,
       }, (identification, hours) => {
         state.currentIdentification = identification;
+        setPlayerTrack(elements, identification, identification ? findInstructorName(identification) : null);
         highlightRow(elements, identification);
         if (identification && hours) {
           colorHoursCellInPreview(elements);
         }
+        if (identification) {
+          processedIds.add(identification);
+          setPlayerProgress(elements, processedIds.size, total);
+        }
       });
-      setSubmitState(elements.uploadButton, 'success');
+      setPlayerState(elements, 'success');
       const found = results.filter((r) => r.totalHours);
       console.log('[AIA][Excel] Resultados SofiaPlus:', results);
       elements.statusMessage.textContent = found.length > 0
@@ -67,17 +86,16 @@ export function initSubmit(elements: Pick<AppElements, 'uploadButton' | 'statusM
         console.error('[AIA][Excel] No se pudo actualizar el Excel.', updateError);
         elements.statusMessage.textContent = `No se pudo actualizar el Excel: ${updateError instanceof Error ? updateError.message : String(updateError)}`;
       }
-      window.setTimeout(() => setSubmitState(elements.uploadButton, 'idle'), 2500);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const userMessage = message.includes('rol necesario') ? message : 'No se pudo abrir SofiaPlus. Revisa tu conexión e inténtalo nuevamente.';
       elements.statusMessage.textContent = userMessage;
-      setSubmitState(elements.uploadButton, 'error');
+      setPlayerState(elements, 'error');
       alert(userMessage);
     } finally {
       state.isUploading = false;
-      elements.uploadButton.disabled = false;
-      window.setTimeout(() => setSubmitState(elements.uploadButton, 'idle'), 2800);
+      button.disabled = false;
+      window.setTimeout(() => setPlayerState(elements, 'idle'), 2800);
     }
   });
 }

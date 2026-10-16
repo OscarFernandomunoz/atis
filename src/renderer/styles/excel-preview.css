@@ -14,6 +14,11 @@
   animation: content-enter 420ms var(--ease-out) both;
 }
 
+/* Sin vista previa no reserva espacio: antes ese hueco separaba del botón de envío. */
+.excel-preview:empty {
+  display: none;
+}
+
 .excel-preview section {
   min-width: 0;
   padding: 18px;

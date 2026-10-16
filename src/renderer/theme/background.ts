@@ -69,7 +69,7 @@ function createBlobs(): Blob[] {
     radiusY: randomInt(55, 95),
     fadeStop: randomInt(72, 90),
     hue: (baseHue + randomInt(-60, 60) + 360) % 360,
-    alpha: Number(randomInRange(0.24, 0.44).toFixed(2)),
+    alpha: Number(randomInRange(0.14, 0.26).toFixed(2)),
   }));
 }
 
