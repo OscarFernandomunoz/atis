@@ -31,7 +31,7 @@ interface Blob {
   fadeStop: number;
   /** Tono final, ya desplazado respecto de la familia elegida. */
   hue: number;
-  /** Opacidad del color sobre el negro; baja para que el negro siga dominando. */
+  /** Opacidad del color sobre el negro; más alta para que el foco se note. */
   alpha: number;
 }
 
@@ -70,7 +70,7 @@ function createBlobs(): Blob[] {
     radiusY: randomInt(55, 95),
     fadeStop: randomInt(72, 90),
     hue: (baseHue + randomInt(-60, 60) + 360) % 360,
-    alpha: Number(randomInRange(0.07, 0.14).toFixed(2)),
+    alpha: Number(randomInRange(0.13, 0.23).toFixed(2)),
   }));
 }
 

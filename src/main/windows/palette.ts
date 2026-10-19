@@ -2,7 +2,7 @@
 // script de cromo que se inyecta en las páginas remotas.
 export const TITLE_BAR_THEME_COLORS = {
   light: { background: '#f7f7f5', text: '#5f5f5b', border: '#f7f7f5' },
-  dark: { background: '#181818', text: '#c7c7c4', border: '#181818' },
+  dark: { background: '#000000', text: '#c7c7c4', border: '#000000' },
 } as const;
 
 export const TITLE_BAR_OVERLAY_COLORS = {

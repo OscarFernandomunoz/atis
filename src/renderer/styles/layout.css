@@ -14,6 +14,9 @@
   flex: 1;
   min-width: 0;
   overflow-y: auto;
+  /* Deja hueco al final para que el contenido pueda subir por encima de la
+     barra del reproductor, que flota translúcida sobre el scroll. */
+  padding-bottom: calc(var(--player-bar-height) + 32px);
   background: transparent;
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
 }
@@ -43,7 +46,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 48px clamp(20px, 5vw, 64px) 28px;
+  padding: 48px clamp(20px, 5vw, 64px) 40px;
   background: transparent;
   -webkit-app-region: no-drag;
   z-index: 10;

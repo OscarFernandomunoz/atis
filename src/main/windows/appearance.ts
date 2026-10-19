@@ -31,7 +31,7 @@ function getWindowAppearanceOptions(
   if (process.platform === 'darwin') {
     return {
       titleBarStyle: 'hiddenInset',
-      trafficLightPosition: { x: 14, y: 12 },
+      trafficLightPosition: { x: 16, y: 18 },
     };
   }
 

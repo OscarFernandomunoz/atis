@@ -60,8 +60,9 @@
   --pastel-10: #f6caa8;
   --pastel-11: #b7e3b1;
   --pastel-12: #f6c39b;
-  --section-gap: 40px;
-  --title-bar-height: 36px;
+  --section-gap: 56px;
+  --player-bar-height: 88px;
+  --title-bar-height: 48px;
   --title-bar-overlay-width: 138px;
   --title-bar-overlay-center-offset: 69px;
   --title-bar-bg: #000000;

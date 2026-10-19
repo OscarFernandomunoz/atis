@@ -2,12 +2,12 @@
 
 .months-showcase {
   width: 100%;
-  margin: 2px 0 var(--section-gap);
+  margin: 10px 0 var(--section-gap);
   padding: 0 clamp(20px, 5vw, 64px);
 }
 
 .months-showcase-heading {
-  margin-bottom: 14px;
+  margin-bottom: 22px;
 }
 
 .months-showcase-title {
@@ -20,7 +20,7 @@
 
 .months-track {
   display: flex;
-  gap: 40px;
+  gap: 56px;
   overflow-x: auto;
   padding: 6px 4px 14px;
   scroll-snap-type: x proximity;
