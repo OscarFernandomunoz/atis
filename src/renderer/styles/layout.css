@@ -46,7 +46,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 48px clamp(20px, 5vw, 64px) 40px;
+  padding: 48px clamp(20px, 5vw, 64px) 48px;
   background: transparent;
   -webkit-app-region: no-drag;
   z-index: 10;
