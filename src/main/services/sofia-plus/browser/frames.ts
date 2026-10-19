@@ -14,7 +14,7 @@ export function trackChildWindow(parent: BrowserWindow, child: BrowserWindow): v
   child.on('closed', () => childWindows.get(parent)?.delete(child));
 }
 
-function getTrackedChildWindows(parent: BrowserWindow): ReadonlySet<BrowserWindow> {
+export function getTrackedChildWindows(parent: BrowserWindow): ReadonlySet<BrowserWindow> {
   return childWindows.get(parent) ?? new Set<BrowserWindow>();
 }
 

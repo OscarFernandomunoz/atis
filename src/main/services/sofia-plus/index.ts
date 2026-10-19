@@ -13,6 +13,7 @@ import {
 import { clickInstructorResultLink, clickInstructorSearchInput, fillInstructorIdentification, fillReportDates, markIdentificationTypeSelect, readTotalHours, selectCitizenshipId, selectLearningResultsOption, submitInstructorTimesReport } from './report/index.js';
 import type { InstructorHours, SofiaCredentials } from './types.js';
 import { resetAutomationPause, waitIfPaused } from './flow/pause-gate.js';
+import { resetSofiaSession } from './flow/session-reset.js';
 import { showStepBanner } from './flow/step-banner.js';
 import { loadWindow } from './flow/window-loader.js';
 
@@ -27,8 +28,13 @@ async function markStep(window: BrowserWindow, stepNumber: number, stepTitle: st
 }
 
 // Ejecuta el flujo completo: login, navegación, selección de fechas y preparación del reporte.
-export async function openSofiaPlus(credentials: SofiaCredentials, onProgress?: (identification: string | null, hours: string | null) => void): Promise<InstructorHours[]> {
+export async function openSofiaPlus(
+  credentials: SofiaCredentials,
+  onProgress?: (identification: string | null, hours: string | null) => void,
+): Promise<InstructorHours[]> {
   resetAutomationPause();
+  // Cada corrida empieza sin cookies ni caché: el portal siempre arranca en el login.
+  await resetSofiaSession();
   const window = await loadWindow();
   await markStep(window, 1, '🔐 Llenando credenciales y haciendo login');
   await booleanScript(window, `(${fillSofiaInputs.toString()})(${JSON.stringify(credentials)})`, 'No se encontraron los campos de acceso de SofiaPlus.');

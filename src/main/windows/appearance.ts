@@ -110,6 +110,8 @@ export function registerRemoteWindow(window: BrowserWindow): void {
 
   window.webContents.setWindowOpenHandler(() => ({
     action: 'allow',
+    // Las emergentes del portal (diálogo de instructor, etc.) acompañan a la ventana visible
+    // de SofiaPlus y conservan su mismo aspecto.
     overrideBrowserWindowOptions: getAppWindowOptions(getCurrentTitleBarTheme()),
   }));
 

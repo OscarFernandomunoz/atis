@@ -6,6 +6,7 @@ import { applyHoursMultipleWithExcel, type ApplyHoursMultiplePayload } from '../
 import { showSystemNotification } from '../services/notifications.js';
 import { readSettings, updateSettings } from '../services/settings.js';
 import { applyTitleBarTheme } from '../windows/appearance.js';
+import { resetSofiaSession } from '../services/sofia-plus/flow/session-reset.js';
 import type { NotificationPermission, SystemNotification } from '../../shared/notifications.js';
 
 // Envía un evento de progreso al renderer (resaltado de fila y horas en la vista previa).
@@ -21,10 +22,17 @@ export function registerIpcHandlers(): void {
     // Ejecuta el flujo completo de login y manejo de SofiaPlus con las credenciales recibidas.
     ipcMain.handle('sofia:open-and-fill', async (event, credentials: SofiaCredentials): Promise<InstructorHours[]> => {
       try {
-        return await openSofiaPlus(credentials, (identification, hours) => sendProgress(event.sender, identification, hours));
+        return await openSofiaPlus(
+          credentials,
+          (identification, hours) => sendProgress(event.sender, identification, hours),
+        );
       } catch (error) {
         console.error('[AIA][SofiaPlus] No se pudo completar el flujo de automatización.', error);
         throw error;
+      } finally {
+        // Al terminar (con éxito o con error) se cierra la ventana del portal y se borra su
+        // sesión: la próxima corrida vuelve a empezar desde el login, sin quedarse abierta.
+        await resetSofiaSession();
       }
     });
 

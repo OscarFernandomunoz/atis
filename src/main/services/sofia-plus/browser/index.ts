@@ -2,7 +2,7 @@
 // ventanas, parches de página, frames y acciones de clic.
 export { patchBlockUiScript } from './block-ui-patch.js';
 export { booleanScript, clickScript, markClickPoint } from './click.js';
-export { executeInAllFrames, executeInEveryFrame, executeInFrames, trackChildWindow } from './frames.js';
+export { executeInAllFrames, executeInEveryFrame, executeInFrames, getTrackedChildWindows, trackChildWindow } from './frames.js';
 export { patchEsperaGuardarScript } from './espera-guardar-patch.js';
 export { clearPageMarkers, clearPageMarkersScript } from './markers.js';
 export { patchOpenerShimScript } from './opener-shim-patch.js';
