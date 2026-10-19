@@ -8,19 +8,22 @@ const CHECK_ICON = `
   </svg>
 `;
 
-// La tarjeta y su selector, que el showcase necesita para marcar y enganchar el clic.
+// La tarjeta completa es el control; el círculo solo refleja el estado.
 export interface MonthCardView {
-  card: HTMLElement;
-  button: HTMLButtonElement;
+  card: HTMLButtonElement;
   month: MonthCard;
 }
 
-// Tarjeta de un mes: foto, nombre y el selector en la esquina superior izquierda.
+// Tarjeta de un mes: foto, nombre y el indicador de selección en la esquina.
 export function createMonthCard(month: MonthCard): MonthCardView {
-  const card = document.createElement('article');
+  const card = document.createElement('button');
+  card.type = 'button';
   card.className = 'month-card';
+  card.setAttribute('role', 'checkbox');
+  card.setAttribute('aria-checked', 'false');
+  card.setAttribute('aria-label', `Seleccionar ${month.label}`);
 
-  const media = document.createElement('div');
+  const media = document.createElement('span');
   media.className = 'month-card-media';
 
   const photo = document.createElement('img');
@@ -30,19 +33,16 @@ export function createMonthCard(month: MonthCard): MonthCardView {
   photo.loading = 'lazy';
   photo.decoding = 'async';
 
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'month-card-select';
-  button.setAttribute('role', 'checkbox');
-  button.setAttribute('aria-checked', 'false');
-  button.setAttribute('aria-label', `Seleccionar ${month.label}`);
-  button.innerHTML = CHECK_ICON;
+  const indicator = document.createElement('span');
+  indicator.className = 'month-card-select';
+  indicator.setAttribute('aria-hidden', 'true');
+  indicator.innerHTML = CHECK_ICON;
 
   const label = document.createElement('span');
   label.className = 'month-card-label';
   label.textContent = month.label;
 
-  media.append(photo, button);
+  media.append(photo, indicator);
   card.append(media, label);
-  return { card, button, month };
+  return { card, month };
 }
