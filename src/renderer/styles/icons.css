@@ -144,45 +144,72 @@ html.icons-ready .app-icon {
   }
 }
 
-@keyframes dropzone-cloud-float {
+@keyframes dropzone-glyph-float {
 
   0%,
   100% {
-    transform: translate3d(0, 1px, 0) rotate(-1deg);
+    transform: translate3d(0, 1px, 0);
   }
 
   50% {
-    transform: translate3d(0, -3px, 0) rotate(1deg);
+    transform: translate3d(0, -2.5px, 0);
   }
 }
 
-@keyframes dropzone-arrow-float {
+@keyframes dropzone-glyph-bob {
 
   0%,
   100% {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(0, 1px, 0) scale(1);
   }
 
   50% {
-    transform: translate3d(-50%, -3px, 0);
+    transform: translate3d(0, -2px, 0) scale(1.04);
   }
 }
 
-@keyframes dropzone-arrow-launch {
+@keyframes dropzone-glyph-launch {
 
   0% {
-    transform: translate3d(-50%, 2px, 0) scale(0.9);
-    opacity: 0.55;
+    transform: translate3d(0, 2px, 0) scale(0.94);
+    opacity: 0.6;
   }
 
   55% {
-    transform: translate3d(-50%, -8px, 0) scale(1.15);
+    transform: translate3d(0, -4px, 0) scale(1.08);
     opacity: 1;
   }
 
   100% {
-    transform: translate3d(-50%, -2px, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes dropzone-dot-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-5) 55%, transparent);
+    opacity: 0.7;
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--pastel-5) 0%, transparent);
+    opacity: 1;
+  }
+}
+
+@keyframes dropzone-invite {
+
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-7) 38%, transparent),
+      0 20px 44px -28px color-mix(in srgb, #000 65%, transparent);
+  }
+
+  100% {
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--pastel-7) 0%, transparent),
+      0 20px 44px -28px color-mix(in srgb, #000 65%, transparent);
   }
 }
 

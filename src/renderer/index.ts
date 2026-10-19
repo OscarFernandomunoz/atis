@@ -1,3 +1,4 @@
+import { initDropzoneSpotlight } from './components/dropzone-spotlight.js';
 import { initFileHandling } from './components/excel-preview.js';
 import { initMonthsShowcase } from './components/months-showcase/index.js';
 import { initNotificationConsent } from './components/notifications/index.js';
@@ -55,7 +56,7 @@ function enforceSvgIconVisibility(): void {
       el.style.setProperty('display', '', 'important');
     }
   });
-  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .btn-icon, .cloud-icon, .upload-arrow-icon').forEach((svg) => {
+  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .btn-icon, .dropzone-glyph').forEach((svg) => {
     svg.style.setProperty('opacity', '1', 'important');
     svg.style.setProperty('visibility', 'visible', 'important');
     svg.style.removeProperty('animation-play-state');
@@ -64,7 +65,7 @@ function enforceSvgIconVisibility(): void {
 
 function initIconScrollAnimations(): void {
   const icons = Array.from(document.querySelectorAll<HTMLElement>(
-    '.app-icon, .input-icon, .dropzone-icon .cloud-icon, .dropzone-icon .upload-arrow-icon, .btn-icon',
+    '.app-icon, .input-icon, .dropzone-icon .dropzone-glyph, .btn-icon',
   ));
   if (!icons.length) return;
 
@@ -113,6 +114,7 @@ function initApp(): void {
   initNotificationConsent();
   initMonthsShowcase();
   initPlayerBar(elements);
+  initDropzoneSpotlight(elements.dropzone);
   initFileHandling(elements, state);
   initPreviewModal(elements);
   initSubmit(elements, state);

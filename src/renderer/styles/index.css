@@ -7,6 +7,9 @@
 @import "./animations.css";
 @import "./forms.css";
 @import "./dropzone.css";
+@import "./dropzone-copy.css";
+@import "./dropzone-cta.css";
+@import "./dropzone-icon.css";
 @import "./illustration.css";
 @import "./excel-preview.css";
 @import "./modal.css";
