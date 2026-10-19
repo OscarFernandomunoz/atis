@@ -31,7 +31,9 @@ export async function rebuildFromRows(data: ArrayBuffer, cedula: string, hours: 
   return (await out.xlsx.writeBuffer()) as unknown as ArrayBuffer;
 }
 
-// Versión que conserva SOLO las filas de las cédulas consultadas.
+// Versión múltiple que conserva TODAS las filas del libro y solo escribe las horas de
+// las cédulas consultadas. Es importante no filtrar: el archivo actualizado debe seguir
+// mostrando a todos los instructores, no solo a los que se procesaron.
 export async function rebuildFromRowsMultiple(
   data: ArrayBuffer,
   targets: Array<{ identification: string; totalHours: string }>,
@@ -42,41 +44,14 @@ export async function rebuildFromRowsMultiple(
   for (const sheetName of source.SheetNames) {
     const sheet = source.Sheets[sheetName];
     const rows = sheet ? XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '' }) : [];
-    const keepRows = filterRowsByCedulas(rows, targets);
-    const filtered = keepRows.length > 0 ? keepRows : rows;
     const ws = out.addWorksheet(sheetName);
-    ws.addRows(filtered);
+    ws.addRows(rows);
     for (const { identification, totalHours } of targets) {
       if (colorHoursCellInRows(ws, identification, totalHours)) updated = true;
     }
   }
   if (!updated) return null;
   return (await out.xlsx.writeBuffer()) as unknown as ArrayBuffer;
-}
-
-// Filtra las filas: conserva encabezados y solo las filas con las cédulas indicadas.
-function filterRowsByCedulas(
-  rows: unknown[][],
-  targets: Array<{ identification: string; totalHours: string }>,
-): unknown[][] {
-  const cedulaHeader = findColumnAnywhere(rows, isCedulaHeader);
-  if (!cedulaHeader) return [];
-  const cedulaCol = cedulaHeader.col;
-  const headerRowIndex = cedulaHeader.row;
-  const cedulas = new Set(targets.map((t) => t.identification.trim()));
-  const result: unknown[][] = [];
-  for (let i = 0; i < rows.length; i += 1) {
-    const row = rows[i] ?? [];
-    if (i <= headerRowIndex) {
-      result.push(row);
-      continue;
-    }
-    const cellValue = String(row[cedulaCol] ?? '').trim();
-    if (cedulas.has(cellValue)) {
-      result.push(row);
-    }
-  }
-  return result;
 }
 
 // Colorea la celda de horas en una fila específica.
