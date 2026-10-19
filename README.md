@@ -5,7 +5,7 @@ Aplicación de escritorio que automatiza el registro de tiempos de instructores 
 
 En lugar de repetir a mano once pasos en el portal —inicio de sesión, navegación por cuatro
 menús, filtros de fecha, búsqueda del instructor por cédula y selección del registro—, la
-aplicación los ejecuta sola y muestra el progreso paso a paso.
+aplicación los ejecuta sola en una ventana propia del portal, con el avance indicado paso a paso.
 
 ---
 
@@ -33,8 +33,12 @@ aplicación los ejecuta sola y muestra el progreso paso a paso.
 2. La app valida que exista la columna `Columna 3` o `# DE DOCUMENTO` y extrae de ella la
    **cédula** del instructor.
 3. Muestra una vista previa con todas las hojas del libro y un filtro por columna.
-4. Al pulsar **Iniciar sesión en SofiaPlus**, se abre el portal, se autentica y se recorre el
-   flujo de consulta de tiempos para ese instructor y ese rango de fechas.
+4. Al pulsar **Iniciar sesión en SofiaPlus**, el portal se abre en **su propia ventana visible**,
+   se autentica y se recorre el flujo de consulta de tiempos para ese instructor y ese rango de
+   fechas. El avance se marca con un banner dentro de la página y con la barra inferior de la app.
+5. Al terminar, **tanto si salió bien como si falló**, se cierra la ventana del portal y se
+   borran sus cookies y su caché. La siguiente corrida vuelve a empezar desde el login, sin
+   reutilizar una sesión a medias.
 
 La interfaz incluye reloj, fecha, clima, selector de tema claro/oscuro/sistema y una barra de
 título nativa unificada en todas las ventanas.
@@ -58,9 +62,15 @@ del portal, espera a que el elemento correspondiente esté disponible y actúa s
 | 10  | Botón Consultar                    | Pulsa el `input[type=submit]` del diálogo             |
 | 11  | Enlace del instructor              | Selecciona el registro con `clickInstructorResultLink` |
 
-Un banner de progreso se inyecta en la propia página del portal para que el usuario vea en qué
-paso va, y toda la salida de `console.log` de la página se reenvía a la terminal de la app con
-el prefijo `[AIA][SofiaPlus]`.
+La ventana del portal (y las emergentes que abre) es visible: la automatización la controla por
+JavaScript y el usuario ve exactamente lo que ocurre en pantalla. Dentro de la propia página se
+inyecta un banner con el paso actual, y toda la salida de `console.log` del portal se reenvía a
+la terminal de la app con el prefijo `[AIA][SofiaPlus]`. Al terminar la corrida, la ventana se
+cierra sola.
+
+La sesión del portal vive en una partición aislada. Antes de cada corrida y al terminarla se
+borran sus cookies, almacenamiento local y caché; así el siguiente intento siempre arranca en la
+pantalla de login y no queda ninguna sesión abierta.
 
 ## Requisitos
 
@@ -169,10 +179,10 @@ src/
 ├── renderer/                  # Interfaz
 │   ├── index.html
 │   ├── index.ts
-│   ├── components/            # Excel, reloj, envío, tema, barra de título
-│   ├── styles/                # CSS modular (15 hojas)
+│   ├── components/            # Excel, carnets, barra tipo reproductor y ventanas internas
+│   ├── styles/                # CSS modular (16 hojas)
 │   └── theme/                 # Estado, persistencia y etiquetas del tema
-└── shared/window.ts           # Constantes y tipos compartidos
+└── shared/                    # Constantes y tipos compartidos (ventana y notificaciones)
 ```
 
 El detalle completo está en [`docs/architecture.md`](docs/architecture.md); las convenciones de
@@ -206,7 +216,8 @@ de fallar en producción.
 | Constant                 | Archivo                                     | Para qué sirve                            |
 | ------------------------ | ------------------------------------------- | ----------------------------------------- |
 | `SOFIA_URL`              | `services/sofia-plus/flow/window-loader.ts` | URL del portal                            |
-| `TOTAL_STEPS`            | `services/sofia-plus/flow/step-banner.ts`   | Total de pasos del banner                 |
+| `TOTAL_STEPS`            | `services/sofia-plus/flow/step-banner.ts`   | Total de pasos del flujo                  |
+| `SOFIA_PARTITION`        | `services/sofia-plus/flow/window-loader.ts` | Sesión aislada del portal                 |
 | `ACTION_DELAY_MS`        | `services/sofia-plus/browser/timing.ts`     | Espera entre acciones                     |
 | `DEMO_MODE`              | `services/sofia-plus/browser/click.ts`      | Marca la posición del clic sin ejecutarlo |
 | `REQUIRED_COLUMN_NUMBER` | `renderer/components/excel-preview.ts`      | Columna de la que se extrae la cédula     |
@@ -238,6 +249,11 @@ Conviene ser explícito sobre el punto en que está el proyecto:
   `sofiaPopUp.js`.
 - **`DEMO_MODE` debe estar en `false`.** Si está en `true`, solo se dibuja el marcador visual del
   clic pero no se ejecuta realmente.
+- **La ventana del portal es visible y se cierra al terminar.** La automatización corre en su
+  propia ventana y el usuario puede ver el paso a paso en el banner que se inyecta en la página.
+  Al acabar (con éxito o error) se cierra la ventana y se limpia su sesión. La sesión usa una
+  partición aislada (`SOFIA_PARTITION`) para poder borrar cookies y caché sin afectar las
+  preferencias de la app.
 - **Sin integración continua.** No hay workflows de GitHub Actions; la verificación depende de ejecutar `npm run build` antes de publicar.
 - **El portal puede cambiar.** Los selectores y el flujo dependen de la estructura del DOM de
   SofiaPlus. Cualquier cambio en el portal puede requerir ajustar `report/` y `navigation.ts`.

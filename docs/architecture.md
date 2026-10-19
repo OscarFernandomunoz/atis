@@ -24,6 +24,8 @@ src/
 │   │       │   └── click.ts              # Clic por coordenadas, marcador y scripts
 │   │       ├── flow/                     # Piezas del flujo de automatización
 │   │       │   ├── step-banner.ts        # Contador de progreso en la página
+│   │       │   ├── pause-gate.ts         # Pausa y reanudación en cada frontera de paso
+│   │       │   ├── session-reset.ts      # Limpieza de cookies, caché y almacenamiento
 │   │       │   └── window-loader.ts      # Creación y carga de la ventana del portal
 │   │       └── report/                   # Helpers del reporte y docente
 │   │           ├── index.ts              # API pública de los helpers
@@ -98,7 +100,8 @@ src/
 │       ├── theme-service.ts              # Estado, persistencia y tema del sistema
 │       └── types.ts                      # Tipos y etiquetas de temas
 └── shared/
-    └── window.ts                         # Tipos y constantes compartidos
+    ├── window.ts                         # Tipos y constantes de ventana
+    └── notifications.ts                  # Tipos de avisos del sistema
 ```
 
 ## Límites entre procesos
@@ -121,7 +124,16 @@ src/
 - `sofia-plus/browser/` encapsula todo lo que habla con Electron: parches de página, recorrido
   de frames, ventanas emergentes y clics. `window-tracker.ts` es la única dueño del estado de
   ventanas emergentes; `frames.ts` lo consulta mediante `getTrackedChildWindows`.
-- `sofia-plus/flow/` contiene las piezas del flujo (banner de progreso y carga de la ventana).
+- `sofia-plus/flow/` contiene las piezas del flujo (banner de progreso, puerta de pausa,
+  limpieza de sesión y carga de la ventana).
+- `flow/window-loader.ts` crea la ventana visible del portal en una partición propia
+  (`SOFIA_PARTITION`). Al reutilizarla vuelve a cargar la URL base, de modo que cada corrida
+  arranca en el login.
+- `flow/session-reset.ts` cierra la ventana del portal y borra cookies, almacenamiento local,
+  caché y credenciales de esa partición. Se ejecuta al empezar cada corrida y al terminarla
+  (con éxito o error), para que no quede una sesión abierta y el siguiente intento no reutilice
+  una sesión a medias. Al usar una partición aislada, el tema y las demás preferencias de la app
+  (sesión por defecto) quedan intactos.
 - `sofia-plus/report/` divide el reporte por paso: fechas, apertura del diálogo, tipo y campo
   de identificación, botón de búsqueda y enlace de resultado.
 - Los módulos son carpetas con un `index.ts` barril. Quien consume importa de `browser/index.js`
