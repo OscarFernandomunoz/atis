@@ -8,7 +8,7 @@ const REQUIRED_COLUMN_NAME = `Columna ${REQUIRED_COLUMN_NUMBER}`;
 const ALTERNATIVE_COLUMN_NAME = '# DE DOCUMENTO';
 const REQUIRED_COLUMN_NAMES = [REQUIRED_COLUMN_NAME, ALTERNATIVE_COLUMN_NAME];
 const REQUIRED_COLUMN_LABEL = `${REQUIRED_COLUMN_NAME} o ${ALTERNATIVE_COLUMN_NAME}`;
-const DROPZONE_HINT = `Arrastra y suelta tu archivo de nómina aquí (.xls, .xlsx). Obligatorio. Debe incluir ${REQUIRED_COLUMN_LABEL}.`;
+const DROPZONE_HINT = 'Arrastra y suelta tu archivo de nómina aquí o haz clic para seleccionarlo.';
 
 export type FileElements = Pick<AppElements, 'dropzone' | 'fileInput' | 'dropzoneText' | 'excelPreview' | 'cardsGrid' | 'programFilter' | 'hoursFilter' | 'cardsSearch' | 'cardsSelectAll' | 'cardsCount' | 'cardsEmpty' | 'statusMessage'>;
 
@@ -26,8 +26,19 @@ function cardBoard(elements: FileElements): CardBoard {
 
 export function initFileHandling(elements: FileElements, state: FileUploadState): void {
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
+  elements.dropzone.addEventListener('keydown', (event: KeyboardEvent) => {
+    // La tarjeta actúa como botón: Enter y Espacio deben abrir el selector.
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    elements.fileInput.click();
+  });
   elements.dropzone.addEventListener('dragover', (event: DragEvent) => { event.preventDefault(); elements.dropzone.classList.add('dragover'); });
-  elements.dropzone.addEventListener('dragleave', () => elements.dropzone.classList.remove('dragover'));
+  elements.dropzone.addEventListener('dragleave', (event: DragEvent) => {
+    // Al pasar sobre un hijo el navegador emite dragleave: solo se apaga al salir.
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && elements.dropzone.contains(nextTarget)) return;
+    elements.dropzone.classList.remove('dragover');
+  });
   elements.dropzone.addEventListener('drop', (event: DragEvent) => {
     event.preventDefault();
     elements.dropzone.classList.remove('dragover');
