@@ -54,14 +54,42 @@ src/
 │   │   ├── dropzone.css                  # Zona de carga y estados
 │   │   ├── illustration.css              # Ilustración del dropzone
 │   │   ├── excel-preview.css             # Vista previa y filtros de Excel
+│   │   ├── instructor-cards.css          # Carnets, filtros y selección
+│   │   ├── modal.css                     # Modal de vista previa
 │   │   ├── submit.css                    # Botón principal y estados
-│   │   ├── status-bar.css                # Barra inferior, reloj y clima
+│   │   ├── player-bar.css                # Barra inferior tipo reproductor y progreso
 │   │   ├── animations.css                # Keyframes compartidas
 │   │   └── responsive.css                # Media queries y reduced motion
 │   ├── types.ts                          # Tipos de estado y elementos
 │   ├── components/
 │   │   ├── excel-preview.ts              # Carga y vista previa de Excel
-│   │   ├── live-context.ts               # Reloj, ubicación y clima
+│   │   ├── instructor-cards/             # Carnets de instructores con filtros y selección
+│   │   │   ├── index.ts                  # API pública del módulo
+│   │   │   ├── parse.ts                  # Instructores desde las filas del Excel
+│   │   │   ├── card.ts                   # Credencial de cada instructor
+│   │   │   ├── render.ts                 # Render y combinación de filtros
+│   │   │   ├── filter.ts                 # Filtro por programa
+│   │   │   ├── hours-filter.ts           # Filtro por horas
+│   │   │   ├── hours.ts                  # Horas del portal (en vivo) y su clasificación
+│   │   │   ├── search.ts                 # Búsqueda por nombre o documento
+│   │   │   ├── selection.ts              # Casillas y "seleccionar todo"
+│   │   │   ├── palette.ts                # Color por programa
+│   │   │   └── roster.ts                 # Cédula -> nombre para la barra
+│   │   ├── months-showcase/              # Carrusel de paisajes y rango de fechas
+│   │   │   ├── index.ts                  # API pública del carrusel
+│   │   │   ├── showcase.ts               # Montaje y sincronización con las fechas
+│   │   │   ├── card.ts                   # Tarjeta y selector de cada mes
+│   │   │   ├── months.ts                 # Datos de los doce meses
+│   │   │   ├── selection.ts              # Rango de meses contiguo
+│   │   │   └── date-range.ts             # Vuelca el rango en los inputs de fecha
+│   │   ├── player-bar/                   # Barra tipo reproductor (cédula, play y progreso)
+│   │   │   ├── index.ts                  # API pública de la barra
+│   │   │   ├── player-bar.ts             # Inicialización de la barra
+│   │   │   ├── progress.ts               # Avance de la automatización
+│   │   │   ├── state.ts                  # Estados del botón de play
+│   │   │   ├── track.ts                  # Cédula en ejecución
+│   │   │   └── types.ts                  # Tipos de la barra
+│   │   ├── preview-modal.ts              # Modal bajo demanda de la vista previa
 │   │   ├── submit.ts                     # Orquestación del envío/login
 │   │   ├── theme-selector.ts             # Eventos DOM del selector de tema
 │   │   └── title-bar.ts                  # Sincronización de la barra nativa

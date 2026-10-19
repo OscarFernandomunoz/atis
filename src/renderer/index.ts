@@ -1,36 +1,51 @@
+import { initDropzoneSpotlight } from './components/dropzone-spotlight.js';
 import { initFileHandling } from './components/excel-preview.js';
-import { initLiveContext, initClock } from './components/live-context.js';
+import { initMonthsShowcase } from './components/months-showcase/index.js';
+import { initNotificationConsent } from './components/notifications/index.js';
+import { initPreviewModal } from './components/preview-modal.js';
+import { initPlayerBar } from './components/player-bar/index.js';
 import { initSubmit } from './components/submit.js';
 import { initTitleBar } from './components/title-bar.js';
-import { initTheme } from './theme/index.js';
+import { initDynamicBackground } from './theme/index.js';
 import type { AppElements, FileUploadState } from './types.js';
 
 function getElements(): AppElements {
   return {
-    clock: document.getElementById('clock') as HTMLElement,
-    date: document.getElementById('currentDate') as HTMLElement,
-    city: document.getElementById('currentCity') as HTMLElement,
-    weather: document.getElementById('weather') as HTMLElement,
-    weatherIcon: document.getElementById('weatherIcon') as HTMLElement,
     dropzone: document.getElementById('dropzone') as HTMLElement,
     fileInput: document.getElementById('fileInput') as HTMLInputElement,
     dropzoneText: document.getElementById('dropzoneText') as HTMLElement,
     excelPreview: document.getElementById('excelPreview') as HTMLElement,
-    uploadButton: document.getElementById('btnUpload') as HTMLButtonElement,
+    previewOpenButton: document.getElementById('previewOpenButton') as HTMLButtonElement,
+    previewModal: document.getElementById('previewModal') as HTMLElement,
+    previewBackdrop: document.getElementById('previewBackdrop') as HTMLElement,
+    previewCloseButton: document.getElementById('previewCloseButton') as HTMLButtonElement,
+    playerTableButton: document.getElementById('playerTableButton') as HTMLButtonElement,
+    cardsGrid: document.getElementById('cardsGrid') as HTMLElement,
+    programFilter: document.getElementById('programFilter') as HTMLElement,
+    hoursFilter: document.getElementById('hoursFilter') as HTMLElement,
+    cardsSearch: document.getElementById('cardsSearch') as HTMLInputElement,
+    cardsSelectAll: document.getElementById('cardsSelectAll') as HTMLInputElement,
+    cardsCount: document.getElementById('cardsCount') as HTMLElement,
+    cardsEmpty: document.getElementById('cardsEmpty') as HTMLElement,
+    playButton: document.getElementById('playerPlay') as HTMLButtonElement | null,
+    playerIdentification: document.getElementById('playerIdentification') as HTMLElement,
+    playerInstructorName: document.getElementById('playerInstructorName') as HTMLElement,
+    playerProgressCurrent: document.getElementById('playerProgressCurrent') as HTMLElement,
+    playerProgressTotal: document.getElementById('playerProgressTotal') as HTMLElement,
+    playerTrack: document.getElementById('playerTrack') as HTMLElement,
+    playerProgressFill: document.getElementById('playerProgressFill') as HTMLElement,
     statusMessage: document.getElementById('statusMessage') as HTMLElement,
     inputUser: document.getElementById('usuario') as HTMLInputElement,
     inputPass: document.getElementById('password') as HTMLInputElement,
     inputStartDate: document.getElementById('fechaInicio') as HTMLInputElement,
     inputEndDate: document.getElementById('fechaFin') as HTMLInputElement,
-    themeToggle: document.getElementById('themeToggle') as HTMLButtonElement,
   };
 }
 
 function enforceSvgIconVisibility(): void {
   const selectors = [
-    '.svg-icon-path', '.svg-cloud', '.svg-arrow', '.svg-moon',
-    '.svg-sun', '.svg-sun-rays', '.svg-weather-cloud', '.svg-clock-hands', '.svg-check',
-    '.svg-lock-core', '.svg-cal-dot',
+    '.svg-icon-path', '.svg-cloud', '.svg-arrow',
+    '.svg-check', '.svg-lock-core', '.svg-cal-dot',
   ];
   document.querySelectorAll<SVGElement | HTMLElement>(selectors.join(',')).forEach((el) => {
     if (el instanceof SVGElement || el instanceof HTMLElement) {
@@ -41,7 +56,7 @@ function enforceSvgIconVisibility(): void {
       el.style.setProperty('display', '', 'important');
     }
   });
-  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .status-icon, .btn-icon, .theme-icon, .cloud-icon, .upload-arrow-icon').forEach((svg) => {
+  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .btn-icon, .dropzone-glyph').forEach((svg) => {
     svg.style.setProperty('opacity', '1', 'important');
     svg.style.setProperty('visibility', 'visible', 'important');
     svg.style.removeProperty('animation-play-state');
@@ -50,7 +65,7 @@ function enforceSvgIconVisibility(): void {
 
 function initIconScrollAnimations(): void {
   const icons = Array.from(document.querySelectorAll<HTMLElement>(
-    '.app-icon, .theme-icon, .status-icon, .input-icon, .dropzone-icon .cloud-icon, .dropzone-icon .upload-arrow-icon, .btn-icon',
+    '.app-icon, .input-icon, .dropzone-icon .dropzone-glyph, .btn-icon',
   ));
   if (!icons.length) return;
 
@@ -90,63 +105,20 @@ function initIconScrollAnimations(): void {
   }, true);
 }
 
-function initMouseLightEffect(): void {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const header = document.querySelector<HTMLElement>('.content-header');
-  let headerBounds = header?.getBoundingClientRect();
-  let framePending = false;
-  let targetX = window.innerWidth / 2;
-  let targetY = window.innerHeight / 3;
-  let currentX = targetX;
-  let currentY = targetY;
-
-  const updateLightPosition = (): void => {
-    currentX += (targetX - currentX) * 0.18;
-    currentY += (targetY - currentY) * 0.18;
-    document.documentElement.style.setProperty('--mouse-x', `${currentX}px`);
-    document.documentElement.style.setProperty('--mouse-y', `${currentY}px`);
-    if (headerBounds) {
-      document.documentElement.style.setProperty('--header-mouse-x', `${currentX - headerBounds.left}px`);
-      document.documentElement.style.setProperty('--header-mouse-y', `${currentY - headerBounds.top}px`);
-    }
-
-    const distance = Math.hypot(targetX - currentX, targetY - currentY);
-    if (distance > 0.5) {
-      window.requestAnimationFrame(updateLightPosition);
-      return;
-    }
-
-    currentX = targetX;
-    currentY = targetY;
-    framePending = false;
-  };
-
-  const handleMouseMove = (event: MouseEvent): void => {
-    if (document.documentElement.dataset.theme !== 'dark') return;
-    targetX = event.clientX;
-    targetY = event.clientY;
-    if (framePending) return;
-    framePending = true;
-    window.requestAnimationFrame(updateLightPosition);
-  };
-
-  window.addEventListener('resize', () => { headerBounds = header?.getBoundingClientRect(); }, { passive: true });
-  document.addEventListener('mousemove', handleMouseMove, { passive: true });
-}
-
 function initApp(): void {
   const elements = getElements();
   const state: FileUploadState = { file: null, firstIdentification: null, identifications: [], isUploading: false, currentIdentification: null };
 
-  initTheme(elements);
+  initDynamicBackground();
   initTitleBar();
-  initClock(elements);
-  void initLiveContext(elements);
+  initNotificationConsent();
+  initMonthsShowcase();
+  initPlayerBar(elements);
+  initDropzoneSpotlight(elements.dropzone);
   initFileHandling(elements, state);
+  initPreviewModal(elements);
   initSubmit(elements, state);
   initIconScrollAnimations();
-  initMouseLightEffect();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

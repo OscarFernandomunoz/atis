@@ -1,0 +1,45 @@
+import { HOURS_THRESHOLD, parseHoursValue } from '../excel-update/helpers.js';
+import type { Instructor } from './parse.js';
+
+// Clasificación de un valor de horas respecto al umbral del reporte.
+export type HoursKind = 'ok' | 'low' | 'none';
+
+export interface HoursView {
+  /** Texto a mostrar: las horas o un guion cuando no hay dato. */
+  text: string;
+  /** Clase de color asociada. */
+  kind: HoursKind;
+  /** Si hay un valor numérico válido. */
+  hasHours: boolean;
+}
+
+export function hoursView(hours: string): HoursView {
+  const value = parseHoursValue(hours);
+  const hasHours = hours !== '' && Number.isFinite(value);
+  return {
+    text: hasHours ? hours : '—',
+    kind: hasHours ? (value < HOURS_THRESHOLD ? 'low' : 'ok') : 'none',
+    hasHours,
+  };
+}
+
+export function hoursKind(hours: string): HoursKind {
+  return hoursView(hours).kind;
+}
+
+// Horas leídas en vivo desde SofiaPlus (el span del reporte), por cédula. Mandan
+// sobre las de la nómina para que el carnet muestre lo que reporta el portal.
+const liveHours = new Map<string, string>();
+
+export function rememberLiveHours(identification: string, hours: string): void {
+  if (identification && hours) liveHours.set(identification, hours);
+}
+
+/** Horas efectivas: las del portal si ya se leyeron, si no las del Excel. */
+export function effectiveHours(instructor: Instructor): string {
+  return liveHours.get(instructor.identification) ?? instructor.hours;
+}
+
+export function forgetLiveHours(): void {
+  liveHours.clear();
+}

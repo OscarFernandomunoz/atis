@@ -34,6 +34,8 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
     ? '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     : '"Segoe UI Variable Text", "Segoe UI", sans-serif';
   const iconDataUrl = getAppIconDataUrl();
+  const iconSize = 22;
+  const iconTop = (TITLE_BAR_HEIGHT - iconSize) / 2;
   const iconMarkup = iconDataUrl
     ? `<img class="icon" src="${iconDataUrl}" alt="" aria-hidden="true">`
     : '';
@@ -53,11 +55,11 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
     }
     .icon {
       position: absolute;
-      top: 9px;
-      left: 10px;
+      top: ${iconTop}px;
+      left: 12px;
       display: ${isMac ? 'none' : 'block'};
-      width: 18px;
-      height: 18px;
+      width: ${iconSize}px;
+      height: ${iconSize}px;
       object-fit: contain;
       pointer-events: none;
       -webkit-user-drag: none;
@@ -69,7 +71,7 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
       max-width: calc(100% - ${titleMaxWidth});
       overflow: hidden;
       color: ${titleBarText};
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 500;
       text-overflow: ellipsis;
       white-space: nowrap;

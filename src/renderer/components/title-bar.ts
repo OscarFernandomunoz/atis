@@ -1,5 +1,3 @@
-import { subscribeToTheme } from '../theme/index.js';
-
 // Activa los controles nativos del sistema y conserva los botones HTML como fallback.
 export function initTitleBar(): void {
   if (typeof window.electronAPI === 'undefined') {
@@ -10,9 +8,8 @@ export function initTitleBar(): void {
   const titleBarPlatform = window.electronAPI.titleBarPlatform;
   document.documentElement.dataset.titleBarPlatform = titleBarPlatform;
 
-  subscribeToTheme((theme) => {
-    window.electronAPI.setTitleBarTheme(theme);
-  });
+  // La app usa siempre el tema oscuro, así que la barra nativa se fija una sola vez.
+  window.electronAPI.setTitleBarTheme('dark');
 
   // En macOS, Windows y Linux los controles ya los dibuja el sistema operativo.
   if (titleBarPlatform !== 'custom') return;

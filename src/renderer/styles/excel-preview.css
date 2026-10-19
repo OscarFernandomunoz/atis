@@ -14,6 +14,11 @@
   animation: content-enter 420ms var(--ease-out) both;
 }
 
+/* Sin vista previa no reserva espacio: antes ese hueco separaba del botón de envío. */
+.excel-preview:empty {
+  display: none;
+}
+
 .excel-preview section {
   min-width: 0;
   padding: 18px;
@@ -251,6 +256,16 @@
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: background-color 180ms var(--ease-smooth), box-shadow 180ms var(--ease-smooth), transform 180ms var(--ease-smooth);
+}
+
+.excel-filter-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  border-radius: 6px;
 }
 
 .excel-download-btn:hover {

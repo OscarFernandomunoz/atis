@@ -1,0 +1,81 @@
+/* Copia de la zona de carga: rótulo, instrucción y chips de requisitos. */
+
+.dropzone-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dropzone-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: color-mix(in srgb, var(--text) 68%, var(--text-muted));
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Punto vivo: comunica que la zona está lista antes de interactuar. */
+.dropzone-eyebrow::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--pastel-5);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-5) 60%, transparent);
+  content: "";
+  animation: dropzone-dot-pulse 2.6s var(--ease-smooth) infinite;
+}
+
+.dropzone-text {
+  color: color-mix(in srgb, var(--text) 68%, var(--text-muted));
+  font-size: 13.5px;
+  line-height: 1.55;
+  transition: color 320ms var(--ease-smooth), transform 420ms var(--ease-out);
+}
+
+.dropzone-text strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.dropzone-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dropzone-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  color: color-mix(in srgb, var(--text) 52%, var(--text-muted));
+  border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transition: color 300ms var(--ease-smooth), border-color 300ms var(--ease-smooth),
+    background-color 300ms var(--ease-smooth);
+}
+
+.dropzone-chip.is-required {
+  color: color-mix(in srgb, var(--pastel-7) 42%, var(--text));
+  border-color: color-mix(in srgb, var(--pastel-7) 24%, transparent);
+  background: color-mix(in srgb, var(--pastel-7) 10%, transparent);
+}
+
+.dropzone:hover .dropzone-text,
+.dropzone.dragover .dropzone-text {
+  color: var(--text);
+  transform: translateX(2px);
+}
+
+.dropzone:hover .dropzone-chip,
+.dropzone.dragover .dropzone-chip {
+  border-color: color-mix(in srgb, var(--text) 20%, transparent);
+}

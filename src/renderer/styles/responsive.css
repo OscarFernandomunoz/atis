@@ -10,78 +10,40 @@
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
-
-  body::before {
-    display: none;
-  }
 }
 
 @media (max-width: 900px) {
-  .status-bar {
-    gap: 8px;
-    padding-inline: 10px;
-  }
-
-  .status-items {
-    gap: 6px;
-  }
-
-  .status-label {
-    display: none;
-  }
-
-  .status-item {
-    gap: 7px;
-    padding-right: 8px;
-  }
-
-  .status-value,
-  .status-date-item .status-value {
-    max-width: 155px;
-  }
-
-  .status-message {
-    max-width: 22%;
-    padding-inline: 9px;
+  .player-bar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 14px;
+    padding-inline: 12px;
   }
 }
 
-@media (max-width: 780px) {
-  .status-date-item,
-  .status-date-item + .status-divider {
-    display: none;
+@media (max-width: 760px) {
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 
-  .status-location-item .status-value,
-  .status-weather-item .status-value {
-    max-width: 125px;
+  /* Sin espacio para la píldora: la tarjeta completa ya abre el selector. */
+  .dropzone-cta {
+    display: none;
   }
 }
 
 @media (max-width: 640px) {
   :root {
-    --section-gap: 28px;
-    --excel-preview-gap: 36px;
+    --section-gap: 44px;
+    --player-bar-height: 60px;
   }
 
   .content-header {
     align-items: flex-start;
-    padding: 50px 20px 18px;
-  }
-
-  .theme-toggle span {
-    display: none;
-  }
-
-  .theme-toggle {
-    width: 38px;
-    justify-content: center;
-    padding: 0;
+    padding: 50px 20px 32px;
   }
 
   .dashboard-panel {
-    width: calc(100% - 40px);
-    padding: 22px 16px;
+    padding: 0 20px;
   }
 
   .panel-heading {
@@ -92,33 +54,38 @@
     margin-top: 12px;
   }
 
-  .access-card {
-    padding: 16px 12px;
-  }
-
-  .form-group {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .form-group label {
-    width: auto;
-    padding: 0;
-    text-align: left;
-  }
-
   .dropzone {
     align-items: flex-start;
     flex-direction: column;
+    gap: 14px;
     padding: 20px 16px;
+  }
+
+  .dropzone-content {
+    width: 100%;
+  }
+
+  .dropzone-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+  }
+
+  .dropzone-icon-halo {
+    inset: -6px;
+    border-radius: 22px;
+  }
+
+  .dropzone-glyph {
+    width: 26px;
+    height: 26px;
   }
 
   .dropzone-illustration-wrap {
     align-self: flex-end;
     width: 76px;
     height: 76px;
-    margin-top: -20px;
+    margin-top: -18px;
     margin-right: -6px;
     opacity: 0.8;
   }
@@ -133,15 +100,21 @@
     min-width: 0;
   }
 
-  .status-bar {
-    gap: 8px;
-    min-height: 44px;
-    padding: 4px 10px;
-    overflow: hidden;
+  .player-bar {
+    gap: 12px;
+    min-height: var(--player-bar-height);
+    padding: 8px 12px;
   }
 
-  .status-bar .status-message,
-  .status-bar .status-divider:last-of-type {
+  .player-artwork {
+    display: none;
+  }
+
+  .player-progress {
+    gap: 8px;
+  }
+
+  .player-time-total {
     display: none;
   }
 }

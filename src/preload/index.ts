@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { getTitleBarPlatform, type TitleBarTheme } from '../shared/window.js';
+import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
 // Se limita a invocar canales IPC definidos en el proceso principal sin permitir acceso directo a Node.
@@ -25,6 +26,9 @@ export const electronAPI = {
     return ipcRenderer.invoke('sofia:open-and-fill', credentials);
   },
 
+  // Pausa o reanuda la automatización en curso; reanuda justo donde quedó.
+  setAutomationPaused: (paused: boolean): void => ipcRenderer.send('sofia:set-paused', paused),
+
   // Escribe las horas en el Excel con Excel real (COM), preservando diseño y filtros.
   applyHoursToExcel: (payload: { data: ArrayBuffer; fileName: string; cedula: string; hours: string }): Promise<ArrayBuffer | null> =>
     ipcRenderer.invoke('excel:apply-hours', payload),
@@ -35,6 +39,14 @@ export const electronAPI = {
 
   // Sincroniza el color del overlay nativo de Windows/Linux.
   setTitleBarTheme: (theme: TitleBarTheme): void => ipcRenderer.send('window:set-title-bar-theme', theme),
+
+  // Notificaciones del computador: el renderer pregunta, recuerda la decisión y avisa.
+  getNotificationPermission: (): Promise<NotificationPermission | null> =>
+    ipcRenderer.invoke('notifications:permission'),
+  setNotificationPermission: (permission: NotificationPermission): Promise<NotificationPermission | null> =>
+    ipcRenderer.invoke('notifications:set-permission', permission),
+  notifySystem: (payload: SystemNotification): Promise<boolean> =>
+    ipcRenderer.invoke('notifications:show', payload),
 
   // Controles propios usados únicamente como fallback.
   minimize: (): void => ipcRenderer.send('window:minimize'),

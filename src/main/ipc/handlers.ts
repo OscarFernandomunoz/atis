@@ -1,8 +1,12 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { openSofiaPlus, type InstructorHours, type SofiaCredentials } from '../services/sofia-plus/index.js';
+import { setAutomationPaused } from '../services/sofia-plus/flow/pause-gate.js';
 import { applyHoursWithExcel, type ApplyHoursPayload } from '../services/excel/apply-hours.js';
 import { applyHoursMultipleWithExcel, type ApplyHoursMultiplePayload } from '../services/excel/apply-hours-multiple.js';
+import { showSystemNotification } from '../services/notifications.js';
+import { readSettings, updateSettings } from '../services/settings.js';
 import { applyTitleBarTheme } from '../windows/appearance.js';
+import type { NotificationPermission, SystemNotification } from '../../shared/notifications.js';
 
 // Envía un evento de progreso al renderer (resaltado de fila y horas en la vista previa).
 function sendProgress(webContents: Electron.WebContents, identification: string | null, hours: string | null): void {
@@ -22,6 +26,13 @@ export function registerIpcHandlers(): void {
         console.error('[AIA][SofiaPlus] No se pudo completar el flujo de automatización.', error);
         throw error;
       }
+    });
+
+    // Pausa o reanuda la automatización en curso sin cortarla: el flujo se detiene en la
+    // próxima frontera de paso y continúa desde ese mismo punto.
+    ipcMain.on('sofia:set-paused', (_event, paused: unknown) => {
+      if (typeof paused !== 'boolean') return;
+      setAutomationPaused(paused);
     });
 
     // Escribe las horas en el Excel con Excel real (COM) preservando diseño y filtros.
@@ -44,6 +55,23 @@ export function registerIpcHandlers(): void {
         console.error('[AIA][Excel] Error al aplicar horas múltiples con Excel COM.', error);
         return null;
       }
+    });
+
+    // Permiso de notificaciones: se pregunta una sola vez y la respuesta se recuerda
+    // en disco, así el modal no vuelve a aparecer en los siguientes arranques.
+    ipcMain.handle('notifications:permission', (): NotificationPermission | null => readSettings().notifications);
+
+    ipcMain.handle('notifications:set-permission', (_event, value: unknown): NotificationPermission | null => {
+      if (value !== 'allowed' && value !== 'denied') return readSettings().notifications;
+      return updateSettings({ notifications: value }).notifications;
+    });
+
+    // Muestra el aviso nativo; sólo si el usuario lo autorizó y el sistema lo soporta.
+    // Devuelve si llegó a mostrarse, para que el renderer pueda usar su respaldo.
+    ipcMain.handle('notifications:show', async (_event, payload: SystemNotification): Promise<boolean> => {
+      if (readSettings().notifications !== 'allowed') return false;
+      if (typeof payload?.title !== 'string' || typeof payload?.body !== 'string') return false;
+      return showSystemNotification({ title: payload.title, body: payload.body });
     });
 
     // Sincroniza el tema y la barra nativa de todas las ventanas de la app.

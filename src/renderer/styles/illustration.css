@@ -1,6 +1,7 @@
-/* Upload illustration and illustration theme variants. */
+/* Ilustración de la zona de carga: papel flotante, sello de validación y brillo. */
 
 .dropzone-illustration-wrap {
+  position: relative;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
@@ -9,25 +10,46 @@
   margin-right: 4px;
 }
 
+/* Halo pastel detrás del papel; se enciende al interactuar con la tarjeta. */
+.dropzone-illustration-wrap::before {
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+      color-mix(in srgb, var(--pastel-7) 30%, transparent) 0%, transparent 68%);
+  content: "";
+  filter: blur(6px);
+  opacity: 0.42;
+  transform: scale(0.9);
+  transition: opacity 520ms var(--ease-smooth), transform 720ms var(--ease-out);
+}
+
 .illustration {
   display: block;
   width: 100px;
   height: 100px;
   overflow: visible;
-  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.12));
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.16));
   animation: dropzone-sheet-float 4.4s var(--ease-smooth) infinite;
-  transition: filter 360ms var(--ease-smooth), opacity 280ms var(--ease-smooth);
+  transition: filter 360ms var(--ease-smooth), scale 600ms var(--ease-out),
+    rotate 600ms var(--ease-out);
 }
 
 .illustration-shadow {
-  fill: rgba(0, 0, 0, 0.1);
+  fill: rgba(0, 0, 0, 0.14);
   transform-origin: center;
   animation: dropzone-sheet-float 4.4s var(--ease-smooth) infinite;
 }
 
+.illustration-back-card {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-6deg) translate(-2px, 1px);
+}
+
 .illustration-back-card rect {
   fill: color-mix(in srgb, #d7d7d4 68%, var(--surface-muted));
-  stroke: rgba(0, 0, 0, 0.3);
+  stroke: color-mix(in srgb, var(--text) 34%, transparent);
   stroke-width: 1.5;
 }
 
@@ -35,22 +57,22 @@
 .illustration-table-line,
 .illustration-spark path {
   fill: none;
-  stroke: #626262;
+  stroke: color-mix(in srgb, var(--text) 46%, var(--text-muted));
   stroke-width: 2;
   stroke-linecap: round;
-  opacity: 0.68;
+  opacity: 0.72;
 }
 
 .illustration-main-card > path:first-child {
   fill: var(--surface);
-  stroke: color-mix(in srgb, #333333 68%, var(--border-strong));
+  stroke: color-mix(in srgb, var(--text) 52%, var(--border-strong));
   stroke-width: 1.7;
   stroke-linejoin: round;
 }
 
 .illustration-fold {
   fill: color-mix(in srgb, #dededb 72%, var(--surface));
-  stroke: #666666;
+  stroke: color-mix(in srgb, var(--text) 42%, var(--text-muted));
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -58,9 +80,9 @@
 
 .illustration-check circle {
   fill: #161616;
-  stroke: color-mix(in srgb, #000000 58%, var(--surface));
+  stroke: color-mix(in srgb, var(--text) 30%, var(--surface));
   stroke-width: 1.5;
-  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.24));
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.28));
   transform-origin: 72px 70px;
   animation: dropzone-check-pop 2.4s var(--ease-smooth) infinite;
 }
@@ -85,13 +107,24 @@
 
 .dropzone:hover .illustration,
 .dropzone.dragover .illustration {
-  filter: drop-shadow(0 15px 14px rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(0 16px 16px rgba(0, 0, 0, 0.24));
+  scale: 1.05;
+  rotate: -2deg;
 }
 
-.dropzone:hover .dropzone-text,
-.dropzone.dragover .dropzone-text {
-  color: var(--text);
-  transform: translateX(2px);
+.dropzone.dragover .illustration {
+  scale: 1.08;
+  rotate: 2deg;
+}
+
+.dropzone:hover .dropzone-illustration-wrap::before,
+.dropzone.dragover .dropzone-illustration-wrap::before {
+  opacity: 0.9;
+  transform: scale(1.06);
+}
+
+.dropzone.dragover .illustration-check circle {
+  animation-duration: 1s;
 }
 
 :root[data-theme='dark'] .illustration-shadow {
@@ -111,7 +144,7 @@
 }
 
 :root[data-theme='dark'] .illustration-main-card > path:first-child {
-  fill: #191919;
+  fill: url(#illustrationSheetFill);
   stroke: #b8b8b4;
 }
 
@@ -121,16 +154,16 @@
 }
 
 :root[data-theme='dark'] .illustration-check circle {
-  fill: #ededeb;
+  fill: url(#illustrationCheckFill);
   stroke: #ffffff;
   filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.62));
 }
 
 :root[data-theme='dark'] .illustration-check path {
-  stroke: #111111;
+  stroke: #ffffff;
 }
 
 :root[data-theme='dark'] .dropzone:hover .illustration,
 :root[data-theme='dark'] .dropzone.dragover .illustration {
-  filter: drop-shadow(0 15px 16px rgba(0, 0, 0, 0.62));
+  filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.66));
 }

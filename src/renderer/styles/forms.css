@@ -1,87 +1,156 @@
-/* Access form, inputs and form controls. */
+/* Formulario de acceso: credenciales y fechas que alimentan la automatización. */
 
+/* El formulario no es una tarjeta aparte: flota sobre el degradado ambiental de
+   la página, sin fondo propio, igual que los encabezados de paisajes y carnets. */
 .access-card {
-  padding: 22px;
   margin-bottom: var(--section-gap);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--form-surface);
-  box-shadow: 0 10px 26px color-mix(in srgb, #000 12%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
-  transition: background-color 260ms var(--ease-smooth), border-color 260ms var(--ease-smooth), box-shadow 260ms var(--ease-smooth);
 }
 
-.access-card:focus-within {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent), 0 10px 26px color-mix(in srgb, #000 12%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+.access-card-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 34px;
+}
+
+.access-card-badge {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--accent-contrast);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 100%, #fff 8%), color-mix(in srgb, var(--accent) 84%, #000 8%));
+  box-shadow: 0 6px 16px color-mix(in srgb, #000 38%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent);
+}
+
+.access-card-badge svg {
+  width: 19px;
+  height: 19px;
 }
 
 .access-card-title {
-  margin-bottom: 16px;
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.access-card-subtitle {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px 48px;
+}
+
+/* Divisor con rótulo: separa las credenciales del rango de fechas para que los
+   campos no se lean como un único bloque apretado. */
+.form-separator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 52px 0 40px;
+  color: var(--text-muted);
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.form-separator::before,
+.form-separator::after {
+  height: 1px;
+  background: color-mix(in srgb, #fff 10%, transparent);
+  content: "";
+}
+
+.form-separator::before {
+  width: 26px;
+  flex: 0 0 auto;
+}
+
+.form-separator::after {
+  flex: 1;
 }
 
 .form-group {
   display: flex;
-  align-items: center;
-  max-width: 590px;
-  margin-bottom: 12px;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
 }
 
 .form-group label {
-  width: 110px;
-  padding-right: 16px;
   color: var(--text-muted);
-  font-size: 13px;
-  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .input-wrapper {
   position: relative;
-  flex: 1;
 }
 
 .input-icon {
   position: absolute;
   top: 50%;
-  left: 13px;
+  left: 16px;
   transform: translateY(-50%);
-  color: var(--text);
-  opacity: 0.6;
-  font-size: 13px;
-}
-
-.input-icon {
   width: 16px;
   height: 16px;
+  color: var(--text-muted);
   pointer-events: none;
   transition: color 220ms var(--ease-smooth), transform 220ms var(--ease-out), filter 220ms var(--ease-smooth);
 }
 
 .input-wrapper:focus-within .input-icon {
-  color: var(--text);
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
+  color: var(--accent);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 45%, transparent));
 }
 
 .input-control {
   width: 100%;
-  padding: 10px 12px 10px 36px;
-  border: 1px solid var(--border-strong);
-  border-radius: 9px;
-  background: var(--input-surface);
+  padding: 14px 16px 14px 42px;
+  /* Misma superficie translúcida que el buscador de carnets: cristal esmerilado
+     sobre el degradado, no un relleno opaco que corte la atmósfera. */
+  border: 1px solid color-mix(in srgb, #fff 9%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, #fff 6%, transparent);
   color: var(--text);
   font: inherit;
-  font-size: 13px;
+  font-size: 13.5px;
   outline: none;
   transition: border-color 220ms var(--ease-smooth), background-color 220ms var(--ease-smooth), box-shadow 220ms var(--ease-smooth), transform 220ms var(--ease-out);
 }
 
+.input-control::placeholder {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+.input-control:hover {
+  border-color: color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
 .input-control:focus {
-  border-color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 68%, transparent);
+  background: color-mix(in srgb, #fff 10%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
-  transform: translateY(-1px);
+}
+
+/* El selector nativo del input de fecha ya aporta su propio icono a la derecha. */
+.input-control[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 180ms var(--ease-smooth);
+}
+
+.input-control[type='date']::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }

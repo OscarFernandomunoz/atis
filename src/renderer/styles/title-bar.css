@@ -19,18 +19,14 @@
   border-bottom-color: var(--surface);
 }
 
-:root[data-theme='light'] .title-bar {
-  border-bottom-color: var(--bg);
-}
-
 .title-bar-app-icon {
   position: relative;
   z-index: 2;
   display: none;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   flex: 0 0 auto;
-  margin-left: 10px;
+  margin-left: 14px;
   object-fit: contain;
   pointer-events: none;
   -webkit-user-drag: none;
@@ -51,8 +47,9 @@
   max-width: calc(100% - 300px);
   overflow: hidden;
   color: var(--title-bar-text);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
+  letter-spacing: 0.01em;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -97,7 +94,7 @@ html[data-title-bar-platform='custom'] .title-bar-title {
 }
 
 html[data-title-bar-platform='darwin'] .title-bar-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 

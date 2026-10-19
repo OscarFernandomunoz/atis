@@ -1,0 +1,136 @@
+/* Baldosa del icono de carga: brillo, halo pastel y glifo animado. */
+
+.dropzone-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 62px;
+  height: 62px;
+  color: #1a1a1a;
+  border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+  border-radius: 20px;
+  /* La baldosa siempre es clara: contrasta con el fondo negro igual que el papel
+     de la ilustración, que es el motivo visual de la tarjeta. */
+  background:
+    radial-gradient(120% 120% at 22% 0%, #ffffff 0%, rgba(255, 255, 255, 0) 58%),
+    linear-gradient(150deg, #fdfdfc 0%, #ebeaf2 52%, #dedde9 100%);
+  box-shadow:
+    0 16px 28px -14px color-mix(in srgb, #000 68%, transparent),
+    0 3px 8px -2px color-mix(in srgb, #000 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -10px 18px -14px rgba(77, 65, 141, 0.45);
+  transition:
+    border-color 420ms var(--ease-smooth),
+    box-shadow 520ms var(--ease-out),
+    transform 520ms var(--ease-out);
+  will-change: transform;
+}
+
+.dropzone-icon-halo {
+  position: absolute;
+  inset: -7px;
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  border-radius: 26px;
+  box-shadow: 0 0 28px color-mix(in srgb, var(--pastel-7) 24%, transparent);
+  opacity: 0.55;
+  animation: dropzone-halo-pulse 4.2s var(--ease-smooth) infinite;
+  pointer-events: none;
+}
+
+.dropzone-glyph-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  animation: dropzone-glyph-float 3.8s var(--ease-smooth) infinite;
+}
+
+.dropzone-glyph {
+  display: block;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px rgba(20, 20, 40, 0.18));
+}
+
+.dropzone-glyph-arrow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: dropzone-glyph-bob 2.8s var(--ease-smooth) infinite;
+}
+
+.dropzone-glyph-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.72;
+  animation: dropzone-spark 3.2s var(--ease-smooth) infinite;
+}
+
+.dropzone-valid-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: #0c2a1c;
+  border: 3px solid var(--surface);
+  border-radius: 999px;
+  background: linear-gradient(145deg, #e2f8ec, #82dcac);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--pastel-2) 48%, transparent),
+    0 8px 16px -6px color-mix(in srgb, #000 65%, transparent);
+  opacity: 0;
+  transform: scale(0.45) rotate(-20deg);
+  transition: opacity 280ms var(--ease-smooth), transform 420ms var(--ease-out);
+}
+
+.dropzone-valid-badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.dropzone.dropzone-valid .dropzone-valid-badge {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.dropzone:hover .dropzone-icon,
+.dropzone.dragover .dropzone-icon {
+  border-color: color-mix(in srgb, var(--text) 34%, transparent);
+  box-shadow:
+    0 20px 34px -16px color-mix(in srgb, #000 72%, transparent),
+    0 4px 10px -2px color-mix(in srgb, #000 44%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -10px 18px -14px rgba(77, 65, 141, 0.5),
+    0 0 36px -8px color-mix(in srgb, var(--pastel-4) 62%, transparent);
+  transform: translateY(-3px) rotate(-3deg) scale(1.05);
+}
+
+.dropzone:hover .dropzone-icon-halo,
+.dropzone.dragover .dropzone-icon-halo {
+  border-color: color-mix(in srgb, var(--pastel-7) 42%, var(--text));
+  opacity: 0.9;
+  animation-duration: 2.6s;
+}
+
+.dropzone:hover .dropzone-glyph-arrow {
+  animation-duration: 1.5s;
+}
+
+.dropzone.dragover .dropzone-glyph-arrow {
+  animation: dropzone-glyph-launch 900ms var(--ease-smooth) infinite;
+}
+
+.dropzone.dragover .dropzone-glyph-spark {
+  animation-duration: 1.2s;
+}
+
+.dropzone.dropzone-valid .dropzone-icon {
+  border-color: color-mix(in srgb, var(--pastel-2) 42%, var(--text));
+  box-shadow:
+    0 18px 30px -16px color-mix(in srgb, #000 68%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    0 0 32px -10px color-mix(in srgb, var(--pastel-2) 62%, transparent);
+}

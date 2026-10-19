@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@
   <title>Ahorro Instructor Automatizado (AIA)</title>
   <link rel="stylesheet" href="styles/index.css">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://nominatim.openstreetmap.org https://api.open-meteo.com; object-src 'none'; base-uri 'self';" />
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self';" />
 </head>
 
 <body>
@@ -18,7 +18,7 @@
     <img class="title-bar-app-icon" src="images/sofia-plus.png" alt="" aria-hidden="true" draggable="false">
 
     <div class="title-bar-drag-region">
-      <span class="title-bar-title">AIA - Gestión de Nómina</span>
+      <span class="title-bar-title">AIA · Gestión de nómina</span>
     </div>
 
     <div class="title-bar-controls windows-window-controls">
@@ -47,141 +47,124 @@
           <p class="eyebrow">AIA · Gestión de nómina</p>
           <h1 id="viewTitle">Subir archivo</h1>
         </div>
-        <div class="theme-selector">
-          <button class="theme-toggle" id="themeToggle" type="button" aria-label="Seleccionar tema"
-            aria-haspopup="menu" aria-expanded="false">
-            <svg class="app-icon theme-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path class="svg-moon" d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a6.5 6.5 0 0 0 11 11Z" stroke="currentColor"
-                stroke-width="2" stroke-linejoin="round" />
-            </svg>
-            <span id="themeLabel">Tema</span>
-          </button>
-          <div class="theme-dropdown" id="themeDropdown">
-            <button class="theme-option" data-theme="light">
-              <svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle class="svg-sun" cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" />
-                <path class="svg-sun-rays"
-                  d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-              <span>Claro</span>
-            </button>
-            <button class="theme-option" data-theme="dark">
-              <svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path class="svg-moon" d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a6.5 6.5 0 0 0 11 11Z" stroke="currentColor"
-                  stroke-width="2" stroke-linejoin="round" />
-              </svg>
-              <span>Oscuro</span>
-            </button>
-            <button class="theme-option" data-theme="system">
-              <svg class="app-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect class="svg-icon-path" x="3" y="3" width="18" height="18" rx="2" stroke="currentColor"
-                  stroke-width="2" />
-                <path class="svg-icon-path" d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" />
-              </svg>
-              <span>Sistema</span>
-            </button>
-          </div>
-        </div>
+        <button class="table-button" id="previewOpenButton" type="button" aria-haspopup="dialog">
+          <svg class="table-button-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="15" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M3 9.5h18M3 14.5h18M9.5 4.5v15" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          <span>Ver tabla</span>
+        </button>
       </div>
       <section id="subir" class="view-section active">
-        <div class="dashboard-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="section-kicker">Carga segura</p>
-              <h2 class="panel-title">Automatización de ahorro para instructores</h2>
-            </div>
-            <span class="panel-status">
-              <svg class="app-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                style="--icon-delay: 120ms;">
-                <circle class="svg-icon-path" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" />
-                <path class="svg-check" d="M8 12.5l2.8 2.8L16 10" stroke="currentColor" stroke-width="2.4"
-                  stroke-linecap="round" stroke-linejoin="round" fill="none" />
-              </svg>
-              Sistema listo
-            </span>
+        <section class="months-showcase" aria-label="Paisajes de Colombia por mes">
+          <div class="months-showcase-heading">
+            <p class="section-kicker">Colombia mes a mes</p>
+            <h2 class="months-showcase-title">Doce paisajes para acompañar tu año</h2>
           </div>
+          <div class="months-track" id="monthsTrack"></div>
+        </section>
+        <div class="dashboard-panel">
           <form id="accessForm" class="access-card" onsubmit="return false;">
-            <div class="access-card-title">Datos de Acceso</div>
-            <div class="form-group">
-              <label for="usuario">Usuario:</label>
-              <div class="input-wrapper">
-                <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                  style="--icon-delay: 20ms;">
-                  <circle class="svg-icon-path" cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" />
-                  <path class="svg-icon-path" d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2"
+            <div class="access-card-head">
+              <span class="access-card-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <rect x="4" y="10.5" width="16" height="9.5" rx="2.6" stroke="currentColor" stroke-width="1.8" />
+                  <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7" stroke="currentColor" stroke-width="1.8"
                     stroke-linecap="round" />
                 </svg>
-                <input type="text" id="usuario" class="input-control" value="juan.perez" required />
+              </span>
+              <div class="access-card-heading">
+                <p class="access-card-title">Datos de acceso</p>
+                <p class="access-card-subtitle">Credenciales de SofiaPlus y rango de fechas</p>
               </div>
             </div>
-            <div class="form-group">
-              <label for="password">Contraseña:</label>
-              <div class="input-wrapper">
-                <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                  style="--icon-delay: 40ms;">
-                  <rect class="svg-icon-path" x="4" y="11" width="16" height="10" rx="2" stroke="currentColor"
-                    stroke-width="2" />
-                  <path class="svg-icon-path" d="M8 11V7.5C8 5.3 9.8 3.5 12 3.5s4 1.8 4 4V11" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" />
-                  <circle class="svg-lock-core" cx="12" cy="16" r="1.2" fill="currentColor" opacity="0.85" />
-                </svg>
-                <input type="password" id="password" class="input-control" value="password123" required />
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="usuario">Usuario</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 20ms;">
+                    <circle class="svg-icon-path" cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <path class="svg-icon-path" d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                  <input type="text" id="usuario" class="input-control" value="juan.perez" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 40ms;">
+                    <rect class="svg-icon-path" x="4" y="11" width="16" height="10" rx="2" stroke="currentColor"
+                      stroke-width="2" />
+                    <path class="svg-icon-path" d="M8 11V7.5C8 5.3 9.8 3.5 12 3.5s4 1.8 4 4V11" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round" />
+                    <circle class="svg-lock-core" cx="12" cy="16" r="1.2" fill="currentColor" opacity="0.85" />
+                  </svg>
+                  <input type="password" id="password" class="input-control" value="password123" required />
+                </div>
               </div>
             </div>
-            <div class="form-group">
-              <label for="fechaInicio">Fecha de inicio:</label>
-              <div class="input-wrapper">
-                <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                  style="--icon-delay: 60ms;">
-                  <rect class="svg-icon-path" x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor"
-                    stroke-width="2" />
-                  <path class="svg-icon-path" d="M3.5 9.5h17" stroke="currentColor" stroke-width="2" />
-                  <path class="svg-icon-path" d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" />
-                  <circle class="svg-cal-dot" cx="12" cy="15" r="1.5" fill="currentColor" opacity="0.85" />
-                </svg>
-                <input type="date" id="fechaInicio" class="input-control" required />
+            <p class="form-separator"><span>Rango de fechas</span></p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fechaInicio">Fecha de inicio</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 60ms;">
+                    <rect class="svg-icon-path" x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor"
+                      stroke-width="2" />
+                    <path class="svg-icon-path" d="M3.5 9.5h17" stroke="currentColor" stroke-width="2" />
+                    <path class="svg-icon-path" d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <circle class="svg-cal-dot" cx="12" cy="15" r="1.5" fill="currentColor" opacity="0.85" />
+                  </svg>
+                  <input type="date" id="fechaInicio" class="input-control" required />
+                </div>
               </div>
-            </div>
-            <div class="form-group">
-              <label for="fechaFin">Fecha fin:</label>
-              <div class="input-wrapper">
-                <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
-                  style="--icon-delay: 80ms;">
-                  <rect class="svg-icon-path" x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor"
-                    stroke-width="2" />
-                  <path class="svg-icon-path" d="M3.5 9.5h17" stroke="currentColor" stroke-width="2" />
-                  <path class="svg-icon-path" d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" />
-                  <path class="svg-check" d="M9.5 14.5l2 2 4-4" stroke="currentColor" stroke-width="2.3"
-                    stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                </svg>
-                <input type="date" id="fechaFin" class="input-control" required />
+              <div class="form-group">
+                <label for="fechaFin">Fecha de fin</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 80ms;">
+                    <rect class="svg-icon-path" x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor"
+                      stroke-width="2" />
+                    <path class="svg-icon-path" d="M3.5 9.5h17" stroke="currentColor" stroke-width="2" />
+                    <path class="svg-icon-path" d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <path class="svg-check" d="M9.5 14.5l2 2 4-4" stroke="currentColor" stroke-width="2.3"
+                      stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                  </svg>
+                  <input type="date" id="fechaFin" class="input-control" required />
+                </div>
               </div>
             </div>
           </form>
-          <div class="dropzone" id="dropzone">
+          <div class="dropzone" id="dropzone" role="button" tabindex="0"
+            aria-label="Cargar archivo de nómina en Excel">
             <input type="file" id="fileInput" accept=".xls, .xlsx" required />
             <div class="dropzone-content">
               <div class="dropzone-icon" aria-hidden="true">
                 <span class="dropzone-icon-halo"></span>
-                <span class="dropzone-cloud-float">
-                  <svg class="app-icon is-visible cloud-icon" viewBox="0 0 48 38" fill="none"
+                <span class="dropzone-glyph-wrap">
+                  <svg class="dropzone-glyph app-icon is-visible" viewBox="0 0 40 40" fill="none"
                     style="--icon-delay: 100ms;">
-                    <path class="dropzone-cloud-outline"
-                      d="M14.5 30.5h20.8a8.2 8.2 0 0 0 1.2-16.3A12.2 12.2 0 0 0 13.2 12a9.3 9.3 0 0 0 1.3 18.5Z"
-                      stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-                    <path class="dropzone-cloud-shine" d="M17 14.5c2.6-3.1 6.4-4.7 10.4-4.3"
-                      stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".34" />
-                  </svg>
-                </span>
-                <span class="dropzone-arrow-float">
-                  <svg class="app-icon is-visible upload-arrow-icon" viewBox="0 0 20 20" fill="none">
-                    <path d="M10 15V5m0 0L6 9m4-4 4 4" stroke="currentColor" stroke-width="2.2"
-                      stroke-linecap="round" stroke-linejoin="round" />
+                    <defs>
+                      <linearGradient id="dropzoneGlyphStroke" x1="12" y1="9" x2="28" y2="34"
+                        gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#1b1b1b" />
+                        <stop offset="1" stop-color="#6a58b8" />
+                      </linearGradient>
+                    </defs>
+                    <path class="dropzone-glyph-tray" d="M9.5 24.5v5a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3v-5"
+                      stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+                    <path class="dropzone-glyph-arrow" d="M20 27V9.5m0 0-6 6m6-6 6 6"
+                      stroke="url(#dropzoneGlyphStroke)" stroke-width="2.6" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                    <path class="dropzone-glyph-spark" d="M31.5 12v4M29.5 14h4" stroke="#8d7fd8"
+                      stroke-width="1.8" stroke-linecap="round" />
                   </svg>
                 </span>
                 <span class="dropzone-valid-badge">
@@ -193,12 +176,37 @@
               </div>
               <div class="dropzone-copy">
                 <span class="dropzone-eyebrow">Carga de nómina</span>
-                <span class="dropzone-text" id="dropzoneText">Arrastra y suelta tu archivo de nómina aquí (.xls,
-                  .xlsx). Obligatorio. Debe incluir la Columna 3.</span>
+                <span class="dropzone-text" id="dropzoneText">Arrastra y suelta tu archivo de nómina aquí o haz clic
+                  para seleccionarlo.</span>
+                <span class="dropzone-meta">
+                  <span class="dropzone-chip">Formato .xls / .xlsx</span>
+                  <span class="dropzone-chip is-required">Columna 3 obligatoria</span>
+                </span>
               </div>
             </div>
+            <span class="dropzone-cta" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none">
+                <path d="M10 13.5V3.5m0 0L6.4 7.1M10 3.5l3.6 3.6" stroke="currentColor" stroke-width="1.9"
+                  stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M4 12.5v2.7A1.8 1.8 0 0 0 5.8 17h8.4a1.8 1.8 0 0 0 1.8-1.8v-2.7" stroke="currentColor"
+                  stroke-width="1.9" stroke-linecap="round" />
+              </svg>
+              Seleccionar archivo
+            </span>
             <div class="dropzone-illustration-wrap" aria-hidden="true">
               <svg class="illustration" viewBox="0 0 104 104" fill="none">
+                <defs>
+                  <linearGradient id="illustrationSheetFill" x1="31" y1="12" x2="82" y2="92"
+                    gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#232323" />
+                    <stop offset="1" stop-color="#151515" />
+                  </linearGradient>
+                  <linearGradient id="illustrationCheckFill" x1="58" y1="56" x2="86" y2="84"
+                    gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#2c2c2c" />
+                    <stop offset="1" stop-color="#0b0b0b" />
+                  </linearGradient>
+                </defs>
                 <ellipse class="illustration-shadow" cx="52" cy="91" rx="31" ry="6" />
                 <g class="illustration-back-card">
                   <rect x="25" y="18" width="48" height="62" rx="11" />
@@ -223,27 +231,43 @@
               </svg>
             </div>
           </div>
-          <div class="excel-preview" id="excelPreview" aria-live="polite"></div>
-          <button class="btn-submit" id="btnUpload">
-            <span class="btn-submit-inner">
-              <svg class="app-icon btn-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path class="svg-icon-path" d="M10 3H7.8A3.8 3.8 0 0 0 4 6.8V17A4 4 0 0 0 8 21h9a3 3 0 0 0 3-3V7l-4-4Z"
-                  stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                <path class="svg-icon-path" d="M14 3v4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-              <span class="btn-label">Iniciar sesión en SofiaPlus</span>
-              <svg class="btn-loader" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.25" stroke-width="3" />
-                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-              </svg>
-              <svg class="btn-success" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12.5l4.2 4.2L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </span>
-          </button>
         </div>
+        <section class="cards-showcase" id="cardsPanel">
+          <div class="cards-showcase-heading">
+            <div>
+              <p class="section-kicker">Cartas de presentación</p>
+              <h2 class="cards-showcase-title">Carnets de los instructores</h2>
+            </div>
+            <p class="cards-count" id="cardsCount" aria-live="polite"></p>
+          </div>
+          <div class="cards-toolbar">
+            <label class="cards-search">
+              <svg class="cards-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                <path d="m20 20-3.2-3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <input type="search" id="cardsSearch" placeholder="Buscar por nombre o documento"
+                aria-label="Buscar instructor por nombre o documento" autocomplete="off" />
+            </label>
+            <label class="select-all">
+              <input type="checkbox" id="cardsSelectAll" />
+              <span class="select-all-box" aria-hidden="true">
+                <svg class="select-all-check" viewBox="0 0 16 16" fill="none">
+                  <path d="m3.6 8.4 3 3 5.8-6.4" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <svg class="select-all-dash" viewBox="0 0 16 16" fill="none">
+                  <path d="M3.5 8h9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="select-all-label">Seleccionar todo</span>
+            </label>
+            <div class="hours-filter" id="hoursFilter" role="group" aria-label="Filtrar carnets por horas"></div>
+          </div>
+          <div class="program-filter" id="programFilter" role="group" aria-label="Filtrar carnets por programa"></div>
+          <div class="cards-grid" id="cardsGrid"></div>
+          <p class="cards-empty" id="cardsEmpty" hidden>Ningún instructor coincide con los filtros.</p>
+        </section>
       </section>
       <section id="dashboard" class="view-section placeholder-view">Resumen general e indicadores del sistema.</section>
       <section id="config" class="view-section placeholder-view">Ajustes de la cuenta y configuración de automatización.
@@ -254,92 +278,112 @@
       </section>
     </main>
   </div>
-  <footer class="status-bar" aria-label="Información contextual">
-    <div class="status-items">
-      <div class="status-item status-clock-item">
-        <span class="status-icon-shell" aria-hidden="true">
-          <svg class="app-icon status-icon is-visible" viewBox="0 0 24 24" fill="none">
-            <circle class="status-clock-ring" cx="12" cy="12" r="8.5" />
-            <path class="status-clock-hand status-clock-hand-hour" d="M12 7.5V12" />
-            <path class="status-clock-hand status-clock-hand-minute" d="M12 12l3.2 2" />
-            <circle class="status-clock-center" cx="12" cy="12" r="1.25" />
+  <!-- Barra tipo reproductor (estilo Spotify): a la izquierda la cédula en curso,
+       al centro el play y la barra de progreso de la automatización de SofiaPlus. -->
+  <footer class="player-bar" aria-label="Automatización de SofiaPlus">
+    <div class="player-left">
+      <span class="player-artwork" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3.5" y="5" width="17" height="14" rx="2.4" stroke="currentColor" stroke-width="1.7" />
+          <circle cx="9" cy="11" r="2.1" stroke="currentColor" stroke-width="1.7" />
+          <path d="M5.6 16.6c.8-1.8 2-2.7 3.4-2.7s2.6.9 3.4 2.7" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" />
+          <path d="M15 10h3.4M15 13.2h3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="player-meta">
+        <span class="player-title"><span id="playerIdentification">Sin instructor en curso</span><span class="player-name" id="playerInstructorName"></span></span>
+        <span class="player-subtitle" id="statusMessage" role="status" aria-live="polite"></span>
+      </span>
+    </div>
+
+    <div class="player-center">
+      <div class="player-controls">
+        <button class="player-play" id="playerPlay" type="button" data-state="idle"
+          aria-label="Iniciar la automatización de SofiaPlus">
+          <svg class="player-play-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path class="player-glyph player-glyph-play" d="M9.5 6.2v11.6L18.5 12 9.5 6.2Z" />
+            <path class="player-glyph player-glyph-pause" d="M9.6 6.6v10.8M14.4 6.6v10.8" />
+            <path class="player-glyph player-glyph-success" d="m7.5 12.4 3 3L16.8 9" />
+            <path class="player-glyph player-glyph-error" d="M12 7.4v5.8M12 16.6h.01" />
           </svg>
-        </span>
-        <span class="status-copy">
-          <span class="status-label">Hora local</span>
-          <span class="status-value" id="clock">12:00 PM</span>
-        </span>
+        </button>
+        <button class="player-table" id="playerTableButton" type="button" aria-haspopup="dialog"
+          title="Ver tabla del archivo cargado" aria-label="Ver la tabla del archivo cargado">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="15" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+            <path d="M3 9.5h18M3 14.5h18M9.5 4.5v15" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </button>
       </div>
 
-      <span class="status-divider" aria-hidden="true"></span>
-
-      <div class="status-item status-date-item">
-        <span class="status-icon-shell" aria-hidden="true">
-          <svg class="app-icon status-icon is-visible" viewBox="0 0 24 24" fill="none">
-            <rect class="status-calendar-page" x="3.5" y="5.5" width="17" height="15" rx="3" />
-            <path class="status-calendar-line" d="M3.5 9.5h17M8 3.5v4M16 3.5v4" />
-            <circle class="status-calendar-dot" cx="8" cy="14" r="1" />
-            <circle class="status-calendar-dot" cx="12" cy="14" r="1" />
-            <circle class="status-calendar-dot" cx="16" cy="14" r="1" />
-          </svg>
-        </span>
-        <span class="status-copy">
-          <span class="status-label">Fecha</span>
-          <span class="status-value" id="currentDate">Cargando fecha...</span>
-        </span>
-      </div>
-
-      <span class="status-divider" aria-hidden="true"></span>
-
-      <div class="status-item status-location-item">
-        <span class="status-icon-shell" aria-hidden="true">
-          <svg class="app-icon status-icon is-visible" viewBox="0 0 24 24" fill="none">
-            <circle class="status-location-pulse" cx="12" cy="10" r="7" />
-            <path class="status-location-pin" d="M12 21s6.5-5.8 6.5-11a6.5 6.5 0 1 0-13 0C5.5 15.2 12 21 12 21Z" />
-            <circle class="status-location-dot" cx="12" cy="10" r="2.3" />
-          </svg>
-        </span>
-        <span class="status-copy">
-          <span class="status-label">Ubicación</span>
-          <span class="status-value" id="currentCity">Detectando ciudad...</span>
-        </span>
-      </div>
-
-      <span class="status-divider" aria-hidden="true"></span>
-
-      <div class="status-item status-weather-item">
-        <span class="status-icon-shell" aria-hidden="true">
-          <svg class="app-icon status-icon weather-status-icon is-visible" viewBox="0 0 24 24" fill="none"
-            id="weatherIcon">
-            <g class="weather-sun-group">
-              <circle class="weather-sun-core" cx="8.5" cy="8.5" r="3.2" />
-              <path class="weather-sun-rays"
-                d="M8.5 2.5v2M2.5 8.5h2M4.2 4.2l1.4 1.4M11.4 4.2 10 5.6M12.5 8.5h2" />
-            </g>
-            <path class="weather-cloud-shape" d="M16.8 19a3.6 3.6 0 0 0 .3-7.2 4.6 4.6 0 0 0-8.9 1.1A3.1 3.1 0 0 0 8.6 19h8.2Z" />
-            <g class="weather-rain-group">
-              <path d="m9 21-.8 1.5M13 21l-.8 1.5M17 21l-.8 1.5" />
-            </g>
-            <g class="weather-snow-group">
-              <path d="M9 22h.01M13 22h.01M17 22h.01" />
-            </g>
-            <path class="weather-bolt" d="m13 18-2 3h2l-1 3 3.5-4h-2l1.5-2Z" />
-            <g class="weather-fog-group">
-              <path d="M8 21h9M10 23h7" />
-            </g>
-            <g class="weather-alert-group">
-              <path d="M16 19v2.5M16 23.5h.01" />
-            </g>
-          </svg>
-        </span>
-        <span class="status-copy">
-          <span class="status-label">Clima</span>
-          <span class="status-value" id="weather">Consultando clima...</span>
-        </span>
+      <div class="player-progress">
+        <span class="player-time" id="playerProgressCurrent">0</span>
+        <div class="player-track" id="playerTrack" role="progressbar" aria-label="Avance de la automatización"
+          aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+          <span class="player-track-fill" id="playerProgressFill"></span>
+        </div>
+        <span class="player-time player-time-total" id="playerProgressTotal">0</span>
       </div>
     </div>
-    <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
   </footer>
+
+  <!-- Ventana interna con la tabla del Excel; se abre desde el botón de la cabecera. -->
+  <div class="modal" id="previewModal" hidden>
+    <div class="modal-backdrop" id="previewBackdrop"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="previewModalTitle">
+      <header class="modal-head">
+        <div>
+          <p class="section-kicker">Vista previa</p>
+          <h2 class="modal-title" id="previewModalTitle">Datos del archivo cargado</h2>
+        </div>
+        <button class="modal-close" id="previewCloseButton" type="button" aria-label="Cerrar vista previa">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="excel-preview" id="excelPreview" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Permiso de notificaciones del computador: se pregunta una sola vez, al abrir la app. -->
+  <div class="modal" id="notificationsModal" hidden>
+    <div class="modal-backdrop" id="notificationsBackdrop"></div>
+    <div class="modal-dialog modal-dialog-compact" role="dialog" aria-modal="true"
+      aria-labelledby="notificationsTitle" aria-describedby="notificationsText">
+      <header class="modal-head">
+        <div>
+          <p class="section-kicker">Avisos del sistema</p>
+          <h2 class="modal-title" id="notificationsTitle">¿Permitir notificaciones del computador?</h2>
+        </div>
+        <button class="modal-close" id="notificationsClose" type="button" aria-label="Ahora no, cerrar">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </header>
+      <div class="modal-body consent-body">
+        <span class="consent-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 4.4a5.1 5.1 0 0 0-5.1 5.1v3.2L5.4 15.5h13.2l-1.5-2.8V9.5A5.1 5.1 0 0 0 12 4.4Z"
+              stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M10.2 18.1a2 2 0 0 0 3.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+        </span>
+        <p class="consent-text" id="notificationsText">Si algo sale mal durante la automatización, te avisamos con una
+          notificación del computador para que no tengas que estar pendiente de la ventana. Si tu equipo no puede
+          mostrarlas, el aviso aparece como tarjeta dentro de la aplicación.</p>
+        <p class="consent-note">Si eliges «Ahora no», los avisos siguen apareciendo en la barra inferior.</p>
+        <div class="consent-actions">
+          <button class="consent-button consent-button-ghost" id="notificationsDeny" type="button">Ahora no</button>
+          <button class="consent-button consent-button-primary" id="notificationsAllow" type="button">Permitir
+            notificaciones</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="module" src="index.js"></script>
 </body>
 

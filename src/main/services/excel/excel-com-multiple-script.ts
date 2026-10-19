@@ -31,6 +31,8 @@ $wb = $null
 try {
   $wb = $excel.Workbooks.Open($InPath)
   $done = $false
+  # Targets restantes por encontrar
+$targetsRestantes = $targetPairs.Count
   foreach ($ws in $wb.Worksheets) {
     if ($done) { break }
     $used = $ws.UsedRange
@@ -66,11 +68,15 @@ try {
           $cell.Value2 = $hours
         }
         if ($num -lt 160) {
-          $cell.Interior.Color = [System.Drawing.ColorTranslator]::ToOle([System.Drawing.Color]::FromArgb(255, 0, 0))
+          $cell.Interior.Color = [System.Drawing.ColorTranslator]::ToOle([System.Drawing.Color]::FromArgb(255, 0, 0)) # Rojo
+        } elseif ($num -ge 160 -and $num -lt 200) {
+          $cell.Interior.Color = [System.Drawing.ColorTranslator]::ToOle([System.Drawing.Color]::FromArgb(255, 255, 0)) # Amarillo
         } else {
-          $cell.Interior.Color = [System.Drawing.ColorTranslator]::ToOle([System.Drawing.Color]::FromArgb(0, 176, 80))
+          $cell.Interior.Color = [System.Drawing.ColorTranslator]::ToOle([System.Drawing.Color]::FromArgb(0, 176, 80)) # Verde
         }
-        $done = $true
+        $targetsRestantes--
+        if ($targetsRestantes -eq 0) { $done = $true }
+        break
       }
     }
   }

@@ -1,19 +1,44 @@
 import * as XLSX from 'xlsx';
 import type { AppElements, FileUploadState } from '../types.js';
+import { clearInstructorCards, forgetLiveHours, renderInstructorCards, type CardBoard } from './instructor-cards/index.js';
+import { notify } from './notifications/index.js';
 
 const REQUIRED_COLUMN_NUMBER = 3;
 const REQUIRED_COLUMN_NAME = `Columna ${REQUIRED_COLUMN_NUMBER}`;
 const ALTERNATIVE_COLUMN_NAME = '# DE DOCUMENTO';
 const REQUIRED_COLUMN_NAMES = [REQUIRED_COLUMN_NAME, ALTERNATIVE_COLUMN_NAME];
 const REQUIRED_COLUMN_LABEL = `${REQUIRED_COLUMN_NAME} o ${ALTERNATIVE_COLUMN_NAME}`;
-const DROPZONE_HINT = `Arrastra y suelta tu archivo de nómina aquí (.xls, .xlsx). Obligatorio. Debe incluir ${REQUIRED_COLUMN_LABEL}.`;
+const DROPZONE_HINT = 'Arrastra y suelta tu archivo de nómina aquí o haz clic para seleccionarlo.';
 
-export type FileElements = Pick<AppElements, 'dropzone' | 'fileInput' | 'dropzoneText' | 'excelPreview' | 'statusMessage'>;
+export type FileElements = Pick<AppElements, 'dropzone' | 'fileInput' | 'dropzoneText' | 'excelPreview' | 'cardsGrid' | 'programFilter' | 'hoursFilter' | 'cardsSearch' | 'cardsSelectAll' | 'cardsCount' | 'cardsEmpty' | 'statusMessage'>;
+
+function cardBoard(elements: FileElements): CardBoard {
+  return {
+    grid: elements.cardsGrid,
+    programFilter: elements.programFilter,
+    hoursFilter: elements.hoursFilter,
+    search: elements.cardsSearch,
+    selectAll: elements.cardsSelectAll,
+    count: elements.cardsCount,
+    empty: elements.cardsEmpty,
+  };
+}
 
 export function initFileHandling(elements: FileElements, state: FileUploadState): void {
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
+  elements.dropzone.addEventListener('keydown', (event: KeyboardEvent) => {
+    // La tarjeta actúa como botón: Enter y Espacio deben abrir el selector.
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    elements.fileInput.click();
+  });
   elements.dropzone.addEventListener('dragover', (event: DragEvent) => { event.preventDefault(); elements.dropzone.classList.add('dragover'); });
-  elements.dropzone.addEventListener('dragleave', () => elements.dropzone.classList.remove('dragover'));
+  elements.dropzone.addEventListener('dragleave', (event: DragEvent) => {
+    // Al pasar sobre un hijo el navegador emite dragleave: solo se apaga al salir.
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && elements.dropzone.contains(nextTarget)) return;
+    elements.dropzone.classList.remove('dragover');
+  });
   elements.dropzone.addEventListener('drop', (event: DragEvent) => {
     event.preventDefault();
     elements.dropzone.classList.remove('dragover');
@@ -30,35 +55,45 @@ export function initFileHandling(elements: FileElements, state: FileUploadState)
 function validateAndSetFile(file: File, elements: FileElements, state: FileUploadState): void {
   elements.dropzone.classList.remove('dropzone-valid', 'dropzone-error');
   const extension = file.name.split('.').pop()?.toLowerCase();
-  if (extension !== 'xls' && extension !== 'xlsx') { alert('Solo se permiten archivos Excel en formato .xls o .xlsx'); return; }
+  if (extension !== 'xls' && extension !== 'xlsx') {
+    void notify('Archivo no válido', 'Solo se permiten archivos Excel en formato .xls o .xlsx');
+    return;
+  }
   elements.dropzoneText.innerHTML = `Archivo seleccionado: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
   elements.statusMessage.textContent = `Archivo "${file.name}" cargado. Validando ${REQUIRED_COLUMN_NAME}...`;
+  // Un archivo nuevo empieza sin horas leídas del portal.
+  forgetLiveHours();
   void refreshExcelPreview(file, elements, state);
 }
 
 export async function refreshExcelPreview(file: File, elements: FileElements, state: FileUploadState): Promise<void> {
   elements.excelPreview.replaceChildren();
   elements.excelPreview.textContent = 'Leyendo información del Excel...';
+  clearInstructorCards(cardBoard(elements));
   try {
     const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-    const sheets = workbook.SheetNames.map((sheetName) => {
+    // Detectar si alguna hoja tiene filtro autofilter aplicado (Excel nativo)
+    const sheetFilterInfos = workbook.SheetNames.map((sheetName) => {
       const sheet = workbook.Sheets[sheetName];
+      const autofilter = sheet ? sheet['!autofilter'] : null;
       return {
         sheetName,
+        autofilter,
         rows: sheet ? XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '' }) : [],
       };
     });
-    const validationResults = sheets.map(({ sheetName, rows }) => validateRequiredColumn(rows, sheetName));
+    const validationResults = sheetFilterInfos.map(({ sheetName, rows }) => validateRequiredColumn(rows, sheetName));
     const validSheetCount = validationResults.filter((result) => result === null).length;
     if (validSheetCount === 0) {
       rejectFile(elements, state, validationResults.find(Boolean) ?? `Ninguna hoja contiene ${REQUIRED_COLUMN_LABEL} con datos válidos.`);
       return;
     }
-    const identifications = [...new Set(sheets
+    const identifications = [...new Set(sheetFilterInfos
       .flatMap(({ rows }) => getAllIdentifications(rows)))];
     const firstIdentification = identifications[0] ?? null;
     const fragment = document.createDocumentFragment();
-    sheets.forEach(({ sheetName, rows }) => {
+    sheetFilterInfos.forEach(({ sheetName, rows }, sheetIndex) => {
+      const filterInfo = sheetFilterInfos[sheetIndex];
       const section = document.createElement('section');
       const title = document.createElement('h3');
       title.textContent = sheetName;
@@ -69,11 +104,19 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
         section.appendChild(empty);
       } else {
         const table = createTable(rows, findRequiredColumnIndex(rows)?.columnIndex ?? -1);
+        // Agregar barra de filtros que respeta filas ocultas
         section.appendChild(createFilterBar(table));
         const wrapper = document.createElement('div');
         wrapper.className = 'excel-table-wrapper';
         wrapper.appendChild(table);
         section.appendChild(wrapper);
+        // Si el archivo tiene filtro autofilter nativo, agregar indicación visual
+        if (filterInfo?.autofilter) {
+          const filterNote = document.createElement('p');
+          filterNote.className = 'excel-filter-note';
+          filterNote.textContent = `• Hoja tiene filtro autofilter aplicado (rango: ${filterInfo.autofilter.ref})`;
+          section.appendChild(filterNote);
+        }
       }
       fragment.appendChild(section);
     });
@@ -86,6 +129,10 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     elements.dropzone.classList.remove('dropzone-error');
     elements.dropzone.classList.add('dropzone-valid');
     elements.excelPreview.replaceChildren(fragment);
+    // Con las tablas ya montadas, el filtro de carnets oculta las filas que no aplican.
+    renderInstructorCards(cardBoard(elements), sheetFilterInfos.map(({ rows }) => rows), (visible) => {
+      applyCardFilter(elements, visible);
+    });
     if (!firstIdentification) {
       elements.statusMessage.textContent = `Información de ${file.name} lista para revisar. ${REQUIRED_COLUMN_LABEL} presente, pero no se encontraron cédulas válidas.`;
     }
@@ -156,6 +203,8 @@ export function highlightRow(elements: FileElements, identification: string | nu
     return cells.some((cell) => cell === identification || cell.includes(identification));
   });
   target?.classList.add('excel-row-active');
+  // La tabla vive en una ventana interna: al resaltar hay que acercar la fila.
+  target?.scrollIntoView({ block: 'nearest' });
 }
 
 function rejectFile(elements: FileElements, state: FileUploadState, message: string): void {
@@ -166,8 +215,9 @@ function rejectFile(elements: FileElements, state: FileUploadState, message: str
   elements.dropzone.classList.add('dropzone-error');
   elements.dropzoneText.textContent = DROPZONE_HINT;
   elements.excelPreview.textContent = message;
+  clearInstructorCards(cardBoard(elements));
   elements.statusMessage.textContent = message;
-  alert(message);
+  void notify('No se pudo leer el archivo', message);
 }
 
 function createTable(rows: unknown[][], requiredColumnIndex: number): HTMLTableElement {
@@ -182,10 +232,34 @@ function createTable(rows: unknown[][], requiredColumnIndex: number): HTMLTableE
       if (cellIndex === requiredColumnIndex) tableCell.classList.add('excel-required-column');
       tableRow.appendChild(tableCell);
     });
+    // Se guarda la cédula de la fila para que el filtro de carnets pueda ocultarla.
+    if (rowIndex > 0 && requiredColumnIndex >= 0) {
+      const identification = String((row ?? [])[requiredColumnIndex] ?? '').trim();
+      if (identification.replace(/\D/g, '').length >= 6) tableRow.dataset.identification = identification;
+    }
     (rowIndex === 0 ? head : body).appendChild(tableRow);
   });
   table.append(head, body);
   return table;
+}
+
+// Una fila del preview se oculta por el filtro de carnets o por el buscador de la tabla.
+function isRowHidden(row: HTMLTableRowElement): boolean {
+  return row.dataset.cardHidden === 'true' || row.dataset.searchHidden === 'true';
+}
+
+// Oculta en la vista previa las filas cuya cédula no pasó el filtro de carnets.
+// `visible === null` significa que no hay filtro activo y se muestran todas las filas.
+function applyCardFilter(elements: FileElements, visible: string[] | null): void {
+  const allowed = visible === null ? null : new Set(visible);
+  elements.excelPreview.querySelectorAll('table').forEach((table) => {
+    Array.from(table.tBodies[0]?.rows ?? []).forEach((row) => {
+      const identification = row.dataset.identification ?? '';
+      const shownByCards = allowed === null || (identification !== '' && allowed.has(identification));
+      row.dataset.cardHidden = shownByCards ? 'false' : 'true';
+      row.hidden = isRowHidden(row);
+    });
+  });
 }
 
 function createFilterBar(table: HTMLTableElement): HTMLDivElement {
@@ -227,9 +301,11 @@ function createFilterBar(table: HTMLTableElement): HTMLDivElement {
       rowsCollection.forEach((row, rowIndex) => {
         const values = rowValues[rowIndex] ?? [];
         const cellVal = selectedColumn !== null ? values[selectedColumn] : undefined;
-        row.hidden = Boolean(value) && !(selectedColumn === null
+        const matches = !value || (selectedColumn === null
           ? values.some((cellValue) => cellValue.includes(value))
           : Boolean(cellVal?.includes(value)));
+        row.dataset.searchHidden = matches ? 'false' : 'true';
+        row.hidden = isRowHidden(row);
       });
     });
   };

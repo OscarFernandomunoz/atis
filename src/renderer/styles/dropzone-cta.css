@@ -1,0 +1,53 @@
+/* Píldora de acción del dropzone: refuerza que toda la tarjeta se puede pulsar. */
+
+.dropzone-cta {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding: 9px 15px;
+  color: color-mix(in srgb, var(--text) 84%, var(--text-muted));
+  border: 1px solid color-mix(in srgb, var(--text) 13%, transparent);
+  border-radius: 999px;
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--text) 8%, transparent),
+      color-mix(in srgb, var(--text) 3%, transparent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 10%, transparent),
+    0 10px 22px -18px color-mix(in srgb, #000 65%, transparent);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition:
+    color 300ms var(--ease-smooth),
+    border-color 300ms var(--ease-smooth),
+    background 300ms var(--ease-smooth),
+    box-shadow 300ms var(--ease-smooth),
+    transform 420ms var(--ease-out);
+}
+
+.dropzone-cta svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 420ms var(--ease-out);
+}
+
+.dropzone:hover .dropzone-cta,
+.dropzone.dragover .dropzone-cta {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--text) 26%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 14%, transparent),
+    0 14px 26px -18px color-mix(in srgb, #000 70%, transparent),
+    0 0 26px -12px color-mix(in srgb, var(--pastel-7) 50%, transparent);
+  transform: translateY(-1px);
+}
+
+.dropzone:hover .dropzone-cta svg {
+  transform: translateY(-2px) rotate(-4deg);
+}
+
+.dropzone.dragover .dropzone-cta {
+  transform: translateY(-2px) scale(1.03);
+}

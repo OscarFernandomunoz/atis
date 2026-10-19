@@ -27,80 +27,10 @@ html.icons-ready .app-icon {
   color: var(--success);
 }
 
-.access-card {
-  padding: 22px;
-  margin-bottom: 22px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--form-surface);
-  box-shadow: 0 10px 26px color-mix(in srgb, #000 12%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
-  transition: background-color 260ms var(--ease-smooth), border-color 260ms var(--ease-smooth), box-shadow 260ms var(--ease-smooth);
-}
-
-.access-card:focus-within {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent), 0 10px 26px color-mix(in srgb, #000 12%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
-}
-
-.access-card-title {
-  margin-bottom: 16px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.form-group {
-  display: flex;
-  align-items: center;
-  max-width: 590px;
-  margin-bottom: 12px;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-.form-group label {
-  width: 110px;
-  padding-right: 16px;
-  color: var(--text-muted);
-  font-size: 13px;
-  text-align: right;
-}
-
-.input-wrapper {
-  position: relative;
-  flex: 1;
-}
-
-.input-icon {
-  position: absolute;
-  top: 50%;
-  left: 13px;
-  transform: translateY(-50%);
-  color: var(--text);
-  opacity: 0.6;
-  font-size: 13px;
-}
-
-.input-icon {
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-  transition: color 220ms var(--ease-smooth), transform 220ms var(--ease-out), filter 220ms var(--ease-smooth);
-}
-
-.input-wrapper:focus-within .input-icon {
-  color: var(--text);
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
-}
-
 /* SVG icons: reveal con clip-path + dasharray generoso a prueba de repaints */
 .svg-icon-path,
 .svg-cloud,
 .svg-arrow,
-.svg-moon,
-.svg-sun,
-.svg-sun-rays,
 .svg-weather-cloud,
 .svg-clock-hands,
 .svg-check {
@@ -168,28 +98,11 @@ html.icons-ready .app-icon {
     svg-breath 2.4s ease-in-out 1.5s infinite;
 }
 
-.app-icon.is-visible .svg-sun {
-  transform-origin: 9px 13px;
-  animation: svg-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 500ms both;
-}
-
-.app-icon.is-visible .svg-sun-rays {
-  transform-origin: 9px 13px;
-  animation: svg-draw 700ms var(--ease-out) 300ms forwards,
-    svg-rotate 18s linear 1.4s infinite;
-}
-
 .app-icon.is-visible .svg-weather-cloud {
   stroke-dasharray: 200;
   stroke-dashoffset: 200;
   animation: svg-draw 700ms var(--ease-out) 500ms forwards,
     svg-cloud-drift 5s ease-in-out 1.4s infinite;
-}
-
-.app-icon.is-visible .svg-moon {
-  stroke-dasharray: 180;
-  stroke-dashoffset: 180;
-  animation: svg-draw 620ms var(--ease-out) forwards;
 }
 
 @keyframes svg-pop {
@@ -221,12 +134,6 @@ html.icons-ready .app-icon {
   }
 }
 
-@keyframes svg-rotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes svg-spin {
   from {
     transform: rotate(-40deg) scale(0.7);
@@ -237,45 +144,72 @@ html.icons-ready .app-icon {
   }
 }
 
-@keyframes dropzone-cloud-float {
+@keyframes dropzone-glyph-float {
 
   0%,
   100% {
-    transform: translate3d(0, 1px, 0) rotate(-1deg);
+    transform: translate3d(0, 1px, 0);
   }
 
   50% {
-    transform: translate3d(0, -3px, 0) rotate(1deg);
+    transform: translate3d(0, -2.5px, 0);
   }
 }
 
-@keyframes dropzone-arrow-float {
+@keyframes dropzone-glyph-bob {
 
   0%,
   100% {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(0, 1px, 0) scale(1);
   }
 
   50% {
-    transform: translate3d(-50%, -3px, 0);
+    transform: translate3d(0, -2px, 0) scale(1.04);
   }
 }
 
-@keyframes dropzone-arrow-launch {
+@keyframes dropzone-glyph-launch {
 
   0% {
-    transform: translate3d(-50%, 2px, 0) scale(0.9);
-    opacity: 0.55;
+    transform: translate3d(0, 2px, 0) scale(0.94);
+    opacity: 0.6;
   }
 
   55% {
-    transform: translate3d(-50%, -8px, 0) scale(1.15);
+    transform: translate3d(0, -4px, 0) scale(1.08);
     opacity: 1;
   }
 
   100% {
-    transform: translate3d(-50%, -2px, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes dropzone-dot-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-5) 55%, transparent);
+    opacity: 0.7;
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--pastel-5) 0%, transparent);
+    opacity: 1;
+  }
+}
+
+@keyframes dropzone-invite {
+
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-7) 38%, transparent),
+      0 20px 44px -28px color-mix(in srgb, #000 65%, transparent);
+  }
+
+  100% {
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--pastel-7) 0%, transparent),
+      0 20px 44px -28px color-mix(in srgb, #000 65%, transparent);
   }
 }
 
@@ -359,27 +293,7 @@ html.icons-ready .app-icon {
   }
 }
 
-
-/* Status bar SVGs */
-.status-icon {
-  width: 12px;
-  height: 12px;
-  color: var(--accent);
-}
-
-.status-icon .svg-clock-hands {
-  transform-origin: 12px 12px;
-  animation: svg-rotate 22s linear infinite;
-  stroke-dasharray: 30;
-  stroke-dashoffset: 30;
-}
-
-.theme-toggle .theme-icon {
-  width: 14px;
-  height: 14px;
-  color: currentColor;
-}
-
+/* Panel status icons. */
 .panel-status .app-icon {
   width: 13px;
   height: 13px;

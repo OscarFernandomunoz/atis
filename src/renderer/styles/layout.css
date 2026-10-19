@@ -10,11 +10,33 @@
 }
 
 .main-content {
+  position: relative;
   flex: 1;
   min-width: 0;
   overflow-y: auto;
+  /* Deja hueco al final para que el contenido pueda subir por encima de la
+     barra del reproductor, que flota translúcida sobre el scroll. */
+  padding-bottom: calc(var(--player-bar-height) + 32px);
   background: transparent;
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
+}
+
+/* Atmósfera de la app: el degradado vive dentro de `.main-content`, así que es
+   parte del documento y sube con el scroll hasta salir de la vista (no se queda
+   pegado a la ventana). Mide lo mismo que la pantalla visible, que es lo que dura
+   el color: por debajo los focos ya se han desvanecido y queda el negro de `body`. */
+.main-content::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  will-change: opacity;
+  background-image: var(--app-gradient);
+  animation: background-fade 900ms var(--ease-out) both;
 }
 
 .content-header {
@@ -24,30 +46,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 48px clamp(20px, 5vw, 64px) 28px;
+  padding: 48px clamp(20px, 5vw, 64px) 48px;
   background: transparent;
   -webkit-app-region: no-drag;
   z-index: 10;
 }
 
-.content-header::before {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(circle 190px at var(--header-mouse-x, 50%) var(--header-mouse-y, 50%), rgba(255, 255, 255, 0.1), transparent 72%);
-  transition: opacity 300ms var(--ease-smooth);
-}
-
-:root[data-theme='dark'] .content-header {
-  background: var(--surface);
-}
-
-:root[data-theme='dark'] .content-header::before {
-  opacity: 0;
-}
+/* El encabezado vive por encima del degradado ambiental; no necesita fondo propio. */
 
 .content-header>* {
   position: relative;
@@ -86,25 +91,12 @@
 }
 
 .dashboard-panel {
-  width: min(100% - clamp(40px, 10vw, 128px), 980px);
-  margin: 0 auto 30px;
-  padding: clamp(24px, 4vw, 44px);
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  border-top-color: transparent;
-  border-radius: 18px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  transition: background-color 260ms var(--ease-smooth), border-color 260ms var(--ease-smooth), box-shadow 260ms var(--ease-smooth);
-}
-
-:root[data-theme='dark'] .dashboard-panel {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-:root[data-theme='light'] .dashboard-panel {
-  border-color: transparent;
-  box-shadow: none;
+  /* Sin fondo ni borde propios: el degradado ambiental pasa por detrás, igual
+     que en las secciones de paisajes y carnets. Solo aporta el margen lateral
+     compartido para que formulario, vista previa y carnets quedan alineados. */
+  width: 100%;
+  margin: 0 auto var(--section-gap);
+  padding: 0 clamp(20px, 5vw, 64px);
 }
 
 .panel-heading {
