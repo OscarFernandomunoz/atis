@@ -18,19 +18,21 @@
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
 }
 
-/* Atmósfera de la app: el degradado queda fijo a la ventana, arranca bajo la
-   barra de título y no acompaña al scroll, así los focos de color permanecen
-   quietos mientras se recorre el contenido. */
+/* Atmósfera de la app: el degradado vive dentro de `.main-content`, así que es
+   parte del documento y sube con el scroll hasta salir de la vista (no se queda
+   pegado a la ventana). Mide lo mismo que la pantalla visible, que es lo que dura
+   el color: por debajo los focos ya se han desvanecido y queda el negro de `body`. */
 .main-content::before {
-  position: fixed;
-  inset: var(--title-bar-height) 0 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
   z-index: -1;
   content: "";
   pointer-events: none;
-  will-change: background;
-  background-color: var(--bg);
+  will-change: opacity;
   background-image: var(--app-gradient);
-  transition: background 300ms var(--ease-smooth);
   animation: background-fade 900ms var(--ease-out) both;
 }
 

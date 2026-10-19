@@ -2,8 +2,9 @@ import { createInstructorCard } from './card.js';
 import { buildProgramFilter } from './filter.js';
 import { effectiveHours, hoursKind } from './hours.js';
 import { buildHoursFilter, type HoursFilter } from './hours-filter.js';
-import { programColors } from './palette.js';
+import { FALLBACK_COLOR, programColors } from './palette.js';
 import { parseInstructors } from './parse.js';
+import { forgetCardReveal, revealCards } from './reveal.js';
 import { forgetInstructors, rememberInstructors } from './roster.js';
 import { bindSearch, normalizeText } from './search.js';
 import { bindSelection, refreshSelectAll, resetSelection } from './selection.js';
@@ -33,7 +34,7 @@ export function renderInstructorCards(
   const colors = programColors(instructors.map((instructor) => instructor.program));
   const cards = instructors.map((instructor) => createInstructorCard(
     instructor,
-    colors.get(instructor.program) ?? '#1ed760',
+    colors.get(instructor.program) ?? FALLBACK_COLOR,
   ));
   board.grid.replaceChildren(...cards);
   // La casilla "seleccionar todo" actúa sobre las credenciales visibles de cada filtro.
@@ -86,10 +87,13 @@ export function renderInstructorCards(
     apply();
   });
   apply();
+  // La rejilla recién pintada entra en pantalla con la animación en cascada.
+  revealCards(board.grid);
 }
 
 export function clearInstructorCards(board: CardBoard): void {
   forgetInstructors();
+  forgetCardReveal(board.grid);
   resetSelection(board.grid, board.selectAll);
   board.grid.replaceChildren();
   board.programFilter.replaceChildren();

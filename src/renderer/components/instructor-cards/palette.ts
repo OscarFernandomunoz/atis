@@ -1,19 +1,24 @@
-// Color por programa (paleta sin verdes): se reparte por orden de aparición,
-// alternando fríos y cálidos para que programas consecutivos no se parezcan.
+// Color por programa: los mismos pasteles que usa el carrusel de meses, repartidos
+// por orden de aparición y alternando fríos y cálidos para que programas
+// consecutivos no se parezcan. Se referencian por token (`tokens.css`) para no
+// duplicar la paleta de la app en dos sitios.
 const PROGRAM_COLORS = [
-  '#38bdf8', // celeste
-  '#fb923c', // naranja
-  '#a78bfa', // violeta
-  '#fbbf24', // ámbar
-  '#e879f9', // magenta
-  '#60a5fa', // azul
-  '#fb7185', // coral
-  '#c084fc', // púrpura
-  '#facc15', // amarillo
-  '#818cf8', // índigo
+  'var(--pastel-1)', // rosa
+  'var(--pastel-2)', // menta
+  'var(--pastel-3)', // ámbar
+  'var(--pastel-4)', // lavanda
+  'var(--pastel-5)', // turquesa
+  'var(--pastel-6)', // coral
+  'var(--pastel-7)', // celeste
+  'var(--pastel-8)', // oliva
+  'var(--pastel-9)', // lila
+  'var(--pastel-10)', // melocotón
+  'var(--pastel-11)', // verde
+  'var(--pastel-12)', // salmón
 ] as const;
 
-const FALLBACK_COLOR = '#60a5fa';
+/** Lavanda: el pastel que menos compite con los números de horas. */
+export const FALLBACK_COLOR = 'var(--pastel-4)';
 
 export function programColors(programs: string[]): Map<string, string> {
   const colors = new Map<string, string>();

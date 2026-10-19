@@ -5,8 +5,8 @@
  * sobre una base negra flotan focos de color difuminados, sesgados hacia la
  * parte superior como el encabezado de la app. El resultado se publica en la
  * variable CSS `--app-gradient` y es el CSS quien decide dónde pintarlo
- * (`.main-content::before`, fijo a la ventana); así este módulo no depende del
- * layout ni del tema activo.
+ * (`.main-content::before`, dentro del área que hace scroll); así este módulo no
+ * depende del layout ni del tema activo.
  */
 
 /** Familias de tono base; cada foco se deriva de una de ellas con leves desvíos. */

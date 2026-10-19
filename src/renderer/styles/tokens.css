@@ -45,6 +45,21 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --button-motion: 680ms cubic-bezier(0.33, 1, 0.68, 1);
+  /* Paleta pastel de la app: la comparten el carrusel de meses y los carnets de
+     instructores, alternando fríos y cálidos para que elementos consecutivos no
+     se parezcan. Al ser tonos claros y poco saturados se combinan con el negro. */
+  --pastel-1: #f7b8ce;
+  --pastel-2: #bfe7cd;
+  --pastel-3: #f6d7a1;
+  --pastel-4: #cbc6f6;
+  --pastel-5: #a6e1d6;
+  --pastel-6: #f2b3a3;
+  --pastel-7: #aadcf1;
+  --pastel-8: #d0e2a2;
+  --pastel-9: #d5c0f3;
+  --pastel-10: #f6caa8;
+  --pastel-11: #b7e3b1;
+  --pastel-12: #f6c39b;
   --section-gap: 40px;
   --title-bar-height: 36px;
   --title-bar-overlay-width: 138px;

@@ -18,8 +18,9 @@ body {
   transition: background-color 260ms var(--ease-smooth), color 260ms var(--ease-smooth);
 }
 
-/* El degradado ambiental lo pinta `.main-content::before` en posición fija:
-   se mantiene quieto a la ventana mientras el contenido hace scroll. */
+/* El degradado ambiental lo pinta `.main-content::before`, una capa dentro del
+   área que hace scroll: acompaña al contenido y se va con él hacia arriba. El
+   negro que queda debajo lo aporta el fondo de `body`. */
 
 html {
   width: 100%;

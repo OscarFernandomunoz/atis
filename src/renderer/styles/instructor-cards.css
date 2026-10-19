@@ -266,7 +266,7 @@
   overflow: hidden;
   background-color: color-mix(in srgb, #08080a 68%, transparent);
   background-image:
-    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 12%, transparent) 0%, transparent 62%),
+    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 16%, transparent) 0%, transparent 62%),
     linear-gradient(158deg, color-mix(in srgb, #fff 6%, transparent) 0%, color-mix(in srgb, #fff 1.5%, transparent) 100%);
   border: 1px solid color-mix(in srgb, #fff 9%, transparent);
   border-radius: 18px;
@@ -279,19 +279,42 @@
   display: none;
 }
 
+/* Aparición al entrar en pantalla: la clase la pone el renderer y el retardo en
+   cascada lo aporta cada credencial, así la fila se completa de izquierda a
+   derecha. La animación se repite: al salir de la vista la ficha se rearma y
+   vuelve a entrar animada. Cuando termina, el JS retira `is-revealed` para que
+   el hover vuelva a usar su transición propia. */
+.cards-animate .carnet:not(.is-settled) {
+  opacity: 0;
+}
+
+.cards-animate .carnet.is-revealed {
+  animation: carnet-reveal 680ms var(--ease-out) var(--reveal-delay, 0ms) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards-animate .carnet:not(.is-settled) {
+    opacity: 1;
+  }
+
+  .cards-animate .carnet.is-revealed {
+    animation: none;
+  }
+}
+
 .carnet:hover {
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--card-accent) 38%, transparent);
+  border-color: color-mix(in srgb, var(--card-accent) 46%, transparent);
   box-shadow: 0 20px 44px color-mix(in srgb, #000 36%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--card-accent) 16%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 22%, transparent),
     inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
 }
 
 /* La selección tiñe la ficha entera, no solo la casilla. */
 .carnet:has(.carnet-check:checked) {
-  border-color: color-mix(in srgb, var(--card-accent) 48%, transparent);
+  border-color: color-mix(in srgb, var(--card-accent) 56%, transparent);
   box-shadow: 0 16px 38px color-mix(in srgb, #000 34%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--card-accent) 24%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 30%, transparent),
     inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
 }
 
@@ -378,11 +401,11 @@
   width: 54px;
   height: 54px;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--card-accent) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
   border-radius: 16px;
   color: color-mix(in srgb, #fff 92%, transparent);
   background:
-    radial-gradient(120% 120% at 28% 12%, color-mix(in srgb, var(--card-accent) 34%, transparent) 0%, transparent 72%),
+    radial-gradient(120% 120% at 28% 12%, color-mix(in srgb, var(--card-accent) 40%, transparent) 0%, transparent 72%),
     color-mix(in srgb, var(--card-accent) 10%, #0b0b0c);
   box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
 }
@@ -418,7 +441,7 @@
   letter-spacing: 0.15em;
   line-height: 1;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--card-accent) 72%, #ffffff);
+  color: var(--card-accent);
 }
 
 .carnet-role::before {
@@ -485,12 +508,12 @@
 }
 
 .carnet-hours.is-ok {
-  border-color: color-mix(in srgb, var(--card-accent) 30%, transparent);
-  background: color-mix(in srgb, var(--card-accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--card-accent) 42%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 14%, transparent);
 }
 
 .carnet-hours.is-ok .carnet-hours-value {
-  color: color-mix(in srgb, var(--card-accent) 82%, #ffffff);
+  color: var(--card-accent);
 }
 
 .carnet-hours.is-low {
@@ -541,7 +564,7 @@
   margin-top: 6px;
   border-radius: 50%;
   content: "";
-  background: color-mix(in srgb, var(--card-accent) 85%, #ffffff);
+  background: var(--card-accent);
 }
 
 .cards-empty {

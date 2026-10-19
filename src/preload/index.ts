@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { getTitleBarPlatform, type TitleBarTheme } from '../shared/window.js';
+import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
 // Se limita a invocar canales IPC definidos en el proceso principal sin permitir acceso directo a Node.
@@ -38,6 +39,14 @@ export const electronAPI = {
 
   // Sincroniza el color del overlay nativo de Windows/Linux.
   setTitleBarTheme: (theme: TitleBarTheme): void => ipcRenderer.send('window:set-title-bar-theme', theme),
+
+  // Notificaciones del computador: el renderer pregunta, recuerda la decisión y avisa.
+  getNotificationPermission: (): Promise<NotificationPermission | null> =>
+    ipcRenderer.invoke('notifications:permission'),
+  setNotificationPermission: (permission: NotificationPermission): Promise<NotificationPermission | null> =>
+    ipcRenderer.invoke('notifications:set-permission', permission),
+  notifySystem: (payload: SystemNotification): Promise<boolean> =>
+    ipcRenderer.invoke('notifications:show', payload),
 
   // Controles propios usados únicamente como fallback.
   minimize: (): void => ipcRenderer.send('window:minimize'),

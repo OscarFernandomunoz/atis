@@ -1,4 +1,5 @@
 import type { TitleBarPlatform } from '../shared/window.js';
+import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
 
 // Define la forma del API expuesto desde el preload para que TypeScript reconozca window.electronAPI.
 export interface IElectronAPI {
@@ -31,6 +32,11 @@ export interface IElectronAPI {
   close: () => void;
   isMaximized: () => Promise<boolean>;
   onMaximizeChange: (callback: (isMaximized: boolean) => void) => () => void;
+
+  // Notificaciones del computador: el usuario decide una sola vez y la app lo recuerda.
+  getNotificationPermission: () => Promise<NotificationPermission | null>;
+  setNotificationPermission: (permission: NotificationPermission) => Promise<NotificationPermission | null>;
+  notifySystem: (payload: SystemNotification) => Promise<boolean>;
 }
 
 declare global {

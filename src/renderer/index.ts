@@ -1,5 +1,6 @@
 import { initFileHandling } from './components/excel-preview.js';
 import { initMonthsShowcase } from './components/months-showcase/index.js';
+import { initNotificationConsent } from './components/notifications/index.js';
 import { initPreviewModal } from './components/preview-modal.js';
 import { initPlayerBar } from './components/player-bar/index.js';
 import { initSubmit } from './components/submit.js';
@@ -109,6 +110,7 @@ function initApp(): void {
 
   initDynamicBackground();
   initTitleBar();
+  initNotificationConsent();
   initMonthsShowcase();
   initPlayerBar(elements);
   initFileHandling(elements, state);

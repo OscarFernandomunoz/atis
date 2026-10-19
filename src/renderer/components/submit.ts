@@ -3,6 +3,7 @@ import { writeHoursIntoExcel } from './excel-update/index.js';
 import { highlightRow, getVisibleIdentifications } from './excel-preview.js';
 import { colorHoursCellInPreview } from './excel-update/preview-color.js';
 import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from './instructor-cards/index.js';
+import { notify } from './notifications/index.js';
 import { setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
 
 type SubmitElements = Pick<AppElements,
@@ -43,17 +44,21 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
       return;
     }
 
-    if (!elements.inputUser.value || !elements.inputPass.value) { alert('Ingrese las credenciales de acceso.'); return; }
+    if (!elements.inputUser.value || !elements.inputPass.value) {
+      elements.statusMessage.textContent = 'Faltan las credenciales de acceso a SofiaPlus.';
+      await notify('Faltan las credenciales', 'Ingresa el usuario y la contraseña de SofiaPlus para iniciar la automatización.');
+      return;
+    }
     if (!state.file) {
       elements.dropzone.classList.add('dropzone-error');
       elements.statusMessage.textContent = 'Debes subir un archivo Excel de nómina (.xls o .xlsx) para continuar.';
-      alert('Sube el archivo Excel de nómina antes de iniciar sesión.');
+      await notify('Falta el archivo de nómina', 'Sube el archivo Excel antes de iniciar sesión.');
       return;
     }
     const visibleIdentifications = getVisibleIdentifications(elements);
     if (visibleIdentifications.length === 0) {
       elements.statusMessage.textContent = 'No hay cédulas visibles en la vista previa. Ajusta el filtro de búsqueda.';
-      alert('No hay cédulas visibles con el filtro actual. Ajusta o limpia el filtro para continuar.');
+      await notify('Sin cédulas visibles', 'No hay cédulas visibles con el filtro actual. Ajusta o limpia el filtro para continuar.');
       return;
     }
 
@@ -62,7 +67,7 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
     const targets = visibleIdentifications.filter((identification) => selected.has(identification));
     if (targets.length === 0) {
       elements.statusMessage.textContent = 'Marca con la casilla los instructores que quieres procesar.';
-      alert('Selecciona al menos un instructor para iniciar la automatización.');
+      await notify('Sin instructores seleccionados', 'Selecciona al menos un instructor para iniciar la automatización.');
       return;
     }
 
@@ -118,14 +123,16 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
         }
       } catch (updateError) {
         console.error('[AIA][Excel] No se pudo actualizar el Excel.', updateError);
-        elements.statusMessage.textContent = `No se pudo actualizar el Excel: ${updateError instanceof Error ? updateError.message : String(updateError)}`;
+        const updateMessage = `No se pudo actualizar el Excel: ${updateError instanceof Error ? updateError.message : String(updateError)}`;
+        elements.statusMessage.textContent = updateMessage;
+        await notify('No se pudo actualizar el Excel', updateMessage);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const userMessage = message.includes('rol necesario') ? message : 'No se pudo abrir SofiaPlus. Revisa tu conexión e inténtalo nuevamente.';
       elements.statusMessage.textContent = userMessage;
       setPlayerState(elements, 'error');
-      alert(userMessage);
+      await notify('Error en la automatización', userMessage);
     } finally {
       state.isUploading = false;
       running = false;

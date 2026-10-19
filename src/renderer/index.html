@@ -319,6 +319,42 @@
       </div>
     </div>
   </div>
+  <!-- Permiso de notificaciones del computador: se pregunta una sola vez, al abrir la app. -->
+  <div class="modal" id="notificationsModal" hidden>
+    <div class="modal-backdrop" id="notificationsBackdrop"></div>
+    <div class="modal-dialog modal-dialog-compact" role="dialog" aria-modal="true"
+      aria-labelledby="notificationsTitle" aria-describedby="notificationsText">
+      <header class="modal-head">
+        <div>
+          <p class="section-kicker">Avisos del sistema</p>
+          <h2 class="modal-title" id="notificationsTitle">¿Permitir notificaciones del computador?</h2>
+        </div>
+        <button class="modal-close" id="notificationsClose" type="button" aria-label="Ahora no, cerrar">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </header>
+      <div class="modal-body consent-body">
+        <span class="consent-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 4.4a5.1 5.1 0 0 0-5.1 5.1v3.2L5.4 15.5h13.2l-1.5-2.8V9.5A5.1 5.1 0 0 0 12 4.4Z"
+              stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            <path d="M10.2 18.1a2 2 0 0 0 3.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          </svg>
+        </span>
+        <p class="consent-text" id="notificationsText">Si algo sale mal durante la automatización, te avisamos con una
+          notificación del computador para que no tengas que estar pendiente de la ventana. Si tu equipo no puede
+          mostrarlas, el aviso aparece como tarjeta dentro de la aplicación.</p>
+        <p class="consent-note">Si eliges «Ahora no», los avisos siguen apareciendo en la barra inferior.</p>
+        <div class="consent-actions">
+          <button class="consent-button consent-button-ghost" id="notificationsDeny" type="button">Ahora no</button>
+          <button class="consent-button consent-button-primary" id="notificationsAllow" type="button">Permitir
+            notificaciones</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="module" src="index.js"></script>
 </body>
 

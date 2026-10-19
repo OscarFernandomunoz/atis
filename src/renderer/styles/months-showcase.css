@@ -135,51 +135,52 @@
   letter-spacing: 0.01em;
 }
 
-/* Paleta de franjas: una tonalidad pastel distinta por mes. */
+/* Paleta de franjas: una tonalidad pastel distinta por mes, tomada de la
+   paleta compartida (`tokens.css`). */
 .month-card:nth-child(12n + 1) {
-  --card-accent: #f7b8ce;
+  --card-accent: var(--pastel-1);
 }
 
 .month-card:nth-child(12n + 2) {
-  --card-accent: #bfe7cd;
+  --card-accent: var(--pastel-2);
 }
 
 .month-card:nth-child(12n + 3) {
-  --card-accent: #cbc6f6;
+  --card-accent: var(--pastel-4);
 }
 
 .month-card:nth-child(12n + 4) {
-  --card-accent: #aadcf1;
+  --card-accent: var(--pastel-7);
 }
 
 .month-card:nth-child(12n + 5) {
-  --card-accent: #f6d7a1;
+  --card-accent: var(--pastel-3);
 }
 
 .month-card:nth-child(12n + 6) {
-  --card-accent: #b7e3b1;
+  --card-accent: var(--pastel-11);
 }
 
 .month-card:nth-child(12n + 7) {
-  --card-accent: #f6c39b;
+  --card-accent: var(--pastel-12);
 }
 
 .month-card:nth-child(12n + 8) {
-  --card-accent: #f2b3a3;
+  --card-accent: var(--pastel-6);
 }
 
 .month-card:nth-child(12n + 9) {
-  --card-accent: #d5c0f3;
+  --card-accent: var(--pastel-9);
 }
 
 .month-card:nth-child(12n + 10) {
-  --card-accent: #a6e1d6;
+  --card-accent: var(--pastel-5);
 }
 
 .month-card:nth-child(12n + 11) {
-  --card-accent: #d0e2a2;
+  --card-accent: var(--pastel-8);
 }
 
 .month-card:nth-child(12n + 12) {
-  --card-accent: #f6caa8;
+  --card-accent: var(--pastel-10);
 }

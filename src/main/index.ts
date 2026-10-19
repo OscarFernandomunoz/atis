@@ -2,8 +2,15 @@ import { app, BrowserWindow } from 'electron';
 import { registerIpcHandlers } from './ipc/handlers.js';
 import { registerRemoteWindow } from './windows/appearance.js';
 import { createMainWindow } from './windows/manager.js';
+import { isWsl } from './services/windows-toast.js';
+import { WINDOWS_AUMID, ensureWindowsAppId } from './services/windows-app-id.js';
 
 app.commandLine.appendSwitch('ignore-certificate-errors');
+// Windows atribuye cada notificación a la app por este identificador: sin él, los
+// avisos aparecen con el nombre del ejecutable en lugar del de la aplicación.
+if (process.platform === 'win32') {
+  app.setAppUserModelId(WINDOWS_AUMID);
+}
 // El portal de SofiaPlus usa HTTP y no tiene CSP seguro; sin estos switches Electron
 // inunda la consola con advertencias de recursos inseguros y webSecurity deshabilitado.
 app.commandLine.appendSwitch('disable-web-security');
@@ -32,6 +39,11 @@ app.whenReady().then(() => {
   try {
     // Se habilitan los handlers del proceso principal para que el renderer pueda pedir acciones.
     registerIpcHandlers();
+    // Se registra la identidad de la app en Windows (nombre y logo de los avisos)
+    // en segundo plano: el primer aviso ya la encontrará lista.
+    if (isWsl() || process.platform === 'win32') {
+      void ensureWindowsAppId();
+    }
     // Se crea la ventana principal de la aplicación al arrancar.
     createMainWindow();
 
