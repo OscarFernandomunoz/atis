@@ -40,14 +40,23 @@ export function selectedIdentifications(grid: HTMLElement): Set<string> {
 }
 
 // Engancha la casilla "seleccionar todo" y el recuento de las credenciales visibles.
-export function bindSelection(grid: HTMLElement, selectAll: HTMLInputElement): void {
+// `onChange` avisa de cada cambio de selección para que la vista previa pueda
+// mostrar solo las cédulas marcadas, igual que hace con los filtros del tablero.
+export function bindSelection(
+  grid: HTMLElement,
+  selectAll: HTMLInputElement,
+  onChange?: () => void,
+): void {
   grid.onchange = (event): void => {
     const target = event.target as HTMLElement | null;
-    if (target?.classList.contains('carnet-check')) refreshSelectAll(grid, selectAll);
+    if (!target?.classList.contains('carnet-check')) return;
+    refreshSelectAll(grid, selectAll);
+    onChange?.();
   };
   selectAll.onchange = (): void => {
     setVisibleChecked(grid, selectAll.checked);
     refreshSelectAll(grid, selectAll);
+    onChange?.();
   };
 }
 

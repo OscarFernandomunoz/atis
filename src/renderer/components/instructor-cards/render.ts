@@ -7,7 +7,7 @@ import { parseInstructors } from './parse.js';
 import { forgetCardReveal, revealCards } from './reveal.js';
 import { forgetInstructors, rememberInstructors } from './roster.js';
 import { bindSearch, normalizeText } from './search.js';
-import { bindSelection, refreshSelectAll, resetSelection } from './selection.js';
+import { bindSelection, refreshSelectAll, resetSelection, selectedIdentifications } from './selection.js';
 
 // Partes del tablero de carnets que el render necesita tocar.
 export interface CardBoard {
@@ -21,8 +21,9 @@ export interface CardBoard {
 }
 
 // Reconstruye el tablero de carnets a partir de las filas de cada hoja del Excel.
-// `onVisibleChange` recibe las cédulas que pasan los filtros (o `null` si no hay
-// ningún filtro activo), para que la vista previa y la automatización usen ese subconjunto.
+// `onVisibleChange` recibe las cédulas que pasan los filtros y la selección de
+// casillas (o `null` si no hay ningún filtro activo), para que la vista previa
+// y la automatización usen ese subconjunto.
 export function renderInstructorCards(
   board: CardBoard,
   sheets: unknown[][][],
@@ -38,7 +39,8 @@ export function renderInstructorCards(
   ));
   board.grid.replaceChildren(...cards);
   // La casilla "seleccionar todo" actúa sobre las credenciales visibles de cada filtro.
-  bindSelection(board.grid, board.selectAll);
+  // Al marcar una casilla se repinta el filtro para que la vista previa muestre solo lo marcado.
+  bindSelection(board.grid, board.selectAll, () => apply());
 
   const kinds = instructors.map((instructor) => hoursKind(effectiveHours(instructor)));
   const index = instructors.map((instructor) => normalizeText(
@@ -69,7 +71,14 @@ export function renderInstructorCards(
       ? `${cards.length} ${cards.length === 1 ? 'instructor' : 'instructores'}`
       : `${visible} de ${cards.length} instructores`;
     const hasFilter = program !== null || hours !== 'all' || query !== '';
-    onVisibleChange?.(hasFilter ? [...visibleIdentifications] : null);
+    // Las cédulas marcadas con la casilla son un filtro más de la vista previa:
+    // solo se muestran las filas de lo seleccionado que además pasa los filtros.
+    const selection = selectedIdentifications(board.grid);
+    if (selection.size > 0) {
+      onVisibleChange?.([...visibleIdentifications].filter((identification) => selection.has(identification)));
+    } else {
+      onVisibleChange?.(hasFilter ? [...visibleIdentifications] : null);
+    }
     // Al cambiar los filtros, "seleccionar todo" se recalcula sobre las visibles.
     refreshSelectAll(board.grid, board.selectAll);
   };
