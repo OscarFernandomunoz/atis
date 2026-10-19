@@ -252,45 +252,79 @@
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 30px;
+  gap: 22px;
 }
 
+/* Ficha de cristal sobre el degradado ambiental: el color del programa entra
+   solo como un velo tenue y como acento puntual, igual que en el resto de la app. */
 .carnet {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 22px 20px 20px;
+  gap: 14px;
+  padding: 18px 18px 16px;
   overflow: hidden;
-  /* Fondo negro sólido y sin efectos: el color del programa va solo en los acentos. */
-  background: #000000;
-  border: 1px solid color-mix(in srgb, var(--card-accent) 32%, transparent);
-  border-radius: 20px;
+  background-color: color-mix(in srgb, #08080a 68%, transparent);
+  background-image:
+    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 12%, transparent) 0%, transparent 62%),
+    linear-gradient(158deg, color-mix(in srgb, #fff 6%, transparent) 0%, color-mix(in srgb, #fff 1.5%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, #fff 9%, transparent);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px color-mix(in srgb, #000 28%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent);
+  transition: transform 320ms var(--ease-out), border-color 320ms var(--ease-smooth), box-shadow 320ms var(--ease-smooth);
 }
 
 .carnet[hidden] {
   display: none;
 }
 
+.carnet:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--card-accent) 38%, transparent);
+  box-shadow: 0 20px 44px color-mix(in srgb, #000 36%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 16%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+}
+
+/* La selección tiñe la ficha entera, no solo la casilla. */
+.carnet:has(.carnet-check:checked) {
+  border-color: color-mix(in srgb, var(--card-accent) 48%, transparent);
+  box-shadow: 0 16px 38px color-mix(in srgb, #000 34%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 24%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+}
+
+/* Filete superior que nace en el color del programa y se disuelve. */
 .carnet-band {
   position: absolute;
   inset: 0 0 auto;
-  height: 4px;
-  background: var(--card-accent);
+  height: 2px;
+  background: linear-gradient(90deg,
+      var(--card-accent) 0%,
+      color-mix(in srgb, var(--card-accent) 55%, transparent) 38%,
+      transparent 88%);
+  opacity: 0.85;
+  transition: opacity 320ms var(--ease-smooth);
+}
+
+.carnet:hover .carnet-band,
+.carnet:has(.carnet-check:checked) .carnet-band {
+  opacity: 1;
 }
 
 .carnet-top {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 12px;
-  margin-top: 6px;
+  min-width: 0;
 }
 
 /* Casilla de selección en la esquina de la credencial (sustituye al logo). */
 .carnet-select {
   position: relative;
   display: inline-flex;
+  flex: 0 0 auto;
   cursor: pointer;
 }
 
@@ -305,22 +339,23 @@
 .carnet-select-box {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid color-mix(in srgb, #fff 22%, transparent);
-  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid color-mix(in srgb, #fff 20%, transparent);
+  border-radius: 7px;
   color: transparent;
-  background: color-mix(in srgb, #fff 6%, transparent);
+  background: color-mix(in srgb, #fff 5%, transparent);
   transition: background-color 180ms var(--ease-smooth), border-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
 }
 
 .carnet-select-box svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 }
 
 .carnet-select:hover .carnet-select-box {
-  border-color: color-mix(in srgb, #fff 45%, transparent);
+  border-color: color-mix(in srgb, #fff 42%, transparent);
+  background: color-mix(in srgb, #fff 9%, transparent);
 }
 
 .carnet-check:focus-visible + .carnet-select-box {
@@ -328,56 +363,82 @@
   outline-offset: 2px;
 }
 
+/* Blanco como los chips activos y el "seleccionar todo": nada que compita
+   con el acento del programa dentro de la ficha. */
 .carnet-check:checked + .carnet-select-box {
-  border-color: var(--card-accent);
-  color: #04140a;
-  background: var(--card-accent);
+  border-color: #ffffff;
+  color: #0a0a0a;
+  background: #ffffff;
 }
 
 .carnet-photo {
   display: grid;
+  flex: 0 0 auto;
   place-items: center;
-  width: 82px;
-  height: 96px;
+  width: 54px;
+  height: 54px;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--card-accent) 45%, transparent);
-  border-radius: 12px;
-  color: color-mix(in srgb, #fff 88%, transparent);
-  background: color-mix(in srgb, var(--card-accent) 34%, #000000);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 30%, transparent);
+  border-radius: 16px;
+  color: color-mix(in srgb, #fff 92%, transparent);
+  background:
+    radial-gradient(120% 120% at 28% 12%, color-mix(in srgb, var(--card-accent) 34%, transparent) 0%, transparent 72%),
+    color-mix(in srgb, var(--card-accent) 10%, #0b0b0c);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
 }
 
 .carnet-photo svg {
-  width: 44px;
-  height: 44px;
+  width: 27px;
+  height: 27px;
+  opacity: 0.94;
+}
+
+.carnet-identity {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.carnet-identity-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 24px;
 }
 
 .carnet-role {
-  position: relative;
-  padding-top: 14px;
-  font-size: 10.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.15em;
+  line-height: 1;
   text-transform: uppercase;
-  color: var(--card-accent);
+  color: color-mix(in srgb, var(--card-accent) 72%, #ffffff);
 }
 
 .carnet-role::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
   content: "";
-  background: color-mix(in srgb, var(--card-accent) 70%, transparent);
+  background: var(--card-accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--card-accent) 65%, transparent);
 }
 
 .carnet-name {
-  font-size: 16.5px;
-  font-weight: 780;
-  line-height: 1.22;
-  letter-spacing: 0.004em;
+  font-size: 15.5px;
+  font-weight: 750;
+  line-height: 1.24;
+  letter-spacing: -0.012em;
   color: var(--text);
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .carnet-meta {
@@ -385,50 +446,60 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  min-width: 0;
 }
 
 .carnet-doc {
-  font-size: 12.5px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .carnet-hours {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: baseline;
   gap: 3px;
-  padding: 3px 11px;
-  border-radius: 999px;
-  background: color-mix(in srgb, #fff 8%, transparent);
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, #fff 5%, transparent);
+  line-height: 1;
 }
 
 .carnet-hours-value {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 750;
   letter-spacing: -0.02em;
 }
 
 .carnet-hours-unit {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 650;
   color: var(--text-muted);
 }
 
 .carnet-hours.is-ok {
-  background: color-mix(in srgb, var(--card-accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--card-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 10%, transparent);
 }
 
 .carnet-hours.is-ok .carnet-hours-value {
-  color: var(--card-accent);
+  color: color-mix(in srgb, var(--card-accent) 82%, #ffffff);
 }
 
 .carnet-hours.is-low {
-  background: color-mix(in srgb, #ff5a52 16%, transparent);
+  border-color: color-mix(in srgb, #ff6b63 30%, transparent);
+  background: color-mix(in srgb, #ff6b63 10%, transparent);
 }
 
 .carnet-hours.is-low .carnet-hours-value {
-  color: #ff7b72;
+  color: #ff9a93;
 }
 
 .carnet-hours.is-none .carnet-hours-value {
@@ -438,24 +509,39 @@
 .carnet-foot {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding-top: 13px;
+  gap: 4px;
+  padding-top: 12px;
   margin-top: auto;
-  border-top: 1px solid color-mix(in srgb, #fff 9%, transparent);
+  border-top: 1px solid color-mix(in srgb, #fff 7%, transparent);
 }
 
 .carnet-foot-label {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
 .carnet-foot-value {
-  font-size: 13.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
   font-weight: 650;
+  line-height: 1.3;
   color: var(--text);
+}
+
+.carnet-foot-value::before {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-top: 6px;
+  border-radius: 50%;
+  content: "";
+  background: color-mix(in srgb, var(--card-accent) 85%, #ffffff);
 }
 
 .cards-empty {

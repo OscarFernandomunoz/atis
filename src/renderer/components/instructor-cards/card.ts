@@ -35,15 +35,22 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   card.appendChild(el('span', 'carnet-band'));
 
   const top = el('div', 'carnet-top');
-  // La casilla sustituye el logo: el usuario elige a quién incluir en la automatización.
-  top.appendChild(createSelectionCheckbox(instructor));
   const photo = el('div', 'carnet-photo');
   photo.innerHTML = PHOTO_SVG;
   top.appendChild(photo);
-  card.appendChild(top);
 
-  card.appendChild(el('span', 'carnet-role', 'Contratista'));
-  card.appendChild(el('h3', 'carnet-name', instructor.name));
+  // Nombre y rol comparten bloque para que la credencial se lea como una ficha,
+  // no como un retrato suelto con datos debajo.
+  const identity = el('div', 'carnet-identity');
+  const head = el('div', 'carnet-identity-head');
+  head.appendChild(el('span', 'carnet-role', 'Contratista'));
+  // La casilla sustituye al logo y queda alineada con la esquina de la ficha.
+  // Va en la línea del rol para no restarle ancho al nombre.
+  head.appendChild(createSelectionCheckbox(instructor));
+  identity.appendChild(head);
+  identity.appendChild(el('h3', 'carnet-name', instructor.name));
+  top.appendChild(identity);
+  card.appendChild(top);
 
   const meta = el('div', 'carnet-meta');
   meta.appendChild(el('span', 'carnet-doc', `C.C. ${instructor.identification}`));
