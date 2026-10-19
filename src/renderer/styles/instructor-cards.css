@@ -281,9 +281,9 @@
 
 /* Aparición al entrar en pantalla: la clase la pone el renderer y el retardo en
    cascada lo aporta cada credencial, así la fila se completa de izquierda a
-   derecha. La animación se repite: al salir de la vista la ficha se rearma y
-   vuelve a entrar animada. Cuando termina, el JS retira `is-revealed` para que
-   el hover vuelva a usar su transición propia. */
+   derecha. Cada ficha se anima una sola vez; después queda visible aunque salga
+   y vuelva a entrar. Cuando termina, el JS retira `is-revealed` para que el
+   hover vuelva a usar su transición propia. */
 .cards-animate .carnet:not(.is-settled) {
   opacity: 0;
 }

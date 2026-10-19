@@ -1,13 +1,13 @@
 /**
  * Aparición progresiva de los carnets al entrar en pantalla.
  *
- * La animación es infinita: cada credencial se rearma cuando sale de la vista
- * y vuelve a entrar animada, así el gesto se repite cada vez que se recorre la
- * rejilla. El deslizamiento arranca desde el lado por el que aparece la ficha
- * (`--reveal-from`), para que el movimiento acompañe al scroll en los dos
- * sentidos, y el retardo en cascada (`--reveal-delay`) completa cada fila de
- * izquierda a derecha. La animación vive en CSS (`.cards-animate .carnet`); aquí
- * sólo se decide cuándo, desde dónde y con qué retardo.
+ * Cada credencial se anima una sola vez: la primera vez que cruza la vista.
+ * Después queda visible aunque salga y vuelva a entrar, así el gesto no se
+ * repite al recorrer la rejilla. El deslizamiento arranca desde el lado por el
+ * que aparece la ficha (`--reveal-from`) y el retardo en cascada
+ * (`--reveal-delay`) completa cada fila de izquierda a derecha. La animación
+ * vive en CSS (`.cards-animate .carnet`); aquí sólo se decide cuándo, desde
+ * dónde y con qué retardo.
  */
 
 /** Observador activo por rejilla: al repintar hay que soltar el anterior. */
@@ -27,7 +27,7 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-/** Rearma la ficha fuera de pantalla: queda oculta hasta su siguiente entrada. */
+/** Rearma la ficha: queda oculta hasta su primera entrada en pantalla. */
 function rearm(card: HTMLElement): void {
   card.classList.remove('is-revealed', 'is-settled');
   card.style.removeProperty('--reveal-delay');
@@ -75,12 +75,10 @@ export function revealCards(grid: HTMLElement): void {
   const observer = new IntersectionObserver((entries) => {
     let step = 0;
     entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
       const card = entry.target as HTMLElement;
-      // Al salir por completo de la vista se rearma: la animación no se agota.
-      if (!entry.isIntersecting) {
-        rearm(card);
-        return;
-      }
+      // Fuera del observador tras el primer cruce: la animación no se repite.
+      observer.unobserve(card);
       const rootTop = entry.rootBounds?.top ?? 0;
       unveil(card, Math.min(step * REVEAL_STEP_MS, REVEAL_MAX_DELAY_MS), entry.boundingClientRect.top < rootTop);
       step += 1;
