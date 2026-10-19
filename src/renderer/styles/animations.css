@@ -36,6 +36,94 @@
   }
 }
 
+/* Latido del carnet mientras se consulta su cédula en SofiaPlus. */
+@keyframes carnet-consult-pulse {
+  0%,
+  100% {
+    box-shadow: 0 16px 38px color-mix(in srgb, #000 36%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--card-accent) 34%, transparent),
+      0 0 18px color-mix(in srgb, var(--card-accent) 18%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 20px 46px color-mix(in srgb, #000 42%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--card-accent) 62%, transparent),
+      0 0 34px color-mix(in srgb, var(--card-accent) 32%, transparent),
+      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+  }
+}
+
+/* Barrido de brillo de izquierda a derecha sobre la credencial. */
+@keyframes carnet-consult-scan {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes carnet-photo-pulse {
+  0%,
+  100% {
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
+  }
+
+  50% {
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent),
+      0 0 0 4px color-mix(in srgb, var(--card-accent) 18%, transparent);
+  }
+}
+
+/* Punto que late: identifica la credencial y la fila en consulta. */
+@keyframes consulting-dot {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--card-accent) 60%, transparent);
+  }
+
+  70% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--card-accent) 0%, transparent);
+  }
+
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--card-accent) 0%, transparent);
+  }
+}
+
+/* Igual que el punto del carnet, pero en la tabla el acento no viene del programa. */
+@keyframes row-consulting-dot {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+
+  70% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+}
+
+@keyframes row-consulting-pulse {
+  0%,
+  100% {
+    background-color: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  }
+
+  50% {
+    background-color: color-mix(in srgb, var(--accent) 30%, var(--surface));
+  }
+}
+
 @keyframes content-enter {
   from {
     opacity: 0;

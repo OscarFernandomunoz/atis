@@ -43,7 +43,12 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   // no como un retrato suelto con datos debajo.
   const identity = el('div', 'carnet-identity');
   const head = el('div', 'carnet-identity-head');
-  head.appendChild(el('span', 'carnet-role', 'Contratista'));
+  // El rol y el estado de consulta comparten sitio: al consultar la cédula el
+  // texto cambia sin mover el resto de la credencial.
+  const role = el('span', 'carnet-role');
+  role.appendChild(el('span', 'carnet-role-label', 'Contratista'));
+  role.appendChild(el('span', 'carnet-role-consulting', 'Consultando…'));
+  head.appendChild(role);
   // La casilla sustituye al logo y queda alineada con la esquina de la ficha.
   // Va en la línea del rol para no restarle ancho al nombre.
   head.appendChild(createSelectionCheckbox(instructor));

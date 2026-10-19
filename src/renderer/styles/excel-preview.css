@@ -235,6 +235,69 @@
   50% { background: color-mix(in srgb, var(--accent) 30%, var(--surface)); }
 }
 
+/* Fila que la automatización está consultando en este momento. */
+.excel-preview tbody tr.excel-row-consulting {
+  background-color: color-mix(in srgb, var(--accent) 20%, var(--surface));
+  animation: row-consulting-pulse 1.4s ease-in-out infinite;
+}
+
+/* Barra de acento al inicio de la fila, como un cursor de lectura. */
+.excel-preview tbody tr.excel-row-consulting td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.excel-preview tbody tr.excel-row-consulting td {
+  color: var(--text);
+  font-weight: 650;
+}
+
+/* Punto que late junto a la cédula consultada. */
+.excel-preview tbody tr.excel-row-consulting td.excel-required-column::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  content: "";
+  background: var(--accent);
+  vertical-align: middle;
+  animation: row-consulting-dot 1.2s ease-out infinite;
+}
+
+/* Aviso textual dentro de la barra de filtros de la hoja consultada. */
+.excel-consulting-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 5px 11px;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  animation: content-enter 240ms var(--ease-out) both;
+}
+
+.excel-consulting-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: row-consulting-dot 1.2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .excel-preview tbody tr.excel-row-consulting,
+  .excel-preview tbody tr.excel-row-consulting td.excel-required-column::before,
+  .excel-consulting-dot {
+    animation: none;
+  }
+}
+
 .excel-preview tbody tr:hover td {
   color: var(--text);
 }

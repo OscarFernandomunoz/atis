@@ -1,4 +1,5 @@
 import type { AppElements, FileUploadState } from '../types.js';
+import { startConsulting, stopConsulting } from './consulting.js';
 import { writeHoursIntoExcel } from './excel-update/index.js';
 import { highlightRow, getVisibleIdentifications } from './excel-preview.js';
 import { colorHoursCellInPreview } from './excel-update/preview-color.js';
@@ -95,15 +96,22 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
         state.currentIdentification = identification;
         setPlayerTrack(elements, identification, identification ? findInstructorName(identification) : null);
         highlightRow(elements, identification);
+        if (identification) {
+          // onProgress avisa dos veces por cédula: al empezar la consulta (sin horas)
+          // y al terminar (con las horas, o con null si el portal no las devolvió).
+          if (processedIds.has(identification)) {
+            stopConsulting(elements.cardsGrid, elements.excelPreview);
+          } else {
+            startConsulting(elements.cardsGrid, elements.excelPreview, identification);
+            processedIds.add(identification);
+            setPlayerProgress(elements, processedIds.size, total);
+          }
+        }
         if (identification && hours) {
           // El carnet pasa a mostrar las horas que reporta SofiaPlus (el span del reporte).
           rememberLiveHours(identification, hours);
           updateCardHours(elements.cardsGrid, identification, hours);
           colorHoursCellInPreview(elements);
-        }
-        if (identification) {
-          processedIds.add(identification);
-          setPlayerProgress(elements, processedIds.size, total);
         }
       });
       // Terminó el flujo de SofiaPlus: se cierra la pausa mientras se vuelca al Excel.
@@ -134,6 +142,8 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
       setPlayerState(elements, 'error');
       await notify('Error en la automatización', userMessage);
     } finally {
+      // Al terminar (o fallar) ningún instructor queda marcado como en consulta.
+      stopConsulting(elements.cardsGrid, elements.excelPreview);
       state.isUploading = false;
       running = false;
       pausable = false;

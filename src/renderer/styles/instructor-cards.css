@@ -318,6 +318,53 @@
     inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
 }
 
+/* Consulta en curso: la ficha late y un brillo la recorre de lado a lado. */
+.carnet.is-consulting {
+  border-color: color-mix(in srgb, var(--card-accent) 78%, transparent);
+  animation: carnet-consult-pulse 1.8s var(--ease-smooth) infinite;
+}
+
+/* El velo va por encima del contenido, pero es tan tenue que no lo tapa. */
+.carnet.is-consulting::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(105deg,
+      transparent 30%,
+      color-mix(in srgb, var(--card-accent) 18%, transparent) 50%,
+      transparent 70%);
+  transform: translateX(-110%);
+  animation: carnet-consult-scan 1.9s var(--ease-smooth) infinite;
+}
+
+.carnet.is-consulting .carnet-role {
+  color: var(--card-accent);
+}
+
+.carnet.is-consulting .carnet-role::before {
+  animation: consulting-dot 1.15s ease-out infinite;
+}
+
+.carnet.is-consulting .carnet-photo {
+  animation: carnet-photo-pulse 1.8s var(--ease-smooth) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carnet.is-consulting,
+  .carnet.is-consulting .carnet-photo {
+    animation: none;
+  }
+
+  .carnet.is-consulting::after {
+    display: none;
+  }
+
+  .carnet.is-consulting .carnet-role::before {
+    animation: none;
+  }
+}
+
 /* Filete superior que nace en el color del programa y se disuelve. */
 .carnet-band {
   position: absolute;
@@ -452,6 +499,20 @@
   content: "";
   background: var(--card-accent);
   box-shadow: 0 0 8px color-mix(in srgb, var(--card-accent) 65%, transparent);
+}
+
+/* Mientras la automatización consulta esta cédula, el rol deja su sitio al
+   estado de consulta: mismo tamaño y misma línea, sin mover la credencial. */
+.carnet-role-consulting {
+  display: none;
+}
+
+.carnet.is-consulting .carnet-role-label {
+  display: none;
+}
+
+.carnet.is-consulting .carnet-role-consulting {
+  display: inline;
 }
 
 .carnet-name {
