@@ -1,10 +1,8 @@
-import type { AppElements, FileUploadState } from '../types.js';
+import type { AppElements, FileUploadState } from '../../app/types.js';
+import { colorHoursCellInPreview, getVisibleIdentifications, highlightRow, writeHoursIntoExcel } from '../spreadsheet/index.js';
+import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from '../instructors/index.js';
+import { notify } from '../notifications/index.js';
 import { startConsulting, stopConsulting } from './consulting.js';
-import { writeHoursIntoExcel } from './excel-update/index.js';
-import { highlightRow, getVisibleIdentifications } from './excel-preview.js';
-import { colorHoursCellInPreview } from './excel-update/preview-color.js';
-import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from './instructor-cards/index.js';
-import { notify } from './notifications/index.js';
 import { setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
 
 type SubmitElements = Pick<AppElements,

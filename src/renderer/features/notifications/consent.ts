@@ -1,4 +1,4 @@
-import type { NotificationPermission } from '../../../shared/notifications.js';
+import type { NotificationPermission } from '../../../shared/index.js';
 import { loadNotificationPermission, rememberNotificationPermission } from './permission.js';
 
 /**

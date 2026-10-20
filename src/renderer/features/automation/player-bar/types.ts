@@ -1,4 +1,4 @@
-import type { AppElements } from '../../types.js';
+import type { AppElements } from '../../../app/types.js';
 
 // Piezas del DOM que necesita cada responsabilidad de la barra del reproductor.
 export type PlayerButtonElements = Pick<AppElements, 'playButton'>;

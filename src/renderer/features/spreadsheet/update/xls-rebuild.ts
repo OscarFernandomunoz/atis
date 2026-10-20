@@ -9,7 +9,7 @@ import {
   isCedulaHeader,
   parseHoursValue,
   sameHeader,
-} from './helpers.js';
+} from '../helpers.js';
 
 // Fallback para archivos .xls (ExcelJS no los lee): reconstruye el libro desde las
 // filas. Es la única ruta que puede perder el diseño original; solo se usa si ni

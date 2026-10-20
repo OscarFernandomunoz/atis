@@ -1,4 +1,4 @@
-import { HOURS_THRESHOLD } from '../excel-update/helpers.js';
+import { HOURS_THRESHOLD } from '../spreadsheet/helpers.js';
 
 // Filtro por horas: control segmentado independiente del filtro por programa.
 export type HoursFilter = 'all' | 'ok' | 'low' | 'none';

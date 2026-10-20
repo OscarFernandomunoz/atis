@@ -1,13 +1,12 @@
-import { initDropzoneSpotlight } from './components/dropzone-spotlight.js';
-import { initFileHandling } from './components/excel-preview.js';
-import { initMonthsShowcase } from './components/months-showcase/index.js';
-import { initNotificationConsent } from './components/notifications/index.js';
-import { initPreviewModal } from './components/preview-modal.js';
-import { initPlayerBar } from './components/player-bar/index.js';
-import { initSubmit } from './components/submit.js';
-import { initTitleBar } from './components/title-bar.js';
-import { initDynamicBackground } from './theme/index.js';
-import type { AppElements, FileUploadState } from './types.js';
+import type { AppElements, FileUploadState } from './app/types.js';
+import { initPlayerBar } from './features/automation/player-bar/index.js';
+import { initSubmit } from './features/automation/submit.js';
+import { initNotificationConsent } from './features/notifications/index.js';
+import { initMonthsShowcase } from './features/scheduling/index.js';
+import { initDropzoneSpotlight, initFileHandling } from './features/spreadsheet/index.js';
+import { initDynamicBackground } from './features/theme/index.js';
+import { initPreviewModal } from './shell/preview-modal.js';
+import { initTitleBar } from './shell/title-bar.js';
 
 function getElements(): AppElements {
   return {

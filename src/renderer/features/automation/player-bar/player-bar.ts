@@ -1,4 +1,4 @@
-import type { AppElements } from '../../types.js';
+import type { AppElements } from '../../../app/types.js';
 import { setPlayerProgress } from './progress.js';
 import { setPlayerState } from './state.js';
 import { setPlayerTrack } from './track.js';

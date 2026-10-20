@@ -1,4 +1,4 @@
-import { HOURS_THRESHOLD, parseHoursValue } from '../excel-update/helpers.js';
+import { HOURS_THRESHOLD, parseHoursValue } from '../spreadsheet/helpers.js';
 import type { Instructor } from './parse.js';
 
 // Clasificación de un valor de horas respecto al umbral del reporte.

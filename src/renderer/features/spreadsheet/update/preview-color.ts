@@ -1,5 +1,5 @@
-import type { FileElements } from '../excel-preview.js';
-import { sameHeader } from './helpers.js';
+import type { FileElements } from '../preview/index.js';
+import { sameHeader } from '../helpers.js';
 
 // Realza en la vista previa HTML todas las celdas "Horas Adicionales":
 // cabecera y cuerpo de cada tabla, sin importar el valor de horas.

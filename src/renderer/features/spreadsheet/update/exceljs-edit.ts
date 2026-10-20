@@ -8,7 +8,7 @@ import {
   isCedulaHeader,
   parseHoursValue,
   sameHeader,
-} from './helpers.js';
+} from '../helpers.js';
 
 // Versión que conserva SOLO las filas de las cédulas consultadas.
 // Devuelve el libro con los encabezados originales y solo las filas que coinciden.

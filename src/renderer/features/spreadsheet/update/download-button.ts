@@ -1,4 +1,4 @@
-import type { FileElements } from '../excel-preview.js';
+import type { FileElements } from '../preview/index.js';
 
 // Crea el botón de descarga y lo inserta después de la tabla de vista previa.
 export function showDownloadButton(elements: FileElements, onDownload: () => void): void {

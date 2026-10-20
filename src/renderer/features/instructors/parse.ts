@@ -1,4 +1,4 @@
-import { HOURS_COLUMN_NAME, isCedulaHeader, sameHeader } from '../excel-update/helpers.js';
+import { HOURS_COLUMN_NAME, isCedulaHeader, sameHeader } from '../spreadsheet/helpers.js';
 
 // Datos de un instructor tomados directamente de las columnas del Excel.
 export interface Instructor {

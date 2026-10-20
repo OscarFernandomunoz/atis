@@ -1,4 +1,4 @@
-import type { AppElements } from '../types.js';
+import type { AppElements } from '../app/types.js';
 
 export type PreviewModalElements = Pick<
   AppElements,

@@ -1,8 +1,8 @@
-import type { FileUploadState } from '../../types.js';
-import { refreshExcelPreview, type FileElements } from '../excel-preview.js';
+import type { FileUploadState } from '../../../app/types.js';
+import { refreshExcelPreview, type FileElements } from '../preview/index.js';
 import { editOriginalWorkbookMultiple, highlightAllHoursCells } from './exceljs-edit.js';
 import { rebuildFromRowsMultiple } from './xls-rebuild.js';
-import { HOURS_THRESHOLD } from './helpers.js';
+import { HOURS_THRESHOLD } from '../helpers.js';
 import { colorHoursCellInPreview } from './preview-color.js';
 import { showDownloadButton } from './download-button.js';
 import * as XLSX from 'xlsx';
