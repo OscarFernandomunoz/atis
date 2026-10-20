@@ -12,6 +12,12 @@ type SubmitElements = Pick<AppElements,
   | 'inputUser' | 'inputPass' | 'inputStartDate' | 'inputEndDate'>;
 
 export function initSubmit(elements: SubmitElements, state: FileUploadState): void {
+  // El formulario no se envía: la automatización se dispara con el botón de la
+  // barra inferior. Evita que Enter recargue la interfaz y borre el estado.
+  document.getElementById('accessForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+  });
+
   const button = elements.playButton;
   // La barra del reproductor monta el botón; si aún no está, no hay nada que inicializar.
   if (!button) return;
