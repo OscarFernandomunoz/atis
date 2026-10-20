@@ -1,7 +1,9 @@
 // Activa los controles nativos del sistema y conserva los botones HTML como fallback.
+import { logger } from '../app/logger.js';
+
 export function initTitleBar(): void {
   if (typeof window.electronAPI === 'undefined') {
-    console.error('[AIA][Renderer][TitleBar] window.electronAPI no está disponible. Revisa el preload script.');
+    logger.error('TitleBar', 'window.electronAPI no está disponible. Revisa el preload script.');
     return;
   }
 
@@ -24,7 +26,7 @@ function initFallbackControls(): void {
   const closeButton = document.getElementById('closeButton') as HTMLButtonElement | null;
 
   if (!minimizeButton || !maximizeButton || !closeButton) {
-    console.error('[AIA][Renderer][TitleBar] No se encontraron los controles de fallback.');
+    logger.error('TitleBar', 'No se encontraron los controles de fallback.');
     return;
   }
 
@@ -60,7 +62,7 @@ function initFallbackControls(): void {
           </svg>
         `;
     } catch (error) {
-      console.error('[AIA][Renderer][TitleBar] No se pudo consultar el estado de maximización.', error);
+      logger.error('TitleBar', 'No se pudo consultar el estado de maximización.', error);
     }
   };
 

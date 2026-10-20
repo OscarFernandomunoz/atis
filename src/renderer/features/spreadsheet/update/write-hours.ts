@@ -1,4 +1,5 @@
 import type { FileUploadState } from '../../../app/types.js';
+import { logger } from '../../../app/logger.js';
 import { refreshExcelPreview, type FileElements } from '../preview/index.js';
 import { editOriginalWorkbookMultiple, highlightAllHoursCells } from './exceljs-edit.js';
 import { rebuildFromRowsMultiple } from './xls-rebuild.js';
@@ -20,12 +21,12 @@ export async function writeHoursIntoExcel(
   state: FileUploadState,
 ): Promise<boolean> {
   if (!state.file) {
-    console.warn('[AIA][Excel] No hay archivo cargado en state.');
+    logger.warn('Excel', 'No hay archivo cargado en state.');
     return false;
   }
   const targets = results.filter((r): r is { identification: string; totalHours: string } => Boolean(r.totalHours));
   if (targets.length === 0) {
-    console.warn('[AIA][Excel] No hay horas para aplicar.');
+    logger.warn('Excel', 'No hay horas para aplicar.');
     elements.statusMessage.textContent = 'No hay horas para aplicar. No se modificó el archivo.';
     return false;
   }
@@ -46,7 +47,7 @@ export async function writeHoursIntoExcel(
       usedRoute = 'com';
     }
   } catch (error) {
-    console.warn('[AIA][Excel] Error en la ruta COM múltiple; se intentará ExcelJS.', error);
+    logger.warn('Excel', 'Error en la ruta COM múltiple; se intentará ExcelJS.', error);
   }
 
   // Segunda opción: ExcelJS directo sobre el archivo, conservando estilos y filtros.
@@ -57,7 +58,7 @@ export async function writeHoursIntoExcel(
         usedRoute = 'exceljs';
       }
     } catch (error) {
-      console.warn('[AIA][Excel] Error en la ruta ExcelJS; se usará el fallback .xls.', error);
+      logger.warn('Excel', 'Error en la ruta ExcelJS; se usará el fallback .xls.', error);
     }
   }
 
@@ -68,12 +69,12 @@ export async function writeHoursIntoExcel(
         usedRoute = 'rebuild';
       }
     } catch (error) {
-      console.warn('[AIA][Excel] Falló la reconstrucción del archivo.', error);
+      logger.warn('Excel', 'Falló la reconstrucción del archivo.', error);
     }
   }
 
   if (!updatedBuffer) {
-    console.warn('[AIA][Excel] No se pudieron aplicar horas.');
+    logger.warn('Excel', 'No se pudieron aplicar horas.');
     elements.statusMessage.textContent = 'No se pudieron aplicar las horas. No se modificó el archivo.';
     return false;
   }

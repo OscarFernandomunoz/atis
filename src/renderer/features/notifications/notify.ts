@@ -1,3 +1,4 @@
+import { logger } from '../../app/logger.js';
 import { notificationsAllowed } from './permission.js';
 import { showInAppNotice } from './toast.js';
 
@@ -17,7 +18,7 @@ export async function notify(title: string, body: string): Promise<void> {
     const shown = await window.electronAPI.notifySystem({ title, body });
     if (!shown) showInAppNotice(title, body);
   } catch (error) {
-    console.error('[AIA][Notificaciones] No se pudo mostrar el aviso del sistema.', error);
+    logger.error('Notificaciones', 'No se pudo mostrar el aviso del sistema.', error);
     showInAppNotice(title, body);
   }
 }

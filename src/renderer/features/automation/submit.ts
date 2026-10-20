@@ -1,4 +1,5 @@
 import type { AppElements, FileUploadState } from '../../app/types.js';
+import { logger } from '../../app/logger.js';
 import { colorHoursCellInPreview, getVisibleIdentifications, highlightRow, writeHoursIntoExcel } from '../spreadsheet/index.js';
 import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from '../instructors/index.js';
 import { notify } from '../notifications/index.js';
@@ -121,18 +122,18 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
       button.disabled = true;
       setPlayerState(elements, 'success');
       const found = results.filter((r) => r.totalHours);
-      console.log('[AIA][Excel] Resultados SofiaPlus:', results);
+      logger.info('Excel', 'Resultados SofiaPlus.', results);
       elements.statusMessage.textContent = found.length > 0
         ? `Horas leídas para ${found.length} de ${results.length} instructores. Actualizando el Excel...`
         : 'Sin horas del portal. No se modificó el Excel.';
       try {
         const updated = await writeHoursIntoExcel(results, elements, state);
-        console.log('[AIA][Excel] writeHoursIntoExcel devolvió:', updated);
+        logger.info('Excel', `writeHoursIntoExcel devolvió: ${String(updated)}`);
         if (!updated && found.length > 0) {
           elements.statusMessage.textContent = 'No se encontraron cédulas coincidentes en el Excel.';
         }
       } catch (updateError) {
-        console.error('[AIA][Excel] No se pudo actualizar el Excel.', updateError);
+        logger.error('Excel', 'No se pudo actualizar el Excel.', updateError);
         const updateMessage = `No se pudo actualizar el Excel: ${updateError instanceof Error ? updateError.message : String(updateError)}`;
         elements.statusMessage.textContent = updateMessage;
         await notify('No se pudo actualizar el Excel', updateMessage);

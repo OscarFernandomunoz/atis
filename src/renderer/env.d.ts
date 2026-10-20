@@ -1,8 +1,11 @@
-import type { TitleBarPlatform } from '../shared/index.js';
+import type { AppLogEntry, TitleBarPlatform } from '../shared/index.js';
 import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Define la forma del API expuesto desde el preload para que TypeScript reconozca window.electronAPI.
 export interface IElectronAPI {
+  // Envía un log del renderer al proceso principal para verlo en la terminal.
+  log: (entry: AppLogEntry) => void;
+
   // Abre SofiaPlus y llena las credenciales y fechas solicitadas.
   openSofiaAndFill: (credentials: {
     username: string;
