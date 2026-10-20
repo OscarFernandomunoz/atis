@@ -10,21 +10,15 @@
   --text: #151515;
   --text-muted: #686864;
   --accent: #242424;
-  --accent-hover: #000000;
   --accent-contrast: #ffffff;
   --accent-soft: #e7e7e3;
   --accent-warm: #575752;
   --success: #424b47;
   --primary-start: #202020;
-  --primary-end: #050505;
   --primary-contrast: #ffffff;
   --primary-hover-start: #3a3a3a;
-  --primary-hover-end: #111111;
   --primary-border: rgba(255, 255, 255, 0.2);
   --primary-shadow: rgba(0, 0, 0, 0.28);
-  --primary-glow: rgba(0, 0, 0, 0.09);
-  --form-surface: #f7f7f5;
-  --input-surface: #ffffff;
   --table-header: #2b2b2b;
   --table-header-text: #f4f4f2;
   --table-header-border: #4a4a4a;
@@ -35,7 +29,6 @@
   --required-column-header: #3a3a3a;
   --required-column-header-hover: #454545;
   --required-column-body-hover: #d8d8d4;
-  --background-gradient: #f5f5f3;
   /* Degradado ambiental; el renderer lo reemplaza al azar en cada arranque.
      Solo capas de imagen: el negro de base lo pinta `background-color` (--bg). */
   --app-gradient: radial-gradient(120% 80% at 8% -8%, hsl(0 88% 52% / 0.2) 0%, transparent 80%),
@@ -44,7 +37,6 @@
   --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.07);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --button-motion: 680ms cubic-bezier(0.33, 1, 0.68, 1);
   /* Paleta pastel de la app: la comparten el carrusel de meses y los carnets de
      instructores, alternando fríos y cálidos para que elementos consecutivos no
      se parezcan. Al ser tonos claros y poco saturados se combinan con el negro. */
@@ -79,7 +71,6 @@
   --text: #f1f1ef;
   --text-muted: #a9a9a5;
   --accent: #d0d0cc;
-  --accent-hover: #f1f1ed;
   --accent-contrast: #111111;
   --accent-soft: #292929;
   --accent-warm: #c9c9c4;
@@ -88,15 +79,10 @@
   --required-column-body-hover: #3d3d3d;
   --success: #c8d0ca;
   --primary-start: #f1f1ef;
-  --primary-end: #c7c7c4;
   --primary-contrast: #111111;
   --primary-hover-start: #ffffff;
-  --primary-hover-end: #ddddda;
   --primary-border: rgba(0, 0, 0, 0.18);
   --primary-shadow: rgba(0, 0, 0, 0.42);
-  --primary-glow: rgba(255, 255, 255, 0.1);
-  --form-surface: #181818;
-  --input-surface: #101010;
   --table-header: #2b2b2b;
   --table-header-text: #f4f4f2;
   --table-header-border: #4a4a4a;
@@ -104,7 +90,6 @@
   --table-stripe: #181818;
   --table-hover: #292929;
   --required-column-header: #3a3a3a;
-  --background-gradient: #090909;
   --shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
   --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.36);
   --title-bar-bg: #000000;

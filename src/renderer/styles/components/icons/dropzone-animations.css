@@ -78,15 +78,3 @@
     transform: scale(1.12) rotate(35deg);
   }
 }
-
-@keyframes btn-icon-motion {
-
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-
-  50% {
-    transform: translate3d(0, -1.5px, 0) rotate(-5deg);
-  }
-}

@@ -15,6 +15,5 @@
 @import "./shell/modal/index.css";
 @import "./components/notifications/index.css";
 @import "./features/instructors/index.css";
-@import "./features/automation/submit.css";
 @import "./features/automation/player-bar/index.css";
 @import "./foundation/responsive.css";

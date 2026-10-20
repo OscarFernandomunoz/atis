@@ -29,7 +29,6 @@ html {
 }
 
 /* Anillo de foco compartido por los controles interactivos principales. */
-.btn-submit:focus-visible,
 .dropzone:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent) 30%, transparent);
   outline-offset: 2px;

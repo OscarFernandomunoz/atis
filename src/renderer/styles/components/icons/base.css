@@ -23,7 +23,3 @@ html.icons-ready .app-icon {
   transform: translateY(-50%) rotate(3deg) scale(1.08);
 }
 
-.panel-status .app-icon.is-visible {
-  color: var(--success);
-}
-
