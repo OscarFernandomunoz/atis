@@ -40,5 +40,57 @@
   "allowScripts": {
     "esbuild@0.28.2": true,
     "electron-winstaller@5.4.0": true
+  },
+  "build": {
+    "appId": "com.tims.app",
+    "productName": "TIMS",
+    "copyright": "Copyright © 2025 Oscar Fernando",
+    "directories": {
+      "output": "dist-installer",
+      "buildResources": "build-resources"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "public/images",
+        "to": "images",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/images/logo.png",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TIMS",
+      "uninstallDisplayName": "TIMS",
+      "license": "build-resources/license.txt"
+    },
+    "portable": {
+      "artifactName": "TIMS-${version}-portable.${ext}"
+    }
   }
 }
