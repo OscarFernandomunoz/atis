@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { join } from 'node:path';
+import { appFile } from '../app-paths.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme } from './appearance.js';
 
 // Crea la ventana principal de la aplicación con el renderer HTML y el preload seguro.
@@ -14,7 +14,7 @@ export function createMainWindow(): BrowserWindow {
     show: false,
     ...getAppWindowOptions(getCurrentTitleBarTheme()),
     webPreferences: {
-      preload: join(process.cwd(), 'dist/preload/index.js'),
+      preload: appFile('dist/preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -43,6 +43,6 @@ export function createMainWindow(): BrowserWindow {
   });
 
   // Carga la interfaz de usuario compilada en la carpeta dist.
-  mainWindow.loadFile(join(process.cwd(), 'dist/renderer/index.html'));
+  mainWindow.loadFile(appFile('dist/renderer/index.html'));
   return mainWindow;
 }

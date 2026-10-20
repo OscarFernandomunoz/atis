@@ -1,10 +1,6 @@
 import { nativeTheme, type BrowserWindow, type BrowserWindowConstructorOptions } from 'electron';
-import { join } from 'node:path';
-import {
-  APP_TITLE,
-  TITLE_BAR_HEIGHT,
-  type TitleBarTheme,
-} from '../../shared/index.js';
+import { APP_TITLE, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/index.js';
+import { appFile } from '../app-paths.js';
 import { TITLE_BAR_OVERLAY_COLORS, TITLE_BAR_THEME_COLORS } from './palette.js';
 import { buildRemoteChromeScript } from './remote-chrome.js';
 
@@ -53,7 +49,7 @@ export function getAppWindowOptions(
 ): BrowserWindowConstructorOptions {
   return {
     title: APP_TITLE,
-    icon: join(process.cwd(), 'public/images/sofia-plus.png'),
+    icon: appFile('public/images/sofia-plus.png'),
     autoHideMenuBar: true,
     backgroundColor: TITLE_BAR_THEME_COLORS[initialTheme].background,
     ...getWindowAppearanceOptions(initialTheme),

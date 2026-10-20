@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
-import { join } from 'node:path';
 import { APP_TITLE } from '../../../shared/index.js';
+import { appFile } from '../../app-paths.js';
 import { psString, runPowerShell } from './powershell.js';
 
 /**
@@ -22,7 +22,7 @@ let preparation: Promise<boolean> | null = null;
 
 /** Ruta del icono tal como la ve Windows (en WSL hay que traducirla). */
 function windowsIconPath(): Promise<string | null> {
-  const local = join(process.cwd(), 'public/images', ICON_NAME);
+  const local = appFile('public/images', ICON_NAME);
   if (process.platform === 'win32') return Promise.resolve(local);
 
   // `wslpath` funciona tanto si el proyecto vive dentro de WSL (\\wsl.localhost)

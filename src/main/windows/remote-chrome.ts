@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { APP_TITLE, getTitleBarPlatform, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/index.js';
+import { appFile } from '../app-paths.js';
 import { TITLE_BAR_THEME_COLORS } from './palette.js';
 
 // Cromo de la barra de título que se inyecta en las páginas remotas (SofiaPlus) mediante un
@@ -12,7 +12,7 @@ function getAppIconDataUrl(): string {
   if (appIconDataUrl) return appIconDataUrl;
 
   try {
-    const icon = readFileSync(join(process.cwd(), 'public/images/sofia-plus.png'));
+    const icon = readFileSync(appFile('public/images/sofia-plus.png'));
     appIconDataUrl = `data:image/png;base64,${icon.toString('base64')}`;
   } catch {
     appIconDataUrl = '';
