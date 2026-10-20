@@ -1,5 +1,5 @@
-import type { TitleBarPlatform } from '../shared/window.js';
-import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
+import type { TitleBarPlatform } from '../shared/index.js';
+import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Define la forma del API expuesto desde el preload para que TypeScript reconozca window.electronAPI.
 export interface IElectronAPI {

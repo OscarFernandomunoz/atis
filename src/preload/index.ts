@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { getTitleBarPlatform, type TitleBarTheme } from '../shared/window.js';
-import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
+import { getTitleBarPlatform, type TitleBarTheme } from '../shared/index.js';
+import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
 // Se limita a invocar canales IPC definidos en el proceso principal sin permitir acceso directo a Node.
