@@ -1,6 +1,7 @@
 import type { Instructor } from './parse.js';
 import { createSelectionCheckbox } from './selection.js';
 import { effectiveHours, hoursView } from './hours.js';
+import { refreshHoursHint } from './hours-hint.js';
 
 // Retrato genérico para credenciales sin foto de perfil (estilo intranet).
 const PHOTO_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
@@ -62,9 +63,13 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   top.appendChild(identity);
   card.appendChild(top);
 
+  const hours = effectiveHours(instructor);
+  // Las horas quedan en el dataset para que el pie del reproductor calcule el
+  // avance al pasar el cursor, sin volver a interpretar la insignia.
+  card.dataset.hours = hours;
   const meta = el('div', 'carnet-meta');
   meta.appendChild(el('span', 'carnet-doc', `C.C. ${instructor.identification}`));
-  meta.appendChild(createHoursBadge(effectiveHours(instructor)));
+  meta.appendChild(createHoursBadge(hours));
   card.appendChild(meta);
 
   const foot = el('div', 'carnet-foot');
@@ -79,7 +84,10 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
 export function updateCardHours(grid: HTMLElement, identification: string, hours: string): void {
   Array.from(grid.children).forEach((node) => {
     if (!(node instanceof HTMLElement) || node.dataset.identification !== identification) return;
+    node.dataset.hours = hours;
     const badge = node.querySelector('.carnet-hours');
     if (badge) badge.replaceWith(createHoursBadge(hours));
   });
+  // Si el cursor sigue sobre la ficha, la pista del pie muestra las horas nuevas.
+  refreshHoursHint();
 }

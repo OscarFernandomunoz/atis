@@ -93,6 +93,51 @@
   outline-offset: 2px;
 }
 
+/* Atajo al carnet que la automatización está consultando: mismo peso visual que
+   el botón de la tabla, pero a la izquierda del play. Solo se activa mientras
+   haya una cédula en consulta. */
+.player-locate {
+  position: absolute;
+  top: 50%;
+  right: calc(50% + 40px);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 180ms var(--ease-smooth), transform 200ms var(--ease-out);
+}
+
+.player-locate img {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  object-fit: contain;
+}
+
+.player-locate:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.12);
+}
+
+.player-locate:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.player-locate:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.player-locate:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 48%, transparent);
+  outline-offset: 2px;
+}
+
 .player-play-svg {
   display: block;
   width: 20px;

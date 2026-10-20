@@ -12,6 +12,7 @@ export interface AppElements {
   previewBackdrop: HTMLElement;
   previewCloseButton: HTMLButtonElement;
   playerTableButton: HTMLButtonElement;
+  playerLocateButton: HTMLButtonElement;
   cardsGrid: HTMLElement;
   programFilter: HTMLElement;
   hoursFilter: HTMLElement;
@@ -26,6 +27,7 @@ export interface AppElements {
   playerProgressTotal: HTMLElement;
   playerTrack: HTMLElement;
   playerProgressFill: HTMLElement;
+  playerHoursHint: HTMLElement;
   statusMessage: HTMLElement;
   inputUser: HTMLInputElement;
   inputPass: HTMLInputElement;

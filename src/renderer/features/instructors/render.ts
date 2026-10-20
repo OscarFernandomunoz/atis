@@ -2,6 +2,7 @@ import { createInstructorCard } from './card.js';
 import { buildProgramFilter } from './filter.js';
 import { effectiveHours, hoursKind } from './hours.js';
 import { buildHoursFilter, type HoursFilter } from './hours-filter.js';
+import { forgetHoursHint, refreshHoursHint } from './hours-hint.js';
 import { FALLBACK_COLOR, programColors } from './palette.js';
 import { parseInstructors } from './parse.js';
 import { forgetCardReveal, revealCards } from './reveal.js';
@@ -29,6 +30,8 @@ export function renderInstructorCards(
   sheets: unknown[][][],
   onVisibleChange?: (identifications: string[] | null) => void,
 ): void {
+  // La pista del pie apunta a fichas que están a punto de reemplazarse.
+  forgetHoursHint();
   const instructors = parseInstructors(sheets);
   // Deja el nombre a mano para que la barra del reproductor lo muestre al procesar cada cédula.
   rememberInstructors(instructors);
@@ -85,6 +88,8 @@ export function renderInstructorCards(
     }
     // Al cambiar los filtros, "seleccionar todo" se recalcula sobre las visibles.
     refreshSelectAll(board.grid, board.selectAll);
+    // Si el carnet señalado quedó oculto, la pista del pie se retira.
+    refreshHoursHint();
   };
 
   const scheduleApply = (): void => {
@@ -122,6 +127,7 @@ export function renderInstructorCards(
 
 export function clearInstructorCards(board: CardBoard): void {
   forgetInstructors();
+  forgetHoursHint();
   forgetCardReveal(board.grid);
   resetSelection(board.grid, board.selectAll);
   board.grid.replaceChildren();

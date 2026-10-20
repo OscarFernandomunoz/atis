@@ -61,6 +61,28 @@
     inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
 }
 
+/* Destino del atajo del reproductor: un anillo con el color del programa señala
+   el carnet al que se acaba de saltar. */
+.carnet.is-located {
+  outline: 2px solid transparent;
+  animation: carnet-locate 2.6s var(--ease-out);
+}
+
+@keyframes carnet-locate {
+
+  0%,
+  100% {
+    outline-color: transparent;
+    outline-offset: 0;
+  }
+
+  25%,
+  85% {
+    outline-color: var(--card-accent);
+    outline-offset: 4px;
+  }
+}
+
 /* La selección tiñe la ficha entera, no solo la casilla. */
 .carnet:has(.carnet-check:checked) {
   border-color: color-mix(in srgb, var(--card-accent) 56%, transparent);

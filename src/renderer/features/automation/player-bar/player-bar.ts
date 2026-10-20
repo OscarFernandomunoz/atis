@@ -1,4 +1,5 @@
 import type { AppElements } from '../../../app/types.js';
+import { initPlayerLocate } from './locate.js';
 import { setPlayerProgress } from './progress.js';
 import { setPlayerState } from './state.js';
 import { setPlayerTrack } from './track.js';
@@ -6,9 +7,18 @@ import { setPlayerTrack } from './track.js';
 // Deja la barra en reposo al arrancar: play disponible, sin cédula y progreso en cero.
 export function initPlayerBar(elements: Pick<
   AppElements,
-  'playButton' | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent' | 'playerProgressTotal' | 'playerTrack' | 'playerProgressFill'
+  | 'playButton'
+  | 'playerIdentification'
+  | 'playerInstructorName'
+  | 'playerProgressCurrent'
+  | 'playerProgressTotal'
+  | 'playerTrack'
+  | 'playerProgressFill'
+  | 'playerLocateButton'
+  | 'cardsGrid'
 >): void {
   setPlayerState(elements, 'idle');
   setPlayerTrack(elements, null);
   setPlayerProgress(elements, 0, 0);
+  initPlayerLocate(elements);
 }

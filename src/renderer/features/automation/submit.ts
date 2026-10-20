@@ -4,10 +4,10 @@ import { colorHoursCellInPreview, getVisibleIdentifications, highlightRow, write
 import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from '../instructors/index.js';
 import { notify } from '../notifications/index.js';
 import { startConsulting, stopConsulting } from './consulting.js';
-import { setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
+import { setLocateAvailable, setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
 
 type SubmitElements = Pick<AppElements,
-  | 'playButton' | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent' | 'playerProgressTotal' | 'playerTrack' | 'playerProgressFill'
+  | 'playButton' | 'playerLocateButton' | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent' | 'playerProgressTotal' | 'playerTrack' | 'playerProgressFill'
   | 'statusMessage' | 'dropzone' | 'dropzoneText' | 'fileInput' | 'excelPreview' | 'cardsGrid'
   | 'programFilter' | 'hoursFilter' | 'cardsSearch' | 'cardsSelectAll' | 'cardsCount' | 'cardsEmpty'
   | 'inputUser' | 'inputPass' | 'inputStartDate' | 'inputEndDate'>;
@@ -104,8 +104,10 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
           // y al terminar (con las horas, o con null si el portal no las devolvió).
           if (processedIds.has(identification)) {
             stopConsulting(elements.cardsGrid, elements.excelPreview);
+            setLocateAvailable(elements.playerLocateButton, false);
           } else {
             startConsulting(elements.cardsGrid, elements.excelPreview, identification);
+            setLocateAvailable(elements.playerLocateButton, true);
             processedIds.add(identification);
             setPlayerProgress(elements, processedIds.size, total);
           }
@@ -147,6 +149,7 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
     } finally {
       // Al terminar (o fallar) ningún instructor queda marcado como en consulta.
       stopConsulting(elements.cardsGrid, elements.excelPreview);
+      setLocateAvailable(elements.playerLocateButton, false);
       running = false;
       pausable = false;
       button.disabled = false;
