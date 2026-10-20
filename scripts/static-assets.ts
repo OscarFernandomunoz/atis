@@ -49,11 +49,9 @@ export function copyStaticAssets(rootDir: string): void {
     cpSync(stylesSrc, resolve(distRendererDir, 'styles'), { recursive: true });
   }
 
-  for (const image of ['sofia-plus.svg', 'sofia-plus.png']) {
-    const source = resolve(rootDir, 'public/images', image);
-    if (existsSync(source)) {
-      copyFileSync(source, resolve(distImagesDir, image));
-    }
+  const logoSource = resolve(rootDir, 'public/images/logo.png');
+  if (existsSync(logoSource)) {
+    copyFileSync(logoSource, resolve(distImagesDir, 'logo.png'));
   }
 
   // Fotografías de paisajes que usa el carrusel de meses.

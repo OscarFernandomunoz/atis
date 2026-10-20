@@ -56,7 +56,7 @@ export function getAppWindowOptions(
 ): BrowserWindowConstructorOptions {
   return {
     title: APP_TITLE,
-    icon: appFile('public/images/sofia-plus.png'),
+    icon: appFile('public/images/logo.png'),
     autoHideMenuBar: true,
     backgroundColor: TITLE_BAR_THEME_COLORS[initialTheme].background,
     // En la app empaquetada no se abren DevTools: el usuario final no necesita

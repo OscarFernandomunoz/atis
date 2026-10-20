@@ -16,7 +16,7 @@ export const WINDOWS_AUMID = 'Aia.GestionNomina';
 // La primera vez PowerShell prepara módulos y copia el icono; después es inmediato.
 const REGISTRATION_TIMEOUT_MS = 20000;
 const APP_FOLDER = 'AIA';
-const ICON_NAME = 'sofia-plus.png';
+const ICON_NAME = 'logo.png';
 
 let preparation: Promise<boolean> | null = null;
 

@@ -12,7 +12,7 @@ function getAppIconDataUrl(): string {
   if (appIconDataUrl) return appIconDataUrl;
 
   try {
-    const icon = readFileSync(appFile('public/images/sofia-plus.png'));
+    const icon = readFileSync(appFile('public/images/logo.png'));
     appIconDataUrl = `data:image/png;base64,${icon.toString('base64')}`;
   } catch {
     appIconDataUrl = '';
