@@ -44,35 +44,28 @@ src/
 │   │   │   │   │   ├── index.ts         # API pública
 │   │   │   │   │   ├── script.ts        # Script inyectado en la página
 │   │   │   │   │   └── styles.ts        # Estilos del retículo y la etiqueta
-│   │   │   │   └── markers.ts           # Limpieza de marcadores
 │   │   │   ├── workflow/                # Piezas del flujo
 │   │   │   │   ├── step-banner.ts       # Contador de progreso
 │   │   │   │   ├── pause-gate.ts        # Pausa y reanudación
 │   │   │   │   ├── session-reset.ts     # Limpieza de la sesión
 │   │   │   │   ├── window-loader.ts     # Carga de la ventana del portal
 │   │   │   │   ├── window-lock.ts       # Bloqueo de la ventana
-│   │   │   │   ├── window-size.ts       # Tamaño de la ventana
-│   │   │   │   └── select-instructor.ts # Selección del instructor
+│   │   │   │   └── window-size.ts       # Tamaño de la ventana
 │   │   │   └── report/                  # Helpers del reporte
 │   │   │       ├── index.ts             # API pública de los helpers
 │   │   │       ├── dates.ts             # Campos de fecha
-│   │   │       ├── instructor-picker.ts # Apertura del diálogo
 │   │   │       ├── identification-type.ts
 │   │   │       ├── identification-field.ts
 │   │   │       ├── search-button/
 │   │   │       │   ├── index.ts
-│   │   │       │   ├── click-search-input.ts
-│   │   │       │   └── find-search-point.ts
-│   │   │       ├── instructor-row-select.ts
+│   │   │       │   └── click-search-input.ts
 │   │   │       ├── result-link.ts
 │   │   │       ├── learning-results-option.ts
 │   │   │       ├── form-submit-button.ts
 │   │   │       └── total-hours.ts
 │   │   ├── spreadsheet/                 # Escritura de horas con Excel COM
 │   │   │   ├── index.ts                 # API pública
-│   │   │   ├── apply-hours.ts
 │   │   │   ├── apply-hours-multiple.ts
-│   │   │   ├── excel-com-script.ts
 │   │   │   └── excel-com-multiple-script.ts
 │   │   ├── notifications/               # Avisos del sistema
 │   │   │   ├── index.ts                 # API pública
