@@ -52,7 +52,12 @@ export async function applyHoursMultipleWithExcel(payload: ApplyHoursMultiplePay
     }
   } finally {
     // El libro contiene cédulas y horas reales: no debe quedar en el directorio
-    // temporal después de responder, ni siquiera cuando Excel falla.
-    rmSync(dir, { recursive: true, force: true });
+    // temporal después de responder, ni siquiera cuando Excel falla. Si Windows
+    // todavía lo tiene abierto, se reintenta sin perder el resultado ya leído.
+    try {
+      rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
+    } catch (error) {
+      console.warn('[AIA][Excel] No se pudo borrar el directorio temporal del libro.', error);
+    }
   }
 }
