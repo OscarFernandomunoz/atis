@@ -3,16 +3,11 @@ import { registerIpcHandlers } from './ipc/index.js';
 import { createMainWindow, registerRemoteWindow } from './windows/index.js';
 import { isWsl, WINDOWS_AUMID, ensureWindowsAppId } from './services/platform/index.js';
 
-app.commandLine.appendSwitch('ignore-certificate-errors');
 // Windows atribuye cada notificación a la app por este identificador: sin él, los
 // avisos aparecen con el nombre del ejecutable en lugar del de la aplicación.
 if (process.platform === 'win32') {
   app.setAppUserModelId(WINDOWS_AUMID);
 }
-// El portal de SofiaPlus usa HTTP y no tiene CSP seguro; sin estos switches Electron
-// inunda la consola con advertencias de recursos inseguros y webSecurity deshabilitado.
-app.commandLine.appendSwitch('disable-web-security');
-app.commandLine.appendSwitch('allow-running-insecure-content');
 
 app.on('browser-window-created', (_event, window) => {
   const registerIfRemote = (): void => {
