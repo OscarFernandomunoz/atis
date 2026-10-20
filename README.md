@@ -63,7 +63,7 @@ La automatización está pensada para reducir el trabajo repetitivo y los errore
 - **Coloreado de horas** según el umbral configurado: rojo por debajo, verde desde el umbral.
 - **Sesión aislada del portal**: cookies, almacenamiento local y caché se limpian antes y después de cada ejecución.
 - **Credenciales no persistentes**: se solicitan en cada ejecución y no se guardan en disco.
-- **Interfaz de escritorio oscura** con barra de título nativa, carrusel de paisajes por mes y notificaciones del sistema.
+- **Interfaz de escritorio oscura** con barra de título nativa, selector de meses del periodo de automatización y notificaciones del sistema.
 - **Verificación automática de helpers inyectados** para evitar fallos que TypeScript no puede detectar.
 
 ## Flujo de trabajo

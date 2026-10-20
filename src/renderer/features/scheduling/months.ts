@@ -1,4 +1,4 @@
-// Paisajes de Colombia, uno por mes. `index` coincide con el mes del año: 0 = enero.
+// Meses del periodo a automatizar. `index` coincide con el mes del año: 0 = enero.
 export interface MonthCard {
   /** Posición en el año: 0 = enero, 11 = diciembre. */
   index: number;
