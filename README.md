@@ -181,12 +181,13 @@ src/
 │   └── windows/               # Barras de título, paleta y ciclo de vida
 ├── preload/index.ts           # Puente seguro renderer -> main
 ├── renderer/                  # Interfaz
-│   ├── index.html
+│   ├── index.html             # Shell mínimo con directivas @include
+│   ├── partials/              # Secciones HTML de la interfaz
 │   ├── index.ts
 │   ├── app/                   # Tipos del DOM y del estado
 │   ├── features/              # Automatización, instructores, Excel, meses, tema
 │   ├── shell/                 # Barra de título y ventana de vista previa
-│   └── styles/                # CSS modular por base, armazón, componentes y dominio
+│   └── styles/                # CSS modular con barriles por dominio
 └── shared/                    # Tipos y constantes compartidos
 ```
 

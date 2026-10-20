@@ -40,7 +40,10 @@ src/
 │   │   │   │   ├── frames.ts            # Recorrido de frames
 │   │   │   │   ├── window-tracker.ts    # Ventanas emergentes
 │   │   │   │   ├── click.ts             # Clic por coordenadas
-│   │   │   │   ├── click-marker.ts      # Marcador visual del clic
+│   │   │   │   ├── click-marker/        # Marcador visual del clic
+│   │   │   │   │   ├── index.ts         # API pública
+│   │   │   │   │   ├── script.ts        # Script inyectado en la página
+│   │   │   │   │   └── styles.ts        # Estilos del retículo y la etiqueta
 │   │   │   │   └── markers.ts           # Limpieza de marcadores
 │   │   │   ├── workflow/                # Piezas del flujo
 │   │   │   │   ├── step-banner.ts       # Contador de progreso
@@ -90,7 +93,18 @@ src/
 ├── preload/
 │   └── index.ts                         # Puente seguro renderer -> main
 ├── renderer/
-│   ├── index.html                       # Estructura HTML
+│   ├── index.html                       # Shell mínimo con directivas @include
+│   ├── partials/                        # Secciones HTML de la interfaz
+│   │   ├── title-bar.html
+│   │   ├── content-header.html
+│   │   ├── scheduling.html
+│   │   ├── access-form.html
+│   │   ├── dropzone.html
+│   │   ├── instructors.html
+│   │   ├── placeholders.html
+│   │   ├── player-bar.html
+│   │   ├── preview-modal.html
+│   │   └── notifications-modal.html
 │   ├── index.ts                         # Arranque del renderer
 │   ├── app/
 │   │   └── types.ts                     # Tipos del DOM y del estado
@@ -116,13 +130,17 @@ src/
 │       ├── index.css                    # Entrada de estilos
 │       ├── foundation/                  # Tokens, base, animaciones y responsive
 │       ├── shell/                       # Layout, barra de título y modal
+│       │   └── modal/                   # Botón, diálogo y animaciones
 │       ├── components/                  # Formularios, iconos y avisos
+│       │   ├── icons/                   # Base, reveal y animaciones
+│       │   └── notifications/           # Consentimiento y avisos flotantes
 │       └── features/                    # Estilos de cada dominio
 │           ├── dropzone/
 │           ├── automation/
-│           ├── spreadsheet.css
-│           ├── instructors.css
-│           └── scheduling.css
+│           │   └── player-bar/          # Animaciones, layout, controles y progreso
+│           ├── spreadsheet/             # Vista previa, filtros, tabla y acciones
+│           ├── instructors/             # Carnets, tarjeta, filtros y responsive
+│           └── scheduling/              # Carrusel, tarjetas y paleta
 └── shared/
     ├── index.ts                         # API pública de lo compartido
     ├── window.ts                        # Tipos y constantes de ventana
@@ -142,6 +160,9 @@ src/
 - `main/ipc/` agrupa los canales por dominio; `ipc/index.ts` solo los registra.
 - `renderer/features/` contiene la lógica de producto y `renderer/shell/` el armazón visual.
 - Los estilos siguen la misma división que el renderer: base, armazón, componentes y dominios.
+  Cuando un dominio crece, se convierte en carpeta con un `index.css` que solo importa sus partes.
+- `renderer/index.html` es un shell pequeño. Las secciones viven en `renderer/partials/` y
+  `scripts/static-assets.ts` expande las directivas `@include` al generar `dist/renderer/index.html`.
 - Los archivos se mantienen por debajo de ~200 líneas. La vista previa de Excel se dividió en
   lectura (`preview/column.ts`), tabla (`preview/table.ts`), filtros (`preview/view.ts`) y
   controlador (`preview/controller.ts`).
