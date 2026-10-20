@@ -61,7 +61,13 @@ export function getAppWindowOptions(
     backgroundColor: TITLE_BAR_THEME_COLORS[initialTheme].background,
     // En la app empaquetada no se abren DevTools: el usuario final no necesita
     // el contexto de depuración y una página remota no debe poder inspeccionarse.
-    webPreferences: { devTools: !app.isPackaged },
+    // Las emergentes del portal heredan esta misma configuración restrictiva.
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      devTools: !app.isPackaged,
+    },
     ...getWindowAppearanceOptions(initialTheme),
   };
 }
