@@ -19,6 +19,13 @@ export function getTrackedChildWindows(parent: BrowserWindow): ReadonlySet<Brows
   return childWindows.get(parent) ?? new Set<BrowserWindow>();
 }
 
+// Solo se inyectan scripts en frames del propio portal (o en el `about:blank`
+// temporal que usa el sitio antes de escribir su contenido). Un iframe externo
+// dentro de SofiaPlus no debe recibir ni ejecutar los helpers de la app.
+function isInjectableFrame(url: string): boolean {
+  return url === '' || url === 'about:blank' || isSofiaPlusUrl(url);
+}
+
 // Reúne todos los frames sobre los que se puede inyectar el script.
 // Además de los frames de la ventana principal, incluye las ventanas emergentes
 // (window.open) del propio sitio: el diálogo del instructor puede abrirse en un popup
@@ -28,6 +35,15 @@ function collectFrames(window: BrowserWindow): WebFrameMain[] {
   const visited = new Set<number>();
 
   const visitFrame = (frame: WebFrameMain): void => {
+    let url = '';
+    try {
+      url = frame.url;
+    } catch {
+      // El frame puede haberse destruido mientras se recorre el árbol.
+      return;
+    }
+    if (!isInjectableFrame(url)) return;
+
     frames.push(frame);
     for (const child of frame.frames) visitFrame(child);
   };
