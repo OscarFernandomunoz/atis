@@ -1,6 +1,9 @@
           <div class="dropzone" id="dropzone" role="button" tabindex="0"
             aria-label="Cargar archivo de nómina en Excel">
             <input type="file" id="fileInput" accept=".xls, .xlsx" required />
+            <!-- Resplandor que sigue al puntero. Se mueve con transform para no
+                 repintar la aurora de la tarjeta en cada movimiento. -->
+            <span class="dropzone-spotlight" aria-hidden="true"></span>
             <div class="dropzone-content">
               <div class="dropzone-icon" aria-hidden="true">
                 <span class="dropzone-icon-halo"></span>

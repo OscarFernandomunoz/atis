@@ -94,8 +94,7 @@
 }
 
 .excel-preview tbody tr.excel-row-active {
-  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
-  animation: row-pulse 1.2s ease-in-out infinite;
+  background: color-mix(in srgb, var(--accent) 26%, var(--surface));
 }
 
 .excel-preview tbody tr.excel-row-active td {

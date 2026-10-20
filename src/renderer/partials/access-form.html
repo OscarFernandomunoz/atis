@@ -1,4 +1,4 @@
-          <form id="accessForm" class="access-card" onsubmit="return false;">
+          <form id="accessForm" class="access-card" autocomplete="off">
             <div class="access-card-head">
               <span class="access-card-badge" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
@@ -23,7 +23,7 @@
                     <path class="svg-icon-path" d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2"
                       stroke-linecap="round" />
                   </svg>
-                  <input type="text" id="usuario" class="input-control" value="juan.perez" required />
+                  <input type="text" id="usuario" class="input-control" autocomplete="off" autocapitalize="none" spellcheck="false" required />
                 </div>
               </div>
               <div class="form-group">
@@ -37,7 +37,7 @@
                       stroke-width="2" stroke-linecap="round" />
                     <circle class="svg-lock-core" cx="12" cy="16" r="1.2" fill="currentColor" opacity="0.85" />
                   </svg>
-                  <input type="password" id="password" class="input-control" value="password123" required />
+                  <input type="password" id="password" class="input-control" autocomplete="off" spellcheck="false" required />
                 </div>
               </div>
             </div>

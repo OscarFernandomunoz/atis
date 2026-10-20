@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs';
+import { logger } from '../../../app/logger.js';
 import {
   GREEN_FILL,
   HOURS_COLUMN_NAME,
@@ -92,7 +93,7 @@ export async function highlightAllHoursCells(data: ArrayBuffer): Promise<ArrayBu
   try {
     await workbook.xlsx.load(data);
   } catch (error) {
-    console.warn('[AIA][Excel] No se pudo resaltar el encabezado de horas.', error);
+    logger.warn('Excel', 'No se pudo resaltar el encabezado de horas.', error);
     return null;
   }
 

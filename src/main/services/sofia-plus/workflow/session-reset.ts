@@ -1,5 +1,6 @@
 import { session } from 'electron';
-import { closeSofiaPopups, closeSofiaWindow, SOFIA_PARTITION } from './window-loader.js';
+import { SOFIA_PARTITION } from '../../../../shared/index.js';
+import { closeSofiaPopups, closeSofiaWindow } from './window-loader.js';
 
 // Deja la automatización desde cero: cierra la ventana del portal y borra todo lo que guardó
 // (cookies, almacenamiento local, caché y credenciales). Se llama al empezar cada corrida y

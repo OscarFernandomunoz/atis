@@ -34,7 +34,7 @@ export function readSettings(): AppSettings {
 export function updateSettings(patch: Partial<AppSettings>): AppSettings {
   const next: AppSettings = { ...readSettings(), ...patch };
   try {
-    writeFileSync(settingsPath(), JSON.stringify(next, null, 2), 'utf8');
+    writeFileSync(settingsPath(), JSON.stringify(next, null, 2), { encoding: 'utf8', mode: 0o600 });
   } catch (error) {
     console.error('[AIA][Settings] No se pudieron guardar las preferencias.', error);
   }

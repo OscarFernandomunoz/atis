@@ -9,16 +9,16 @@ export interface MonthCard {
 }
 
 export const MONTHS: MonthCard[] = [
-  { index: 0, label: 'Enero', image: 'images/landscapes/january.jpg' },
-  { index: 1, label: 'Febrero', image: 'images/landscapes/february.jpg' },
-  { index: 2, label: 'Marzo', image: 'images/landscapes/march.jpg' },
-  { index: 3, label: 'Abril', image: 'images/landscapes/april.jpg' },
-  { index: 4, label: 'Mayo', image: 'images/landscapes/may.jpg' },
-  { index: 5, label: 'Junio', image: 'images/landscapes/june.jpg' },
-  { index: 6, label: 'Julio', image: 'images/landscapes/july.jpg' },
-  { index: 7, label: 'Agosto', image: 'images/landscapes/august.jpg' },
-  { index: 8, label: 'Septiembre', image: 'images/landscapes/september.jpg' },
-  { index: 9, label: 'Octubre', image: 'images/landscapes/october.jpg' },
-  { index: 10, label: 'Noviembre', image: 'images/landscapes/november.jpg' },
-  { index: 11, label: 'Diciembre', image: 'images/landscapes/december.jpg' },
+  { index: 0, label: 'Enero', image: 'images/landscapes/january.webp' },
+  { index: 1, label: 'Febrero', image: 'images/landscapes/february.webp' },
+  { index: 2, label: 'Marzo', image: 'images/landscapes/march.webp' },
+  { index: 3, label: 'Abril', image: 'images/landscapes/april.webp' },
+  { index: 4, label: 'Mayo', image: 'images/landscapes/may.webp' },
+  { index: 5, label: 'Junio', image: 'images/landscapes/june.webp' },
+  { index: 6, label: 'Julio', image: 'images/landscapes/july.webp' },
+  { index: 7, label: 'Agosto', image: 'images/landscapes/august.webp' },
+  { index: 8, label: 'Septiembre', image: 'images/landscapes/september.webp' },
+  { index: 9, label: 'Octubre', image: 'images/landscapes/october.webp' },
+  { index: 10, label: 'Noviembre', image: 'images/landscapes/november.webp' },
+  { index: 11, label: 'Diciembre', image: 'images/landscapes/december.webp' },
 ];

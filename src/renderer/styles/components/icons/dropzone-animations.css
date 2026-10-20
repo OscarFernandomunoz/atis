@@ -1,13 +1,12 @@
 @keyframes dropzone-invite {
 
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-7) 38%, transparent),
-      0 20px 44px -28px color-mix(in srgb, #000 65%, transparent);
+  0%,
+  100% {
+    opacity: 0.2;
   }
 
-  100% {
-    box-shadow: 0 0 0 12px color-mix(in srgb, var(--pastel-7) 0%, transparent),
-      0 20px 44px -28px color-mix(in srgb, #000 65%, transparent);
+  50% {
+    opacity: 0.9;
   }
 }
 

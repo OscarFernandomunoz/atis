@@ -1,4 +1,5 @@
 import { registerAutomationHandlers } from './automation.js';
+import { registerLogHandlers } from './log.js';
 import { registerNotificationHandlers } from './notifications.js';
 import { registerSpreadsheetHandlers } from './spreadsheet.js';
 import { registerWindowHandlers } from './window.js';
@@ -7,6 +8,9 @@ import { registerWindowHandlers } from './window.js';
 // canales para que el renderer no dependa de un único archivo monolítico.
 export function registerIpcHandlers(): void {
   try {
+    // El logger va primero: si otro canal falla al registrarse, el error del
+    // renderer ya tiene un destino en la terminal.
+    registerLogHandlers();
     registerAutomationHandlers();
     registerSpreadsheetHandlers();
     registerNotificationHandlers();

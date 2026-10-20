@@ -1,11 +1,15 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { getTitleBarPlatform, type TitleBarTheme } from '../shared/index.js';
+import { getTitleBarPlatform, type AppLogEntry, type TitleBarTheme } from '../shared/index.js';
 import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
 // Se limita a invocar canales IPC definidos en el proceso principal sin permitir acceso directo a Node.
 const electronAPI = {
   titleBarPlatform: getTitleBarPlatform(),
+
+  // El renderer no escribe en la consola de DevTools: envía sus mensajes al
+  // proceso principal, que los imprime en la terminal.
+  log: (entry: AppLogEntry): void => ipcRenderer.send('app:log', entry),
 
   openSofiaAndFill: (credentials: {
     username: string;

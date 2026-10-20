@@ -9,15 +9,14 @@
   transform-origin: center;
 }
 
-/* Aplicar reveal clip-path al SVG padre para un efecto de entrada sin depender de dashoffset */
+/* Aplicar reveal al SVG padre con opacidad y transform: clip-path obligaba a
+   recortar la capa en cada frame. */
 .app-icon.is-visible {
-  clip-path: inset(0 0 0 0);
   animation: svg-reveal 620ms var(--ease-out) var(--icon-delay, 0ms) both;
 }
 
 @keyframes svg-reveal {
   0% {
-    clip-path: inset(100% 0 0 0);
     opacity: 0;
     transform: translateY(10px) scale(0.92);
   }
@@ -27,7 +26,6 @@
   }
 
   100% {
-    clip-path: inset(0 0 0 0);
     opacity: 1;
     transform: translateY(0) scale(1);
   }

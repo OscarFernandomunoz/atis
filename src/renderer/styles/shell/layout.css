@@ -34,7 +34,6 @@
   z-index: -1;
   content: "";
   pointer-events: none;
-  will-change: opacity;
   background-image: var(--app-gradient);
   animation: background-fade 900ms var(--ease-out) both;
 }

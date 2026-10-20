@@ -5,6 +5,10 @@ const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
   + '<path d="m3.6 8.4 3 3 5.8-6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />'
   + '</svg>';
 
+// El check se repite en cada ficha: se parsea una sola vez y se clona.
+const CHECK_TEMPLATE = document.createElement('template');
+CHECK_TEMPLATE.innerHTML = CHECK_SVG;
+
 const CARD_CHECKBOX_SELECTOR = '.carnet-check';
 
 // Crea la casilla para incluir o excluir una credencial de la automatización.
@@ -22,7 +26,7 @@ export function createSelectionCheckbox(instructor: Instructor): HTMLElement {
   const box = document.createElement('span');
   box.className = 'carnet-select-box';
   box.setAttribute('aria-hidden', 'true');
-  box.innerHTML = CHECK_SVG;
+  box.append(CHECK_TEMPLATE.content.cloneNode(true));
 
   label.append(input, box);
   return label;
@@ -62,22 +66,16 @@ export function bindSelection(
 
 // Marca o desmarca solo las credenciales que pasan los filtros actuales.
 function setVisibleChecked(grid: HTMLElement, checked: boolean): void {
-  Array.from(grid.children).forEach((card) => {
-    if (!(card instanceof HTMLElement) || card.hidden) return;
-    const input = card.querySelector<HTMLInputElement>(CARD_CHECKBOX_SELECTOR);
-    if (input) input.checked = checked;
-  });
+  grid.querySelectorAll<HTMLInputElement>(`.carnet:not([hidden]) ${CARD_CHECKBOX_SELECTOR}`)
+    .forEach((input) => { input.checked = checked; });
 }
 
 // Refleja en "seleccionar todo" si están todas, algunas o ninguna de las visibles marcadas.
 export function refreshSelectAll(grid: HTMLElement, selectAll: HTMLInputElement): void {
-  const boxes: HTMLInputElement[] = [];
-  Array.from(grid.children).forEach((card) => {
-    if (!(card instanceof HTMLElement) || card.hidden) return;
-    const input = card.querySelector<HTMLInputElement>(CARD_CHECKBOX_SELECTOR);
-    if (input) boxes.push(input);
-  });
-  const checked = boxes.filter((box) => box.checked).length;
+  // Una sola consulta al DOM en lugar de recorrer y buscar dentro de cada ficha.
+  const boxes = grid.querySelectorAll<HTMLInputElement>(`.carnet:not([hidden]) ${CARD_CHECKBOX_SELECTOR}`);
+  let checked = 0;
+  boxes.forEach((box) => { if (box.checked) checked += 1; });
   selectAll.checked = boxes.length > 0 && checked === boxes.length;
   selectAll.indeterminate = checked > 0 && checked < boxes.length;
 }

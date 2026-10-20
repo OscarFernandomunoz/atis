@@ -1,25 +1,22 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
+import { isSofiaPlusUrl, SOFIA_PARTITION } from '../shared/index.js';
 import { registerIpcHandlers } from './ipc/index.js';
+import { hardenSession } from './security/session.js';
 import { createMainWindow, registerRemoteWindow } from './windows/index.js';
 import { isWsl, WINDOWS_AUMID, ensureWindowsAppId } from './services/platform/index.js';
 
-app.commandLine.appendSwitch('ignore-certificate-errors');
 // Windows atribuye cada notificación a la app por este identificador: sin él, los
 // avisos aparecen con el nombre del ejecutable en lugar del de la aplicación.
 if (process.platform === 'win32') {
   app.setAppUserModelId(WINDOWS_AUMID);
 }
-// El portal de SofiaPlus usa HTTP y no tiene CSP seguro; sin estos switches Electron
-// inunda la consola con advertencias de recursos inseguros y webSecurity deshabilitado.
-app.commandLine.appendSwitch('disable-web-security');
-app.commandLine.appendSwitch('allow-running-insecure-content');
 
 app.on('browser-window-created', (_event, window) => {
   const registerIfRemote = (): void => {
     if (window.isDestroyed()) return;
 
     try {
-      if (window.webContents.getURL().toLowerCase().includes('senasofiaplus')) {
+      if (isSofiaPlusUrl(window.webContents.getURL())) {
         registerRemoteWindow(window);
       }
     } catch {
@@ -35,6 +32,10 @@ app.on('browser-window-created', (_event, window) => {
 // El proceso principal inicializa la app, registra los canales IPC y crea la ventana principal.
 app.whenReady().then(() => {
   try {
+    // La interfaz y el portal no necesitan permisos del navegador. Las descargas
+    // se bloquean solo en la sesión del portal: la app sí descarga su Excel.
+    hardenSession(session.defaultSession);
+    hardenSession(session.fromPartition(SOFIA_PARTITION), { blockDownloads: true });
     // Se habilitan los handlers del proceso principal para que el renderer pueda pedir acciones.
     registerIpcHandlers();
     // Se registra la identidad de la app en Windows (nombre y logo de los avisos)

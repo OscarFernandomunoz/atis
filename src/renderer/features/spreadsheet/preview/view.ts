@@ -26,15 +26,15 @@ export function getVisibleIdentifications(elements: FileElements): string[] {
 
 // Resalta la fila que contiene la cédula indicada.
 export function highlightRow(elements: FileElements, identification: string | null): void {
-  const rows = elements.excelPreview.querySelectorAll('tr');
-  rows.forEach((row) => {
-    row.classList.remove('excel-row-active');
-  });
+  // Solo se toca la fila que estaba activa, no las miles de la tabla.
+  elements.excelPreview.querySelectorAll('.excel-row-active')
+    .forEach((row) => row.classList.remove('excel-row-active'));
   if (!identification) return;
-  const target = Array.from(rows).find((row) => {
-    const cells = Array.from(row.cells).map((cell) => cell.textContent?.trim() ?? '');
-    return cells.some((cell) => cell === identification || cell.includes(identification));
-  });
+  // La cédula ya vive en `data-identification`: se evita leer el texto de todas
+  // las celdas en cada aviso de progreso.
+  const target = elements.excelPreview.querySelector<HTMLTableRowElement>(
+    `tr[data-identification="${CSS.escape(identification)}"]`,
+  );
   target?.classList.add('excel-row-active');
   // La tabla vive en una ventana interna: al resaltar hay que acercar la fila.
   target?.scrollIntoView({ block: 'nearest' });

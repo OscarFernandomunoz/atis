@@ -13,6 +13,8 @@
   gap: 14px;
   padding: 18px 18px 16px;
   overflow: hidden;
+  /* Aísla el layout de cada credencial del resto de la rejilla. */
+  contain: layout style;
   background-color: color-mix(in srgb, #08080a 68%, transparent);
   background-image:
     radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 16%, transparent) 0%, transparent 62%),
@@ -67,10 +69,11 @@
     inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
 }
 
-/* Consulta en curso: la ficha late y un brillo la recorre de lado a lado. */
+/* Consulta en curso: el borde se enciende y un brillo recorre la ficha. El pulso
+   de la sombra se retiró porque obligaba a repintar la credencial entera en cada
+   frame; el barrido y el punto animado ya comunican que hay trabajo en curso. */
 .carnet.is-consulting {
   border-color: color-mix(in srgb, var(--card-accent) 78%, transparent);
-  animation: carnet-consult-pulse 1.8s var(--ease-smooth) infinite;
 }
 
 /* El velo va por encima del contenido, pero es tan tenue que no lo tapa. */

@@ -57,8 +57,13 @@ export function createFilterBar(table: HTMLTableElement): HTMLDivElement {
     cell.textContent?.toLowerCase() ?? ''
   )));
 
+  // Pausa antes de filtrar mientras se escribe: una tabla grande no debe
+  // recorrer todas sus filas en cada pulsación.
+  const FILTER_DEBOUNCE_MS = 100;
   let filterFrame: number | null = null;
-  const apply = (): void => {
+  let filterTimer: number | null = null;
+
+  const runFilter = (): void => {
     // Se agrupa en un frame para no filtrar en cada pulsación del teclado.
     if (filterFrame !== null) return;
     filterFrame = window.requestAnimationFrame(() => {
@@ -76,7 +81,23 @@ export function createFilterBar(table: HTMLTableElement): HTMLDivElement {
       });
     });
   };
-  select.addEventListener('change', apply);
+
+  const apply = (): void => {
+    if (filterTimer !== null) window.clearTimeout(filterTimer);
+    filterTimer = window.setTimeout(() => {
+      filterTimer = null;
+      runFilter();
+    }, FILTER_DEBOUNCE_MS);
+  };
+
+  // El desplegable cambia de columna: conviene reflejarlo sin esperar la pausa.
+  select.addEventListener('change', () => {
+    if (filterTimer !== null) {
+      window.clearTimeout(filterTimer);
+      filterTimer = null;
+    }
+    runFilter();
+  });
   input.addEventListener('input', apply);
   bar.append(label, select, input);
   return bar;

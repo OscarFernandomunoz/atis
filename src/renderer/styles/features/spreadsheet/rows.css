@@ -1,12 +1,8 @@
-@keyframes row-pulse {
-  0%, 100% { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
-  50% { background: color-mix(in srgb, var(--accent) 30%, var(--surface)); }
-}
-
-/* Fila que la automatización está consultando en este momento. */
+/* Fila que la automatización está consultando en este momento. El fondo queda
+   fijo y solo late el punto: animar el color de la fila repintaba la tabla
+   entera en cada frame. */
 .excel-preview tbody tr.excel-row-consulting {
-  background-color: color-mix(in srgb, var(--accent) 20%, var(--surface));
-  animation: row-consulting-pulse 1.4s ease-in-out infinite;
+  background-color: color-mix(in srgb, var(--accent) 26%, var(--surface));
 }
 
 /* Barra de acento al inicio de la fila, como un cursor de lectura. */

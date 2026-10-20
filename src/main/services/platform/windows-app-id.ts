@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
-import { join } from 'node:path';
 import { APP_TITLE } from '../../../shared/index.js';
+import { appFile } from '../../app-paths.js';
 import { psString, runPowerShell } from './powershell.js';
 
 /**
@@ -16,13 +16,13 @@ export const WINDOWS_AUMID = 'Aia.GestionNomina';
 // La primera vez PowerShell prepara módulos y copia el icono; después es inmediato.
 const REGISTRATION_TIMEOUT_MS = 20000;
 const APP_FOLDER = 'AIA';
-const ICON_NAME = 'sofia-plus.png';
+const ICON_NAME = 'logo.png';
 
 let preparation: Promise<boolean> | null = null;
 
 /** Ruta del icono tal como la ve Windows (en WSL hay que traducirla). */
 function windowsIconPath(): Promise<string | null> {
-  const local = join(process.cwd(), 'public/images', ICON_NAME);
+  const local = appFile('public/images', ICON_NAME);
   if (process.platform === 'win32') return Promise.resolve(local);
 
   // `wslpath` funciona tanto si el proyecto vive dentro de WSL (\\wsl.localhost)

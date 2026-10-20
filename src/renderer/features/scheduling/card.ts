@@ -30,8 +30,15 @@ export function createMonthCard(month: MonthCard): MonthCardView {
   photo.className = 'month-card-photo';
   photo.src = month.image;
   photo.alt = `Paisaje de Colombia en ${month.label.toLowerCase()}`;
+  // Las medidas intrínsecas reservan el hueco de la foto antes de decodificarla:
+  // el carrusel no cambia de altura cuando terminan de cargar las imágenes.
+  photo.width = 198;
+  photo.height = 150;
   photo.loading = 'lazy';
   photo.decoding = 'async';
+  // El carrusel vive bajo el pliegue: sus fotos no deben competir con la carga
+  // inicial del formulario y de la barra del reproductor.
+  photo.fetchPriority = 'low';
 
   const indicator = document.createElement('span');
   indicator.className = 'month-card-select';

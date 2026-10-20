@@ -41,67 +41,39 @@ function getElements(): AppElements {
   };
 }
 
-function enforceSvgIconVisibility(): void {
-  const selectors = [
-    '.svg-icon-path', '.svg-cloud', '.svg-arrow',
-    '.svg-check', '.svg-lock-core', '.svg-cal-dot',
-  ];
-  document.querySelectorAll<SVGElement | HTMLElement>(selectors.join(',')).forEach((el) => {
-    if (el instanceof SVGElement || el instanceof HTMLElement) {
-      el.style.setProperty('stroke-dashoffset', '0', 'important');
-      el.style.setProperty('stroke-dasharray', '10000', 'important');
-      el.style.setProperty('opacity', '1', 'important');
-      el.style.setProperty('visibility', 'visible', 'important');
-      el.style.setProperty('display', '', 'important');
-    }
-  });
-  document.querySelectorAll<HTMLElement | SVGElement>('.app-icon, .input-icon, .btn-icon, .dropzone-glyph').forEach((svg) => {
-    svg.style.setProperty('opacity', '1', 'important');
-    svg.style.setProperty('visibility', 'visible', 'important');
-    svg.style.removeProperty('animation-play-state');
-  });
-}
-
 function initIconScrollAnimations(): void {
-  const icons = Array.from(document.querySelectorAll<HTMLElement>(
-    '.app-icon, .input-icon, .dropzone-icon .dropzone-glyph, .btn-icon',
-  ));
-  if (!icons.length) return;
+  // Los iconos que ya nacen con `is-visible` los anima el CSS. Solo se prepara
+  // un observador para los que se añadan sin esa clase.
+  const pending = Array.from(document.querySelectorAll<HTMLElement>('.app-icon:not(.is-visible)'));
+  if (!pending.length) return;
 
   document.documentElement.classList.add('icons-ready');
-  icons.forEach((icon, index) => {
-    icon.classList.add('app-icon');
+  pending.forEach((icon, index) => {
     if (!icon.style.getPropertyValue('--icon-delay')) {
       icon.style.setProperty('--icon-delay', `${Math.min(index * 45, 300)}ms`);
     }
   });
 
   if (!('IntersectionObserver' in window)) {
-    icons.forEach((icon) => icon.classList.add('is-visible'));
-  } else {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    }, { threshold: 0.1 });
-    icons.forEach((icon) => observer.observe(icon));
+    pending.forEach((icon) => icon.classList.add('is-visible'));
+    return;
   }
 
-  window.setTimeout(enforceSvgIconVisibility, 1500);
-  window.setTimeout(enforceSvgIconVisibility, 3500);
-  window.setTimeout(enforceSvgIconVisibility, 7000);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.1 });
+  pending.forEach((icon) => observer.observe(icon));
 
-  // Re-force visibility cada vez que un input recibe foco (soluciona el bug del desaparecido al seleccionar)
-  document.addEventListener('focusin', (event) => {
-    const target = event.target as Element | null;
-    if (target && target.closest('.input-wrapper, .access-card, .dropzone')) {
-      enforceSvgIconVisibility();
-      window.setTimeout(enforceSvgIconVisibility, 10);
-      window.setTimeout(enforceSvgIconVisibility, 120);
-    }
-  }, true);
+  // Red de seguridad: ningún icono debe quedarse invisible si el observador no
+  // llega a dispararse (por ejemplo, si la vista cambia antes de pintarse).
+  window.setTimeout(() => {
+    pending.forEach((icon) => icon.classList.add('is-visible'));
+    observer.disconnect();
+  }, 4000);
 }
 
 function initApp(): void {

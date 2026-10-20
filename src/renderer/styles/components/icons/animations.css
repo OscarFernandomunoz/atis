@@ -86,12 +86,12 @@
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pastel-5) 55%, transparent);
     opacity: 0.7;
+    transform: scale(1);
   }
 
   50% {
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--pastel-5) 0%, transparent);
     opacity: 1;
+    transform: scale(1.35);
   }
 }
