@@ -17,7 +17,9 @@ function readTargetText(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const text = value.trim();
   if (text.length === 0 || text.length > MAX_TARGET_LENGTH) return null;
-  return text.includes(';') || text.includes('|') || hasUnsafeControlChars(text) ? null : text;
+  if (text.includes(';') || text.includes('|') || text.includes('\n') || text.includes('\r')
+    || hasUnsafeControlChars(text)) return null;
+  return text;
 }
 
 function parseTargets(value: unknown): ApplyHoursMultiplePayload['targets'] | null {

@@ -18,7 +18,8 @@ function readIdentification(value: unknown): string | null {
   const text = readText(value, MAX_IDENTIFICATION_LENGTH);
   // Los separadores romperían el mapa "cédula|horas" que consume el script
   // de PowerShell; una cédula real no los necesita.
-  if (!text || text.includes(';') || text.includes('|') || hasUnsafeControlChars(text)) return null;
+  if (!text || text.includes(';') || text.includes('|') || text.includes('\n') || text.includes('\r')
+    || hasUnsafeControlChars(text)) return null;
   return text;
 }
 
