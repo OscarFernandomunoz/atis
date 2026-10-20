@@ -1,0 +1,54 @@
+.player-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.player-time {
+  flex: 0 0 auto;
+  min-width: 26px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.player-track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border-strong) 52%, transparent);
+}
+
+.player-track-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--text);
+  transition: width 420ms var(--ease-out), background-color 280ms var(--ease-smooth);
+}
+
+/* Reflejo en movimiento mientras la automatización está en curso. */
+.player-track.is-active .player-track-fill::after {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 55%, transparent), transparent);
+  content: "";
+  animation: player-fill-shimmer 1.4s linear infinite;
+}
+
+/* Con la automatización en pausa el reflejo se congela. */
+.player-track.is-paused .player-track-fill::after {
+  animation-play-state: paused;
+}
+
+.player-track.is-complete .player-track-fill {
+  background: var(--success);
+}

@@ -1,0 +1,29 @@
+/* SVG icon rendering and icon animations. */
+
+html.icons-ready .app-icon {
+  opacity: 0;
+  transform: translateY(14px) rotate(-8deg) scale(0.86);
+}
+
+.app-icon.is-visible {
+  animation: icon-scroll-in 700ms var(--ease-out) var(--icon-delay, 0ms) both;
+  transition: color 220ms var(--ease-smooth), transform 220ms var(--ease-out), filter 220ms var(--ease-smooth);
+}
+
+.app-icon.is-visible:hover {
+  filter: drop-shadow(0 4px 5px color-mix(in srgb, var(--accent) 22%, transparent));
+  transform: translateY(-3px) rotate(3deg) scale(1.08);
+}
+
+.input-wrapper .app-icon.is-visible {
+  animation-name: input-icon-scroll-in;
+}
+
+.input-wrapper .app-icon.is-visible:hover {
+  transform: translateY(-50%) rotate(3deg) scale(1.08);
+}
+
+.panel-status .app-icon.is-visible {
+  color: var(--success);
+}
+

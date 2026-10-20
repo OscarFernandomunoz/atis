@@ -1,0 +1,115 @@
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+/* Ficha de cristal sobre el degradado ambiental: el color del programa entra
+   solo como un velo tenue y como acento puntual, igual que en el resto de la app. */
+.carnet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 18px 16px;
+  overflow: hidden;
+  background-color: color-mix(in srgb, #08080a 68%, transparent);
+  background-image:
+    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 16%, transparent) 0%, transparent 62%),
+    linear-gradient(158deg, color-mix(in srgb, #fff 6%, transparent) 0%, color-mix(in srgb, #fff 1.5%, transparent) 100%);
+  border: 1px solid color-mix(in srgb, #fff 9%, transparent);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px color-mix(in srgb, #000 28%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent);
+  transition: transform 320ms var(--ease-out), border-color 320ms var(--ease-smooth), box-shadow 320ms var(--ease-smooth);
+}
+
+.carnet[hidden] {
+  display: none;
+}
+
+/* Aparición al entrar en pantalla: la clase la pone el renderer y el retardo en
+   cascada lo aporta cada credencial, así la fila se completa de izquierda a
+   derecha. Cada ficha se anima una sola vez; después queda visible aunque salga
+   y vuelva a entrar. Cuando termina, el JS retira `is-revealed` para que el
+   hover vuelva a usar su transición propia. */
+.cards-animate .carnet:not(.is-settled) {
+  opacity: 0;
+}
+
+.cards-animate .carnet.is-revealed {
+  animation: carnet-reveal 680ms var(--ease-out) var(--reveal-delay, 0ms) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards-animate .carnet:not(.is-settled) {
+    opacity: 1;
+  }
+
+  .cards-animate .carnet.is-revealed {
+    animation: none;
+  }
+}
+
+.carnet:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--card-accent) 46%, transparent);
+  box-shadow: 0 20px 44px color-mix(in srgb, #000 36%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+}
+
+/* La selección tiñe la ficha entera, no solo la casilla. */
+.carnet:has(.carnet-check:checked) {
+  border-color: color-mix(in srgb, var(--card-accent) 56%, transparent);
+  box-shadow: 0 16px 38px color-mix(in srgb, #000 34%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 30%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+}
+
+/* Consulta en curso: la ficha late y un brillo la recorre de lado a lado. */
+.carnet.is-consulting {
+  border-color: color-mix(in srgb, var(--card-accent) 78%, transparent);
+  animation: carnet-consult-pulse 1.8s var(--ease-smooth) infinite;
+}
+
+/* El velo va por encima del contenido, pero es tan tenue que no lo tapa. */
+.carnet.is-consulting::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(105deg,
+      transparent 30%,
+      color-mix(in srgb, var(--card-accent) 18%, transparent) 50%,
+      transparent 70%);
+  transform: translateX(-110%);
+  animation: carnet-consult-scan 1.9s var(--ease-smooth) infinite;
+}
+
+.carnet.is-consulting .carnet-role {
+  color: var(--card-accent);
+}
+
+.carnet.is-consulting .carnet-role::before {
+  animation: consulting-dot 1.15s ease-out infinite;
+}
+
+.carnet.is-consulting .carnet-photo {
+  animation: carnet-photo-pulse 1.8s var(--ease-smooth) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carnet.is-consulting,
+  .carnet.is-consulting .carnet-photo {
+    animation: none;
+  }
+
+  .carnet.is-consulting::after {
+    display: none;
+  }
+
+  .carnet.is-consulting .carnet-role::before {
+    animation: none;
+  }
+}

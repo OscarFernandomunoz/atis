@@ -1,0 +1,75 @@
+/* Filete superior que nace en el color del programa y se disuelve. */
+.carnet-band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg,
+      var(--card-accent) 0%,
+      color-mix(in srgb, var(--card-accent) 55%, transparent) 38%,
+      transparent 88%);
+  opacity: 0.85;
+  transition: opacity 320ms var(--ease-smooth);
+}
+
+.carnet:hover .carnet-band,
+.carnet:has(.carnet-check:checked) .carnet-band {
+  opacity: 1;
+}
+
+.carnet-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Casilla de selección en la esquina de la credencial (sustituye al logo). */
+.carnet-select {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.carnet-check {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.carnet-select-box {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid color-mix(in srgb, #fff 20%, transparent);
+  border-radius: 7px;
+  color: transparent;
+  background: color-mix(in srgb, #fff 5%, transparent);
+  transition: background-color 180ms var(--ease-smooth), border-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
+}
+
+.carnet-select-box svg {
+  width: 14px;
+  height: 14px;
+}
+
+.carnet-select:hover .carnet-select-box {
+  border-color: color-mix(in srgb, #fff 42%, transparent);
+  background: color-mix(in srgb, #fff 9%, transparent);
+}
+
+.carnet-check:focus-visible + .carnet-select-box {
+  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Blanco como los chips activos y el "seleccionar todo": nada que compita
+   con el acento del programa dentro de la ficha. */
+.carnet-check:checked + .carnet-select-box {
+  border-color: #ffffff;
+  color: #0a0a0a;
+  background: #ffffff;
+}

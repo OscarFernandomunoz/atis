@@ -1,0 +1,11 @@
+/* Panel status icons. */
+.panel-status .app-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.panel-status .svg-check {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: svg-draw 600ms var(--ease-out) 400ms forwards;
+}

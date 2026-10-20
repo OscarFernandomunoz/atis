@@ -1,0 +1,39 @@
+/* Barra inferior tipo reproductor (estilo Spotify): cédula en curso a la izquierda,
+   play y progreso de la automatización al centro. */
+
+@keyframes player-fill-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+@keyframes player-error-pulse {
+
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* Latido suave del botón cuando la automatización está en pausa. */
+@keyframes player-paused-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 6px 16px var(--primary-shadow);
+  }
+
+  50% {
+    box-shadow: 0 6px 16px var(--primary-shadow), 0 0 0 7px color-mix(in srgb, var(--accent) 24%, transparent);
+  }
+}

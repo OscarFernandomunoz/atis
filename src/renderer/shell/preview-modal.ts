@@ -15,7 +15,7 @@ export type PreviewModalElements = Pick<
  * del teclado.
  */
 
-/** Algo mayor que la animación de salida de `modal.css`, para no ocultar la ventana antes de que termine. */
+/** Algo mayor que la animación de salida de `modal/animations.css`, para no ocultar la ventana antes de que termine. */
 const CLOSE_ANIMATION_MS = 320;
 
 export function initPreviewModal(elements: PreviewModalElements): void {
