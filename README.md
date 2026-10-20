@@ -1,8 +1,8 @@
 <div align="center">
 
-# AIA
+# ATIS
 
-### Ahorro Instructor Automatizado
+### Automated Time and Instructor System
 
 Aplicación de escritorio para automatizar la consulta de tiempos de instructores en **SofiaPlus (SENA)** a partir de una nómina en Excel.
 
@@ -40,7 +40,7 @@ Aplicación de escritorio para automatizar la consulta de tiempos de instructore
 
 ## Descripción general
 
-**AIA** automatiza el recorrido que un instructor realiza manualmente en SofiaPlus para consultar sus tiempos de formación: inicio de sesión, navegación por el portal, selección del rango de fechas, búsqueda por cédula y lectura de las horas reportadas.
+**ATIS** automatiza el recorrido que un instructor realiza manualmente en SofiaPlus para consultar sus tiempos de formación: inicio de sesión, navegación por el portal, selección del rango de fechas, búsqueda por cédula y lectura de las horas reportadas.
 
 A partir de una nómina en Excel, la aplicación:
 

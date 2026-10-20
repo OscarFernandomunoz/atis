@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { APPLY_HOURS_MULTIPLE_PS1 } from './excel-com-multiple-script.js';
 import { safeWorkbookName, type ApplyHoursMultiplePayload } from './payload.js';
+import { mainLogger } from '../../logger.js';
 
 export type { ApplyHoursMultiplePayload } from './payload.js';
 
@@ -15,7 +16,7 @@ const execFileAsync = promisify(execFile);
 // filtros del archivo original. Devuelve el contenido del archivo modificado, o null
 // si Excel no está disponible o ninguna cédula se encontró.
 export async function applyHoursMultipleWithExcel(payload: ApplyHoursMultiplePayload): Promise<Buffer | null> {
-  const dir = mkdtempSync(join(tmpdir(), 'aia-excel-'));
+  const dir = mkdtempSync(join(tmpdir(), 'atis-excel-'));
   try {
     // El nombre de salida se deriva del mismo nombre saneado que el de entrada:
     // nunca se usa `payload.fileName` directamente para construir una ruta.
@@ -37,17 +38,17 @@ export async function applyHoursMultipleWithExcel(payload: ApplyHoursMultiplePay
       );
     } catch (error) {
       const err = error as { code?: number | string; stderr?: string; message?: string };
-      console.warn(`[AIA][Excel] PowerShell COM múltiple falló (código ${String(err.code)}). Se usará el fallback.`);
-      if (err.stderr) console.warn(`[AIA][Excel] stderr: ${err.stderr.slice(0, 500)}`);
-      if (err.message) console.warn(`[AIA][Excel] message: ${err.message.slice(0, 500)}`);
+      mainLogger.warn('Excel', `PowerShell COM múltiple falló (código ${String(err.code)}). Se usará el fallback.`);
+      if (err.stderr) mainLogger.debug('Excel', `stderr: ${err.stderr.slice(0, 500)}`);
+      if (err.message) mainLogger.debug('Excel', `message: ${err.message.slice(0, 500)}`);
       return null;
     }
     try {
       const result = readFileSync(outPath);
-      console.log(`[AIA][Excel] COM múltiple: archivo modificado leído, ${result.length} bytes (original: ${payload.data.byteLength} bytes)`);
+      mainLogger.info('Excel', `COM múltiple: archivo modificado leído, ${result.length} bytes (original: ${payload.data.byteLength} bytes)`);
       return result;
     } catch {
-      console.warn('[AIA][Excel] No se generó el archivo de salida.');
+      mainLogger.warn('Excel', 'No se generó el archivo de salida.');
       return null;
     }
   } finally {
@@ -57,7 +58,7 @@ export async function applyHoursMultipleWithExcel(payload: ApplyHoursMultiplePay
     try {
       rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 200 });
     } catch (error) {
-      console.warn('[AIA][Excel] No se pudo borrar el directorio temporal del libro.', error);
+      mainLogger.warn('Excel', 'No se pudo borrar el directorio temporal del libro', error);
     }
   }
 }

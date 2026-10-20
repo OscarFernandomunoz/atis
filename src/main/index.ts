@@ -4,6 +4,7 @@ import { registerIpcHandlers } from './ipc/index.js';
 import { hardenSession } from './security/session.js';
 import { createMainWindow, registerRemoteWindow } from './windows/index.js';
 import { isWsl, WINDOWS_AUMID, ensureWindowsAppId } from './services/platform/index.js';
+import { mainLogger, logStartup, logShutdown } from './logger.js';
 
 // Windows atribuye cada notificación a la app por este identificador: sin él, los
 // avisos aparecen con el nombre del ejecutable en lugar del de la aplicación.
@@ -31,6 +32,7 @@ app.on('browser-window-created', (_event, window) => {
 
 // El proceso principal inicializa la app, registra los canales IPC y crea la ventana principal.
 app.whenReady().then(() => {
+  logStartup();
   try {
     // La interfaz y el portal no necesitan permisos del navegador. Las descargas
     // se bloquean solo en la sesión del portal: la app sí descarga su Excel.
@@ -60,7 +62,7 @@ app.whenReady().then(() => {
       }
     });
   } catch (error) {
-    console.error('[AIA][Main] No se pudo inicializar la aplicación.', error);
+    mainLogger.error('Main', 'No se pudo inicializar la aplicación', error);
   }
 });
 
@@ -69,4 +71,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  logShutdown();
 });

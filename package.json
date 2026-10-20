@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "tims",
+  "name": "atis",
   "version": "0.1.0",
   "type": "module",
-  "description": "Time Instructor Management System",
+  "description": "Automated Time and Instructor System",
   "main": "dist/main/index.js",
   "scripts": {
     "test": "npm run check:serialized",
@@ -42,8 +42,8 @@
     "electron-winstaller@5.4.0": true
   },
   "build": {
-    "appId": "com.tims.app",
-    "productName": "TIMS",
+    "appId": "com.atis.app",
+    "productName": "ATIS",
     "copyright": "Copyright © 2025 Oscar Fernando",
     "directories": {
       "output": "dist-installer",
@@ -85,12 +85,12 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "TIMS",
-      "uninstallDisplayName": "TIMS",
+      "shortcutName": "ATIS",
+      "uninstallDisplayName": "ATIS",
       "license": "build-resources/license.txt"
     },
     "portable": {
-      "artifactName": "TIMS-${version}-portable.${ext}"
+      "artifactName": "ATIS-${version}-portable.${ext}"
     }
   }
 }

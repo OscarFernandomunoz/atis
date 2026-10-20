@@ -24,7 +24,7 @@ function startElectron(): void {
     electronProcess = null;
   }
 
-  console.log('[AIA][Dev] Iniciando el proceso de Electron.');
+  console.log('[Dev] Iniciando el proceso de Electron.');
   // --disable-gpu: evita el error "WebGL1 blocklisted" en entornos Linux sin GPU.
   // --no-sandbox: necesario en algunos entornos Linux para que Chromium funcione.
   electronProcess = spawn(String(electronPath), ['.', '--disable-gpu', '--no-sandbox'], {
@@ -37,7 +37,7 @@ function startElectron(): void {
   electronProcess.on('close', (code) => {
     // Evitamos cerrar el proceso dev si Electron fue matado deliberadamente para reiniciar
     if (code !== null && code !== 0) {
-      console.warn(`[AIA][Dev] El proceso de Electron se cerró inesperadamente (código ${code}).`);
+      console.warn(`[Dev] El proceso de Electron se cerró inesperadamente (código ${code}).`);
     }
   });
 }
@@ -49,11 +49,11 @@ const reloadElectronPlugin = (name: string): esbuild.Plugin => ({
     let isFirstBuild = true;
     build.onEnd((result) => {
       if (result.errors.length > 0) {
-        console.error(`[AIA][Dev] Error al recompilar ${name}.`, result.errors);
+        console.error(`[Dev] Error al recompilar ${name}.`, result.errors);
         return;
       }
 
-      console.log(`[AIA][Dev] ${name} recompilado correctamente.`);
+      console.log(`[Dev] ${name} recompilado correctamente.`);
 
       if (isFirstBuild) {
         isFirstBuild = false;
@@ -67,7 +67,7 @@ const reloadElectronPlugin = (name: string): esbuild.Plugin => ({
       // No reiniciar durante la compilación inicial; Electron se inicia al final.
       if (!electronStarted) return;
 
-      console.log(`[AIA][Dev] Se detectaron cambios en ${name}; reiniciando Electron.`);
+      console.log(`[Dev] Se detectaron cambios en ${name}; reiniciando Electron.`);
       startElectron();
     });
   },
@@ -75,10 +75,10 @@ const reloadElectronPlugin = (name: string): esbuild.Plugin => ({
 
 // 3. Función principal de compilación y observación
 async function dev(): Promise<void> {
-  console.log('[AIA][Dev] Limpiando el directorio dist...');
+  console.log('[Dev] Limpiando el directorio dist...');
   rmSync(resolve(rootDir, 'dist'), { recursive: true, force: true });
 
-  console.log('[AIA][Dev] Copiando archivos estáticos...');
+  console.log('[Dev] Copiando archivos estáticos...');
   copyStaticAssets(rootDir);
 
   const sharedConfig: esbuild.BuildOptions = {
@@ -125,7 +125,7 @@ async function dev(): Promise<void> {
     plugins: [reloadElectronPlugin('Renderer')],
   });
 
-  console.log('[AIA][Dev] Observando cambios en los archivos TypeScript (src/**/*.ts)...');
+  console.log('[Dev] Observando cambios en los archivos TypeScript (src/**/*.ts)...');
   await Promise.all([
     mainCtx.watch(),
     preloadCtx.watch(),
@@ -140,6 +140,6 @@ async function dev(): Promise<void> {
 }
 
 dev().catch((err) => {
-  console.error('[AIA][Dev] No se pudo iniciar el entorno de desarrollo.', err);
+  console.error('[Dev] No se pudo iniciar el entorno de desarrollo.', err);
   process.exit(1);
 });

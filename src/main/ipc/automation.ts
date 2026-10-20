@@ -4,6 +4,7 @@ import { openSofiaPlus, type InstructorHours } from '../services/sofia-plus/inde
 import { setAutomationPaused } from '../services/sofia-plus/workflow/pause-gate.js';
 import { resetSofiaSession } from '../services/sofia-plus/workflow/session-reset.js';
 import { isTrustedSender } from './trusted-sender.js';
+import { mainLogger } from '../logger.js';
 
 // Envía un evento de progreso al renderer (resaltado de fila y horas en la vista previa).
 function sendProgress(webContents: Electron.WebContents, identification: string | null, hours: string | null): void {
@@ -27,7 +28,7 @@ export function registerAutomationHandlers(): void {
         (identification, hours) => sendProgress(event.sender, identification, hours),
       );
     } catch (error) {
-      console.error('[AIA][SofiaPlus] No se pudo completar el flujo de automatización.', error);
+      mainLogger.error('SofiaPlus', 'No se pudo completar el flujo de automatización', error);
       throw error;
     } finally {
       // Al terminar (con éxito o con error) se cierra la ventana del portal y se borra su

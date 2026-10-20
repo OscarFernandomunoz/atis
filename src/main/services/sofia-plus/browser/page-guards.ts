@@ -4,6 +4,7 @@ import { patchBlockUiScript } from './block-ui-patch.js';
 import { patchWaitSaveScript } from './wait-save-patch.js';
 import { patchUserInputScript } from './input-guard-patch.js';
 import { patchOpenerShimScript } from './opener-shim-patch.js';
+import { mainLogger } from '../../../logger.js';
 
 // Aplica los parches de la página en TODOS los frames de la ventana: blockUI, esperaGuardar,
 // el shim de window.opener y el bloqueo de entrada del usuario (rueda, arrastre, etc.).
@@ -21,7 +22,7 @@ import { patchOpenerShimScript } from './opener-shim-patch.js';
 export async function patchSofiaPageGuards(window: BrowserWindow): Promise<void> {
   const complete = await executeInEveryFrame(window, patchBlockUiScript(), 3);
   if (!complete) {
-    console.warn('[AIA][SofiaPlus] Algún frame no aceptó el parche de blockUI; se reintentará en la siguiente acción.');
+    mainLogger.warn('SofiaPlus', 'Algún frame no aceptó el parche de blockUI; se reintentará en la siguiente acción');
   }
   await executeInEveryFrame(window, patchWaitSaveScript(), 3);
   await executeInEveryFrame(window, patchOpenerShimScript(), 3);

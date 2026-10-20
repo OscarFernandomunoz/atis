@@ -3,6 +3,7 @@ import { registerLogHandlers } from './log.js';
 import { registerNotificationHandlers } from './notifications.js';
 import { registerSpreadsheetHandlers } from './spreadsheet.js';
 import { registerWindowHandlers } from './window.js';
+import { mainLogger } from '../logger.js';
 
 // Registra los canales IPC agrupados por dominio. Cada módulo es dueño de sus
 // canales para que el renderer no dependa de un único archivo monolítico.
@@ -16,6 +17,6 @@ export function registerIpcHandlers(): void {
     registerNotificationHandlers();
     registerWindowHandlers();
   } catch (error) {
-    console.error('[AIA][IPC] No se pudieron registrar los canales IPC.', error);
+    mainLogger.error('IPC', 'No se pudieron registrar los canales IPC', error);
   }
 }

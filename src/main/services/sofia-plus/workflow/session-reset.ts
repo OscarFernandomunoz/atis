@@ -1,6 +1,7 @@
 import { session } from 'electron';
 import { SOFIA_PARTITION } from '../../../../shared/index.js';
 import { closeSofiaPopups, closeSofiaWindow } from './window-loader.js';
+import { mainLogger } from '../../../logger.js';
 
 // Deja la automatización desde cero: cierra la ventana del portal y borra todo lo que guardó
 // (cookies, almacenamiento local, caché y credenciales). Se llama al empezar cada corrida y
@@ -19,6 +20,6 @@ export async function resetSofiaSession(): Promise<void> {
     await sofiaSession.clearCache();
     await sofiaSession.clearAuthCache();
   } catch (error) {
-    console.warn('[AIA][SofiaPlus] No se pudo limpiar la sesión del portal.', error);
+    mainLogger.warn('SofiaPlus', 'No se pudo limpiar la sesión del portal', error);
   }
 }

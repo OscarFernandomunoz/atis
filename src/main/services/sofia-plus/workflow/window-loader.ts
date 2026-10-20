@@ -1,9 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import { isSofiaPlusUrl, SOFIA_PARTITION, SOFIA_PUBLIC_URL } from '../../../../shared/index.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/index.js';
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
 import { lockSofiaWindow } from './window-lock.js';
 import { getSofiaWindowSize } from './window-size.js';
+import { mainLogger } from '../../../logger.js';
 
 // Partición propia: permite borrar las cookies y la caché de la automatización sin tocar
 // las preferencias de la aplicación, que viven en la sesión por defecto.
@@ -22,10 +23,10 @@ async function loadSofiaUrl(window: BrowserWindow): Promise<void> {
       lastLoadError = error instanceof Error ? error : new Error(String(error));
       const attemptNumber = attempt + 1;
       if (attemptNumber < 3) {
-        console.warn(`[AIA][SofiaPlus] No se pudo cargar SofiaPlus en el intento ${attemptNumber}/3; se reintentará.`, error);
+        mainLogger.warn('SofiaPlus', `No se pudo cargar SofiaPlus en el intento ${attemptNumber}/3; se reintentará`, error);
         await wait(500 * attemptNumber);
       } else {
-        console.error('[AIA][SofiaPlus] No se pudo cargar SofiaPlus después de 3 intentos.', error);
+        mainLogger.error('SofiaPlus', 'No se pudo cargar SofiaPlus después de 3 intentos', error);
       }
     }
   }
@@ -41,7 +42,9 @@ export async function loadWindow(): Promise<BrowserWindow> {
     return sofiaWindow;
   }
 
-  // Tamaño fijo: el usuario solo puede minimizar la ventana, no redimensionarla ni cerrarla.
+  // Tamaño fijo: el usuario puede minimizar y cerrar la ventana.
+  // Al cerrar, se limpia la sesión (cookies, caché, credenciales) para que la próxima
+  // corrida empiece desde cero en la pantalla de login.
   const size = getSofiaWindowSize();
   const window = new BrowserWindow({
     width: size.width,
@@ -54,7 +57,7 @@ export async function loadWindow(): Promise<BrowserWindow> {
     maximizable: false,
     fullscreenable: false,
     minimizable: true,
-    closable: false,
+    closable: true,
     ...getAppWindowOptions(getCurrentTitleBarTheme()),
     webPreferences: {
       partition: SOFIA_PARTITION,
@@ -68,6 +71,22 @@ export async function loadWindow(): Promise<BrowserWindow> {
   registerRemoteWindow(window);
   lockSofiaWindow(window, size);
   sofiaWindow = window;
+
+  // Al cerrar la ventana (botón X), limpiar la sesión del portal para que la próxima
+  // vez no quede logueado ni con datos de la corrida anterior.
+  window.on('close', () => {
+    if (sofiaWindow === window) {
+      const sofiaSession = session.fromPartition(SOFIA_PARTITION);
+      sofiaSession.clearStorageData().catch(() => {});
+      sofiaSession.clearCache().catch(() => {});
+      sofiaSession.clearAuthCache().catch(() => {});
+      // Cerrar popups asociados a esta ventana
+      for (const child of getTrackedChildWindows(window)) {
+        if (!child.isDestroyed()) child.destroy();
+      }
+    }
+  });
+
   window.on('closed', () => { sofiaWindow = null; });
   // Permite que executeInFrames alcance también las ventanas emergentes del sitio
   // (el diálogo del instructor se abre con window.open).

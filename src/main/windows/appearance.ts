@@ -9,6 +9,7 @@ import {
 import { appFile } from '../app-paths.js';
 import { TITLE_BAR_OVERLAY_COLORS, TITLE_BAR_THEME_COLORS } from './palette.js';
 import { buildRemoteChromeScript } from './remote-chrome.js';
+import { mainLogger } from '../logger.js';
 
 let activeTitleBarTheme: TitleBarTheme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
 const remoteWindows = new WeakSet<BrowserWindow>();
@@ -83,7 +84,7 @@ export function applyTitleBarTheme(window: BrowserWindow, theme: TitleBarTheme):
         height: TITLE_BAR_HEIGHT,
       });
     } catch (error) {
-      console.warn('[AIA][Window] No se pudo actualizar el overlay nativo de la ventana.', error);
+      mainLogger.warn('Window', 'No se pudo actualizar el overlay nativo de la ventana', error);
     }
   }
 

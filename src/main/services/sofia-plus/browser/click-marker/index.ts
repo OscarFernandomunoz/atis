@@ -1,6 +1,7 @@
 import type { BrowserWindow } from 'electron';
 import type { ClickPoint } from '../../types.js';
 import { buildClickMarkerScript } from './script.js';
+import { mainLogger } from '../../../../logger.js';
 
 // Dibuja un puntero de precisión en la coordenada exacta donde se hará clic. El retículo
 // (anillo + cruz + punto) está centrado en el punto medido, y la etiqueta se separa lo
@@ -26,7 +27,7 @@ export async function showClickMarker(
     }
   }
 
-  console.log(`[AIA][SofiaPlus] ${demo ? 'Modo demostración: no se ejecutó el clic; ' : 'Clic resaltado; '}posición (${point.x.toFixed(1)}, ${point.y.toFixed(1)}): ${label}`);
+  mainLogger.debug('SofiaPlus', `${demo ? 'Modo demostración: no se ejecutó el clic; ' : 'Clic resaltado; '}posición (${point.x.toFixed(1)}, ${point.y.toFixed(1)}): ${label}`);
 }
 
 // Solo resalta el punto de la página, sin ejecutar ningún clic.

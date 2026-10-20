@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { sanitizeLogText, type AppLogEntry, type AppLogLevel } from '../../shared/index.js';
 import { isTrustedSender } from './trusted-sender.js';
+import { mainLogger } from '../logger.js';
 
 const MAX_SCOPE_LENGTH = 80;
 const MAX_MESSAGE_LENGTH = 2000;
@@ -23,15 +24,25 @@ function isAppLogEntry(value: unknown): value is AppLogEntry {
 function writeEntry(entry: AppLogEntry): void {
   const scope = sanitizeLogText(entry.scope);
   const message = sanitizeLogText(entry.message);
-  const header = `[AIA][Renderer][${entry.level.toUpperCase()}][${scope}] ${message}`;
-  const output = entry.detail ? `${header}\n${sanitizeLogText(entry.detail)}` : header;
+  const detail = entry.detail ? sanitizeLogText(entry.detail) : undefined;
+
+  // Usa el logger profesional con prefijo [Renderer] para distinguir origen
+  const loggerEntry = {
+    level: entry.level,
+    scope: `Renderer/${scope}`,
+    message,
+    detail,
+    timestamp: new Date().toISOString(),
+  };
 
   if (entry.level === 'error') {
-    console.error(output);
+    mainLogger.error(loggerEntry.scope, loggerEntry.message, loggerEntry.detail);
   } else if (entry.level === 'warn') {
-    console.warn(output);
+    mainLogger.warn(loggerEntry.scope, loggerEntry.message, loggerEntry.detail);
+  } else if (entry.level === 'info') {
+    mainLogger.info(loggerEntry.scope, loggerEntry.message, loggerEntry.detail);
   } else {
-    console.log(output);
+    mainLogger.debug(loggerEntry.scope, loggerEntry.message, loggerEntry.detail);
   }
 }
 
