@@ -35,7 +35,7 @@ function collectFrames(window: BrowserWindow): WebFrameMain[] {
   const visited = new Set<number>();
 
   const visitFrame = (frame: WebFrameMain): void => {
-    let url = '';
+    let url: string;
     try {
       url = frame.url;
     } catch {
