@@ -1,4 +1,4 @@
-import { nativeTheme, type BrowserWindow, type BrowserWindowConstructorOptions } from 'electron';
+import { app, nativeTheme, type BrowserWindow, type BrowserWindowConstructorOptions } from 'electron';
 import {
   APP_TITLE,
   TITLE_BAR_HEIGHT,
@@ -59,6 +59,9 @@ export function getAppWindowOptions(
     icon: appFile('public/images/sofia-plus.png'),
     autoHideMenuBar: true,
     backgroundColor: TITLE_BAR_THEME_COLORS[initialTheme].background,
+    // En la app empaquetada no se abren DevTools: el usuario final no necesita
+    // el contexto de depuración y una página remota no debe poder inspeccionarse.
+    webPreferences: { devTools: !app.isPackaged },
     ...getWindowAppearanceOptions(initialTheme),
   };
 }

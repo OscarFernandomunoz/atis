@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { pathToFileURL } from 'node:url';
 import { appFile } from '../app-paths.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme } from './appearance.js';
@@ -24,6 +24,8 @@ export function createMainWindow(): BrowserWindow {
       // La app no usa corrector ortográfico; desactivarlo evita levantar ese
       // servicio al escribir en los campos.
       spellcheck: false,
+      // En la versión empaquetada no se exponen las DevTools.
+      devTools: !app.isPackaged,
     },
   });
 

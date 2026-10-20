@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import { isSofiaPlusUrl, SOFIA_PARTITION, SOFIA_PUBLIC_URL } from '../../../../shared/index.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/index.js';
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
@@ -61,6 +61,8 @@ export async function loadWindow(): Promise<BrowserWindow> {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      // El portal es contenido remoto: en la app empaquetada no se permite inspeccionarlo.
+      devTools: !app.isPackaged,
     },
   });
   registerRemoteWindow(window);
