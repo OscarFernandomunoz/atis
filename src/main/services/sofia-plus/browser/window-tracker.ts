@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron';
 import type { WebContents } from 'electron';
-import { registerRemoteWindow } from '../../../windows/appearance.js';
+import { registerRemoteWindow } from '../../../windows/index.js';
 import { trackChildWindow } from './frames.js';
 import { blockUserInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';

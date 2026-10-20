@@ -1,0 +1,20 @@
+@media (max-width: 640px) {
+  .excel-preview section {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .excel-filter-bar {
+    align-items: stretch;
+  }
+
+  .excel-filter-label {
+    width: 100%;
+  }
+
+  .excel-column-select,
+  .excel-filter-input {
+    width: 100%;
+    min-width: 0;
+  }
+}

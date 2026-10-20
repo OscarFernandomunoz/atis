@@ -23,7 +23,7 @@ terminar, no lo dejes para después.
 ### Árbol de carpetas como API
 
 Al convertir `foo.ts` en `foo/`, los imports pasan de `./foo.js` a `./foo/index.js` (convención
-ya usada en `renderer/theme/`). Nadie fuera de la carpeta debe importar archivos internos.
+ya usada en `renderer/features/theme/`). Nadie fuera de la carpeta debe importar archivos internos.
 
 ## Restricción crítica: helpers inyectados en la página de SofiaPlus
 

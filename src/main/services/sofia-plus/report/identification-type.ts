@@ -6,42 +6,6 @@ import type { ClickPoint } from '../types.js';
 // la página de SofiaPlus. NO pueden referenciar imports, constantes de módulo ni helpers
 // externos: todo lo que usen debe existir dentro del propio cuerpo de cada función.
 
-// Se hace clic sobre el select del diálogo de instructor para abrirlo (solo coordenadas,
-// sin marker; el puntero visible lo añade markClickPoint).
-export async function openIdentificationTypeSelect(): Promise<ClickPoint | null> {
-  // ⚠️ Helper duplicado a propósito: las funciones de este archivo se serializan con
-  // `.toString()` y se ejecutan DENTRO de la página de SofiaPlus, así que no pueden
-  // llamar a helpers de módulo (no existirían en la página → ReferenceError).
-  const normalizeId = (value: string): string => value.trim().toLocaleLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const findIdentificationTypeSelect = (): HTMLSelectElement | null => {
-    const byIdOrName = Array.from(document.querySelectorAll<HTMLSelectElement>('select'))
-      .find((candidate) => normalizeId(candidate.id).includes('tipoidentificacio')
-        || normalizeId(candidate.name).includes('tipoidentificacio'));
-    if (byIdOrName) return byIdOrName;
-    return document.querySelector<HTMLSelectElement>('select[id$=":inputTipoIdentificacion"]')
-      ?? document.querySelector<HTMLSelectElement>('select[id*="inputTipoIdentificacion"]')
-      ?? null;
-  };
-  const select = findIdentificationTypeSelect();
-  if (!(select instanceof HTMLSelectElement)) return null;
-  select.focus();
-  const rect = select.getBoundingClientRect();
-  let x = rect.left + (rect.width / 2);
-  let y = rect.top + (rect.height / 2);
-  let currentWindow: Window = window;
-  while (currentWindow.frameElement) {
-    const frameElement = currentWindow.frameElement;
-    if (!frameElement) break;
-    const frameRect = frameElement.getBoundingClientRect();
-    x += frameRect.left + frameElement.clientLeft;
-    y += frameRect.top + frameElement.clientTop;
-    if (!currentWindow.parent || currentWindow.parent === currentWindow) break;
-    currentWindow = currentWindow.parent;
-  }
-  return { x, y };
-}
-
 // Solo UBICA el select del tipo de identificación y devuelve su centro en coordenadas de la
 // ventana principal: el puntero visible lo dibuja markClickPoint en el frame superior.
 export async function findIdentificationTypePoint(): Promise<ClickPoint | null> {

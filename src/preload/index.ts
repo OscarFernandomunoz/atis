@@ -1,10 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { getTitleBarPlatform, type TitleBarTheme } from '../shared/window.js';
-import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
+import { getTitleBarPlatform, type TitleBarTheme } from '../shared/index.js';
+import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
 // Se limita a invocar canales IPC definidos en el proceso principal sin permitir acceso directo a Node.
-export const electronAPI = {
+const electronAPI = {
   titleBarPlatform: getTitleBarPlatform(),
 
   openSofiaAndFill: (credentials: {
@@ -28,10 +28,6 @@ export const electronAPI = {
 
   // Pausa o reanuda la automatización en curso; reanuda justo donde quedó.
   setAutomationPaused: (paused: boolean): void => ipcRenderer.send('sofia:set-paused', paused),
-
-  // Escribe las horas en el Excel con Excel real (COM), preservando diseño y filtros.
-  applyHoursToExcel: (payload: { data: ArrayBuffer; fileName: string; cedula: string; hours: string }): Promise<ArrayBuffer | null> =>
-    ipcRenderer.invoke('excel:apply-hours', payload),
 
   // Aplica las horas a TODAS las cédulas en una sola pasada con Excel real (COM).
   applyHoursMultipleToExcel: (payload: { data: ArrayBuffer; fileName: string; targets: Array<{ identification: string; totalHours: string }> }): Promise<ArrayBuffer | null> =>

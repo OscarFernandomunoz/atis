@@ -1,10 +1,10 @@
 import { app } from 'electron';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { NotificationPermission } from '../../shared/notifications.js';
+import type { NotificationPermission } from '../../shared/index.js';
 
 /** Preferencias de la app, guardadas en el directorio de datos del usuario. */
-export interface AppSettings {
+interface AppSettings {
   /** `null` mientras el usuario no ha respondido al permiso de notificaciones. */
   notifications: NotificationPermission | null;
 }

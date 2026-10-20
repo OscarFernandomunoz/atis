@@ -1,5 +1,5 @@
 import type { BrowserWindow } from 'electron';
-import { showClickMarker } from './click-marker.js';
+import { showClickMarker } from './click-marker/index.js';
 import { executeInFrames } from './frames.js';
 import { withAutomationInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';

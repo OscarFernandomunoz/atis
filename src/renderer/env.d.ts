@@ -1,5 +1,5 @@
-import type { TitleBarPlatform } from '../shared/window.js';
-import type { NotificationPermission, SystemNotification } from '../shared/notifications.js';
+import type { TitleBarPlatform } from '../shared/index.js';
+import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Define la forma del API expuesto desde el preload para que TypeScript reconozca window.electronAPI.
 export interface IElectronAPI {
@@ -18,10 +18,6 @@ export interface IElectronAPI {
 
   // Aplica las horas al Excel con Excel real, conservando diseño y filtros.
   // Devuelve null si Excel no está disponible (se puede usar el fallback).
-  applyHoursToExcel: (payload: { data: ArrayBuffer; fileName: string; cedula: string; hours: string }) => Promise<ArrayBuffer | null>;
-
-  // Aplica las horas a TODAS las cédulas en una sola pasada con Excel real,
-  // conservando diseño y filtros. Devuelve null si Excel no está disponible.
   applyHoursMultipleToExcel: (payload: { data: ArrayBuffer; fileName: string; targets: Array<{ identification: string; totalHours: string }> }) => Promise<ArrayBuffer | null>;
 
   // Control de la ventana (TitleBar)

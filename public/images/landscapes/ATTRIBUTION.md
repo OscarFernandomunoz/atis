@@ -1,8 +1,8 @@
 # Créditos de las fotografías
 
 Las imágenes de `public/images/landscapes/` provienen de Wikimedia Commons y se
-usan bajo sus licencias libres. Cada archivo conserva el nombre del mes al que
-pertenece en el carrusel.
+usan bajo sus licencias libres. Cada archivo lleva el nombre del mes al que
+pertenece en el carrusel, en inglés.
 
 | Mes | Archivo original | Autoría | Licencia |
 | --- | --- | --- | --- |

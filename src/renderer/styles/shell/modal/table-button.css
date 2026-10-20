@@ -1,0 +1,41 @@
+/* Vista previa del Excel en una ventana interna (modal con fondo difuminado). */
+
+/* Botón de la cabecera que abre la tabla. Solo aparece cuando hay datos:
+   `body:has(.excel-preview section)` se cumple únicamente tras leer el archivo. */
+.table-button {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 18px;
+  border: 1px solid color-mix(in srgb, #fff 10%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 7%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 200ms var(--ease-smooth), border-color 200ms var(--ease-smooth), transform 200ms var(--ease-out);
+}
+
+body:has(.excel-preview section) .table-button {
+  display: inline-flex;
+}
+
+.table-button:hover {
+  background: color-mix(in srgb, #fff 14%, transparent);
+  border-color: color-mix(in srgb, #fff 24%, transparent);
+  transform: translateY(-1px);
+}
+
+.table-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline-offset: 2px;
+}
+
+.table-button-icon {
+  width: 17px;
+  height: 17px;
+}

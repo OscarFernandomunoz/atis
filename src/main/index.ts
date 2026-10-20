@@ -1,9 +1,7 @@
 import { app, BrowserWindow } from 'electron';
-import { registerIpcHandlers } from './ipc/handlers.js';
-import { registerRemoteWindow } from './windows/appearance.js';
-import { createMainWindow } from './windows/manager.js';
-import { isWsl } from './services/windows-toast.js';
-import { WINDOWS_AUMID, ensureWindowsAppId } from './services/windows-app-id.js';
+import { registerIpcHandlers } from './ipc/index.js';
+import { createMainWindow, registerRemoteWindow } from './windows/index.js';
+import { isWsl, WINDOWS_AUMID, ensureWindowsAppId } from './services/platform/index.js';
 
 app.commandLine.appendSwitch('ignore-certificate-errors');
 // Windows atribuye cada notificación a la app por este identificador: sin él, los

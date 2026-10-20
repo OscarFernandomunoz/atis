@@ -65,26 +65,6 @@ function collectFrames(window: BrowserWindow): WebFrameMain[] {
   return frames;
 }
 
-// Ejecuta un script en todos los frames y devuelve TODOS los resultados, sin cortar en el
-// primero. executeInFrames se queda con el primer valor que satisface el predicado, así que
-// para inspeccionar el portal entero servía de poco: el diálogo del instructor vive en un
-// iframe distinto del frame principal, y quedarse con el primero mostraba siempre la página
-// de inicio en lugar del diálogo.
-export async function executeInAllFrames<T>(
-  window: BrowserWindow,
-  script: string,
-): Promise<T[]> {
-  const results: T[] = [];
-  for (const frame of collectFrames(window)) {
-    try {
-      results.push(await frame.executeJavaScript(script) as T);
-    } catch {
-      // El frame puede cambiar durante una redirección o una carga parcial.
-    }
-  }
-  return results;
-}
-
 // Inyecta un script en TODOS los frames de la ventana, sin cortar en el primero que responde.
 //
 // executeInFrames se detiene en el primer frame que satisface el predicado, así que con él solo
