@@ -64,9 +64,11 @@ export async function findInstructorPickerPoint(): Promise<ClickPoint | null> {
   let y = rect.top + rect.height / 2;
   let currentWindow: Window = window;
   while (currentWindow.frameElement) {
-    const frameRect = currentWindow.frameElement.getBoundingClientRect();
-    x += frameRect.left;
-    y += frameRect.top;
+    const frameElement = currentWindow.frameElement;
+    if (!frameElement) break;
+    const frameRect = frameElement.getBoundingClientRect();
+    x += frameRect.left + frameElement.clientLeft;
+    y += frameRect.top + frameElement.clientTop;
     currentWindow = currentWindow.parent;
   }
   console.log(`[Reporte] Botón selector ubicado en (${Math.round(x)}, ${Math.round(y)}).`);

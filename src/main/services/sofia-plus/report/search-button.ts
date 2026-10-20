@@ -203,41 +203,20 @@ export async function findInstructorSearchPoint(): Promise<ClickPoint | null> {
   const best = candidates[0]?.control;
   if (!best) return null;
 
-  // Se dibuja la esfera dentro del PROPIO frame del iframe que contiene el input, en sus
-  // coordenadas locales. Así se evita cualquier desfase de coordenadas entre el iframe y la
-  // ventana principal (la modal es un iframe, no una ventana emergente).
+  // El puntero visible lo dibuja el marcador centralizado en la ventana principal, así que
+  // aquí solo se convierte el centro local del iframe a coordenadas de la ventana superior.
   const rect = best.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-  let marker = document.getElementById('__sofiaTargetMarker__') as HTMLDivElement | null;
-  if (!marker) {
-    marker = document.createElement('div');
-    marker.id = '__sofiaTargetMarker__';
-    document.body.appendChild(marker);
-  }
-  marker.setAttribute('style', [
-    'position:fixed',
-    `left:${Math.round(cx - 15)}px`,
-    `top:${Math.round(cy - 15)}px`,
-    'width:30px',
-    'height:30px',
-    'border:3px solid #ff3b30',
-    'border-radius:50%',
-    'background:rgba(255,59,48,0.25)',
-    'box-shadow:0 0 0 4px rgba(255,59,48,0.35)',
-    'pointer-events:none',
-    'z-index:2147483647',
-  ].join(';'));
-
-  let x = cx;
-  let y = cy;
+  let x = rect.left + rect.width / 2;
+  let y = rect.top + rect.height / 2;
   let currentWindow: Window = window;
   while (currentWindow.frameElement) {
-    const frameRect = currentWindow.frameElement.getBoundingClientRect();
-    x += frameRect.left;
-    y += frameRect.top;
+    const frameElement = currentWindow.frameElement;
+    if (!frameElement) break;
+    const frameRect = frameElement.getBoundingClientRect();
+    x += frameRect.left + frameElement.clientLeft;
+    y += frameRect.top + frameElement.clientTop;
     currentWindow = currentWindow.parent;
   }
-  console.log(`[Reporte] Botón Consultar marcado en el iframe. Centro global aprox. (${Math.round(x)}, ${Math.round(y)}).`);
+  console.log(`[Reporte] Botón Consultar ubicado en el iframe. Centro global (${Math.round(x)}, ${Math.round(y)}).`);
   return { x, y };
 }

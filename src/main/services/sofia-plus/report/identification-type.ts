@@ -7,7 +7,7 @@ import type { ClickPoint } from '../types.js';
 // externos: todo lo que usen debe existir dentro del propio cuerpo de cada función.
 
 // Se hace clic sobre el select del diálogo de instructor para abrirlo (solo coordenadas,
-// sin marker; el marker visible lo añade markIdentificationTypeSelect).
+// sin marker; el puntero visible lo añade markClickPoint).
 export async function openIdentificationTypeSelect(): Promise<ClickPoint | null> {
   // ⚠️ Helper duplicado a propósito: las funciones de este archivo se serializan con
   // `.toString()` y se ejecutan DENTRO de la página de SofiaPlus, así que no pueden
@@ -31,16 +31,20 @@ export async function openIdentificationTypeSelect(): Promise<ClickPoint | null>
   let y = rect.top + (rect.height / 2);
   let currentWindow: Window = window;
   while (currentWindow.frameElement) {
-    const frameRect = currentWindow.frameElement.getBoundingClientRect();
-    x += frameRect.left;
-    y += frameRect.top;
+    const frameElement = currentWindow.frameElement;
+    if (!frameElement) break;
+    const frameRect = frameElement.getBoundingClientRect();
+    x += frameRect.left + frameElement.clientLeft;
+    y += frameRect.top + frameElement.clientTop;
     if (!currentWindow.parent || currentWindow.parent === currentWindow) break;
     currentWindow = currentWindow.parent;
   }
   return { x, y };
 }
 
-export async function markIdentificationTypeSelect(): Promise<boolean> {
+// Solo UBICA el select del tipo de identificación y devuelve su centro en coordenadas de la
+// ventana principal: el puntero visible lo dibuja markClickPoint en el frame superior.
+export async function findIdentificationTypePoint(): Promise<ClickPoint | null> {
   // ⚠️ Helper duplicado a propósito: esta función se serializa con `.toString()` y se
   // ejecuta DENTRO de la página de SofiaPlus; no puede usar helpers de módulo.
   const normalizeId = (value: string): string => value.trim().toLocaleLowerCase()
@@ -61,32 +65,22 @@ export async function markIdentificationTypeSelect(): Promise<boolean> {
     document.querySelectorAll<HTMLSelectElement>('select').forEach((candidate) => {
       console.log(`[Reporte] Select presente: id="${candidate.id}", name="${candidate.name}", visible=${candidate.getClientRects().length > 0}`);
     });
-    return false;
+    return null;
   }
   const rect = select.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-  let marker = document.getElementById('__sofiaTargetMarker__') as HTMLDivElement | null;
-  if (!marker) {
-    marker = document.createElement('div');
-    marker.id = '__sofiaTargetMarker__';
-    document.body.appendChild(marker);
+  let x = rect.left + rect.width / 2;
+  let y = rect.top + rect.height / 2;
+  let currentWindow: Window = window;
+  while (currentWindow.frameElement) {
+    const frameElement = currentWindow.frameElement;
+    if (!frameElement) break;
+    const frameRect = frameElement.getBoundingClientRect();
+    x += frameRect.left + frameElement.clientLeft;
+    y += frameRect.top + frameElement.clientTop;
+    currentWindow = currentWindow.parent;
   }
-  marker.setAttribute('style', [
-    'position:fixed',
-    `left:${Math.round(cx - 15)}px`,
-    `top:${Math.round(cy - 15)}px`,
-    'width:30px',
-    'height:30px',
-    'border:3px solid #ff3b30',
-    'border-radius:50%',
-    'background:rgba(255,59,48,0.25)',
-    'box-shadow:0 0 0 4px rgba(255,59,48,0.35)',
-    'pointer-events:none',
-    'z-index:2147483647',
-  ].join(';'));
-  console.log(`[Reporte] Select Tipo de Identificación marcado en (${Math.round(cx)},${Math.round(cy)}) del iframe.`);
-  return true;
+  console.log(`[Reporte] Select Tipo de Identificación ubicado en (${Math.round(x)},${Math.round(y)}).`);
+  return { x, y };
 }
 
 // Elige la opción de cédula de ciudadanía en el selector del formulario de reporte.

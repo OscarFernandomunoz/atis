@@ -15,8 +15,8 @@ export type PreviewModalElements = Pick<
  * del teclado.
  */
 
-/** Debe coincidir con la animación de salida de `modal.css`. */
-const CLOSE_ANIMATION_MS = 200;
+/** Algo mayor que la animación de salida de `modal.css`, para no ocultar la ventana antes de que termine. */
+const CLOSE_ANIMATION_MS = 320;
 
 export function initPreviewModal(elements: PreviewModalElements): void {
   const isOpen = (): boolean => !elements.previewModal.hidden;

@@ -1,6 +1,8 @@
 import { BrowserWindow } from 'electron';
 import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/appearance.js';
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
+import { lockSofiaWindow } from './window-lock.js';
+import { getSofiaWindowSize } from './window-size.js';
 
 const SOFIA_URL = 'http://senasofiaplus.edu.co/sofia-public/';
 // Partición propia: permite borrar las cookies y la caché de la automatización sin tocar
@@ -40,9 +42,20 @@ export async function loadWindow(): Promise<BrowserWindow> {
     return sofiaWindow;
   }
 
+  // Tamaño fijo: el usuario solo puede minimizar la ventana, no redimensionarla ni cerrarla.
+  const size = getSofiaWindowSize();
   const window = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: size.width,
+    height: size.height,
+    minWidth: size.width,
+    minHeight: size.height,
+    maxWidth: size.width,
+    maxHeight: size.height,
+    resizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    minimizable: true,
+    closable: false,
     ...getAppWindowOptions(getCurrentTitleBarTheme()),
     webPreferences: {
       partition: SOFIA_PARTITION,
@@ -52,6 +65,7 @@ export async function loadWindow(): Promise<BrowserWindow> {
     },
   });
   registerRemoteWindow(window);
+  lockSofiaWindow(window, size);
   sofiaWindow = window;
   window.on('closed', () => { sofiaWindow = null; });
   // Permite que executeInFrames alcance también las ventanas emergentes del sitio

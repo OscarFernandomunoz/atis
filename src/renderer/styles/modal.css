@@ -47,19 +47,22 @@ body:has(.excel-preview section) .table-button {
   display: grid;
   place-items: center;
   padding: clamp(16px, 3vw, 44px);
+  /* Curva específica de la modal: arranca con decisión pero frena durante más
+     tiempo que el ease-out general, para que la transición se perciba suave. */
+  --modal-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .modal[hidden] {
   display: none;
 }
 
-/* Velo difuminado: apaga la app de fondo sin dejar de dejarla entrever. */
+/* Velo de la modal. Sin `backdrop-filter`: desenfocar toda la app en cada frame
+   de la animación era lo que hacía que abrir y cerrar se sintiera pesado. */
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, #000 62%, transparent);
-  backdrop-filter: blur(18px) saturate(125%);
-  animation: modal-fade 220ms var(--ease-out) both;
+  background: color-mix(in srgb, #000 74%, transparent);
+  animation: modal-fade 300ms var(--modal-ease) both;
 }
 
 .modal-dialog {
@@ -72,11 +75,12 @@ body:has(.excel-preview section) .table-button {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, #fff 12%, transparent);
   border-radius: 22px;
-  background: color-mix(in srgb, #0a0a0a 94%, transparent);
+  background: #0a0a0a;
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent),
-    0 40px 90px color-mix(in srgb, #000 62%, transparent);
-  animation: modal-rise 260ms var(--ease-out) both;
+    0 24px 48px color-mix(in srgb, #000 55%, transparent);
+  transform-origin: 50% 50%;
+  animation: modal-rise 420ms var(--modal-ease) both;
 }
 
 .modal-head {
@@ -130,6 +134,7 @@ body:has(.excel-preview section) .table-button {
   min-height: 0;
   padding: clamp(18px, 2.4vw, 28px);
   overflow: auto;
+  overscroll-behavior: contain;
 }
 
 /* Dentro de la ventana la tabla manda: más alta y sin el margen de sección. */
@@ -142,38 +147,49 @@ body:has(.excel-preview section) .table-button {
 }
 
 /* La tabla se pinta mientras la ventana está cerrada; esta clase la hace entrar
-   de nuevo cada vez que se abre desde cualquiera de sus botones. */
+   de nuevo cada vez que se abre desde cualquiera de sus botones. El contenido
+   arranca cuando la ventana ya está apareciendo, para que no compitan los dos
+   movimientos. */
+.modal-dialog .excel-preview.is-entering {
+  animation: none;
+}
+
 .modal-dialog .excel-preview.is-entering section {
-  animation: preview-content-enter 420ms var(--ease-out) both;
+  animation: preview-content-enter 380ms var(--modal-ease) 80ms both;
 }
 
 .modal-dialog .excel-preview.is-entering section:nth-child(2) {
-  animation-delay: 70ms;
-}
-
-.modal-dialog .excel-preview.is-entering section:nth-child(3) {
   animation-delay: 140ms;
 }
 
+.modal-dialog .excel-preview.is-entering section:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.modal-dialog .excel-preview.is-entering section:nth-child(n+4) {
+  animation-delay: 260ms;
+}
+
+/* Solo opacidad: animar también la escala de una tabla grande obligaba a
+   recomponer una superficie muy amplia y aportaba poco al gesto. */
 @keyframes preview-content-enter {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.992);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
-/* Salida: el mismo gesto al revés para que cerrar no sea un corte seco. */
+/* Salida: el mismo gesto al revés, más pausado y con una caída suave. Así el
+   cierre también se percibe, pero sin la sensación de que la ventana se corta. */
 .modal.is-closing .modal-backdrop {
-  animation: modal-fade-out 180ms var(--ease-smooth) both;
+  animation: modal-fade-out 300ms var(--ease-smooth) both;
 }
 
 .modal.is-closing .modal-dialog {
-  animation: modal-sink 200ms var(--ease-smooth) both;
+  animation: modal-sink 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes modal-fade {
@@ -199,23 +215,36 @@ body:has(.excel-preview section) .table-button {
 @keyframes modal-sink {
   from {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 
   to {
     opacity: 0;
-    transform: translateY(10px) scale(0.985);
+    transform: translate3d(0, 22px, 0) scale(0.968);
   }
 }
 
+/* Entrada en un solo gesto: la ventana sube y crece hasta su sitio. El recorrido
+   es mayor que antes para que el cambio se note, pero la curva frena despacio. */
 @keyframes modal-rise {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.985);
+    transform: translate3d(0, 32px, 0) scale(0.955);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Con movimiento reducido se muestra el contenido sin esperas escalonadas. */
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal-dialog,
+  .modal.is-closing .modal-backdrop,
+  .modal.is-closing .modal-dialog,
+  .modal-dialog .excel-preview.is-entering section {
+    animation: none !important;
   }
 }

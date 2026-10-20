@@ -5,7 +5,7 @@
 // ejecución, sin constantes de módulo y sin referencias a helpers externos.
 export { fillReportDates } from './dates.js';
 export { findInstructorPicker, findInstructorPickerPoint } from './instructor-picker.js';
-export { openIdentificationTypeSelect, selectCitizenshipId, markIdentificationTypeSelect } from './identification-type.js';
+export { openIdentificationTypeSelect, selectCitizenshipId, findIdentificationTypePoint } from './identification-type.js';
 export { fillInstructorIdentification } from './identification-field.js';
 export { clickInstructorSearchInput, findInstructorSearchPoint } from './search-button.js';
 export { findInstructorRowSelect, selectInstructorRow } from './instructor-row-select.js';

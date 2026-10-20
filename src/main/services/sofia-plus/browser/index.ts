@@ -1,7 +1,8 @@
 // API pública de la capa de navegador de SofiaPlus:
 // ventanas, parches de página, frames y acciones de clic.
 export { patchBlockUiScript } from './block-ui-patch.js';
-export { booleanScript, clickScript, markClickPoint } from './click.js';
+export { booleanScript, clickScript } from './click.js';
+export { markClickPoint } from './click-marker.js';
 export { executeInAllFrames, executeInEveryFrame, executeInFrames, getTrackedChildWindows, trackChildWindow } from './frames.js';
 export { patchEsperaGuardarScript } from './espera-guardar-patch.js';
 export { clearPageMarkers, clearPageMarkersScript } from './markers.js';

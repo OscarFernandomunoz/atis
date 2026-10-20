@@ -45,7 +45,14 @@ app.whenReady().then(() => {
       void ensureWindowsAppId();
     }
     // Se crea la ventana principal de la aplicación al arrancar.
-    createMainWindow();
+    const mainWindow = createMainWindow();
+    // La ventana de SofiaPlus no se puede cerrar por el usuario: si desaparece la principal,
+    // hay que terminar la app para no dejarlo atrapado con una ventana que no puede cerrar.
+    mainWindow.on('closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit();
+      }
+    });
 
     // En macOS, cuando la app vuelve a activarse, se reabre la ventana si no hay ninguna abierta.
     app.on('activate', () => {

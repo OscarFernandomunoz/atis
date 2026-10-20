@@ -1,5 +1,5 @@
 import type { BrowserWindow } from 'electron';
-import { booleanScript, clickScript, executeInFrames, wait } from './browser/index.js';
+import { booleanScript, clickScript, executeInFrames, markClickPoint, wait } from './browser/index.js';
 import { fillSofiaInputs } from './login.js';
 import {
   findAmbientesOption,
@@ -10,8 +10,8 @@ import {
   openAspiranteOptions,
   selectCurriculumOption,
 } from './navigation.js';
-import { clickInstructorResultLink, clickInstructorSearchInput, fillInstructorIdentification, fillReportDates, markIdentificationTypeSelect, readTotalHours, selectCitizenshipId, selectLearningResultsOption, submitInstructorTimesReport } from './report/index.js';
-import type { InstructorHours, SofiaCredentials } from './types.js';
+import { clickInstructorResultLink, clickInstructorSearchInput, fillInstructorIdentification, fillReportDates, findIdentificationTypePoint, readTotalHours, selectCitizenshipId, selectLearningResultsOption, submitInstructorTimesReport } from './report/index.js';
+import type { ClickPoint, InstructorHours, SofiaCredentials } from './types.js';
 import { resetAutomationPause, waitIfPaused } from './flow/pause-gate.js';
 import { resetSofiaSession } from './flow/session-reset.js';
 import { showStepBanner } from './flow/step-banner.js';
@@ -25,6 +25,18 @@ export type { InstructorHours, SofiaCredentials } from './types.js';
 async function markStep(window: BrowserWindow, stepNumber: number, stepTitle: string): Promise<void> {
   await waitIfPaused();
   void showStepBanner(window, stepNumber, stepTitle);
+}
+
+// Marca con el puntero visible el select del tipo de identificación. El cambio de valor lo
+// hace selectCitizenshipId por JavaScript; aquí solo se resalta el control en pantalla.
+async function markIdentificationTypeField(window: BrowserWindow): Promise<void> {
+  const point = await executeInFrames<ClickPoint | null>(
+    window,
+    `(${findIdentificationTypePoint.toString()})()`,
+    Boolean,
+  );
+  if (!point) throw new Error('No se encontró el campo Tipo de Identificación.');
+  await markClickPoint(window, point, 'Campo Tipo de Identificación');
 }
 
 // Ejecuta el flujo completo: login, navegación, selección de fechas y preparación del reporte.
@@ -67,7 +79,7 @@ export async function openSofiaPlus(
   await clickScript(window, `(${findProgramLookupButton.toString()})()`, 'No se encontró el botón de selección de programa de formación.');
 
   await markStep(window, 11, '🆔 Seleccionando Tipo de Identificación → Cédula de ciudadanía');
-  await booleanScript(window, `(${markIdentificationTypeSelect.toString()})()`, 'No se encontró el campo Tipo de Identificación.');
+  await markIdentificationTypeField(window);
   await wait(400);
   await booleanScript(window, `(${selectCitizenshipId.toString()})()`, 'No se encontró la opción Cédula de ciudadanía.');
 
@@ -87,7 +99,7 @@ export async function openSofiaPlus(
       await booleanScript(window, `(${fillReportDates.toString()})(${JSON.stringify({ startDate: credentials.startDate, endDate: credentials.endDate })})`, 'No se encontraron los campos de fechas del informe.');
       await booleanScript(window, `(${selectLearningResultsOption.toString()})()`, 'No se encontró la opción RESULTADOS DE APRENDIZAJE de Actividad de Formación.');
       await clickScript(window, `(${findProgramLookupButton.toString()})()`, 'No se encontró el botón de selección de programa de formación.');
-      await booleanScript(window, `(${markIdentificationTypeSelect.toString()})()`, 'No se encontró el campo Tipo de Identificación.');
+      await markIdentificationTypeField(window);
       await wait(400);
       await booleanScript(window, `(${selectCitizenshipId.toString()})()`, 'No se encontró la opción Cédula de ciudadanía.');
       await wait(600);

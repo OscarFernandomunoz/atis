@@ -20,9 +20,11 @@ export async function openAspiranteOptions(): Promise<ClickPoint | null> {
     let y = rect.top + (rect.height / 2);
     let currentWindow: Window = window;
     while (currentWindow.frameElement) {
-      const frameRect = currentWindow.frameElement.getBoundingClientRect();
-      x += frameRect.left;
-      y += frameRect.top;
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
       currentWindow = currentWindow.parent;
     }
     return { x, y };
@@ -66,9 +68,11 @@ export async function findEnvironmentManagementOption(): Promise<ClickPoint | nu
     let y = rect.top + (rect.height / 2);
     let currentWindow: Window = window;
     while (currentWindow.frameElement) {
-      const frameRect = currentWindow.frameElement.getBoundingClientRect();
-      x += frameRect.left;
-      y += frameRect.top;
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
       currentWindow = currentWindow.parent;
     }
     return { x, y };
@@ -90,7 +94,18 @@ export async function findEnvironmentManagementOption(): Promise<ClickPoint | nu
 export async function findAmbientesOption(): Promise<ClickPoint | null> {
   const pointFor = (element: HTMLElement): ClickPoint => {
     const rect = element.getBoundingClientRect();
-    return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+    let x = rect.left + (rect.width / 2);
+    let y = rect.top + (rect.height / 2);
+    let currentWindow: Window = window;
+    while (currentWindow.frameElement) {
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
+      currentWindow = currentWindow.parent;
+    }
+    return { x, y };
   };
   const control = Array.from(document.querySelectorAll<HTMLElement>(
     'a[href], a[onclick], button, [role="menuitem"], [role="option"], li',
@@ -108,7 +123,18 @@ export async function findAmbientesOption(): Promise<ClickPoint | null> {
 export async function findInstructorActivityTimeOption(): Promise<ClickPoint | null> {
   const pointFor = (element: HTMLElement): ClickPoint => {
     const rect = element.getBoundingClientRect();
-    return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+    let x = rect.left + (rect.width / 2);
+    let y = rect.top + (rect.height / 2);
+    let currentWindow: Window = window;
+    while (currentWindow.frameElement) {
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
+      currentWindow = currentWindow.parent;
+    }
+    return { x, y };
   };
   const control = Array.from(document.querySelectorAll<HTMLElement>(
     'a[href], a[onclick], button, [role="menuitem"], [role="option"], li',
@@ -129,7 +155,18 @@ export async function findInstructorActivityTimeOption(): Promise<ClickPoint | n
 export async function findProgramLookupButton(): Promise<ClickPoint | null> {
   const pointFor = (element: HTMLElement): ClickPoint => {
     const rect = element.getBoundingClientRect();
-    return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+    let x = rect.left + (rect.width / 2);
+    let y = rect.top + (rect.height / 2);
+    let currentWindow: Window = window;
+    while (currentWindow.frameElement) {
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
+      currentWindow = currentWindow.parent;
+    }
+    return { x, y };
   };
   const normalize = (value: string): string => value.trim().toLocaleLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -148,7 +185,18 @@ export async function findProgramLookupButton(): Promise<ClickPoint | null> {
 export async function findReportsOption(): Promise<ClickPoint | null> {
   const pointFor = (element: HTMLElement): ClickPoint => {
     const rect = element.getBoundingClientRect();
-    return { x: rect.left + (rect.width / 2), y: rect.top + (rect.height / 2) };
+    let x = rect.left + (rect.width / 2);
+    let y = rect.top + (rect.height / 2);
+    let currentWindow: Window = window;
+    while (currentWindow.frameElement) {
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
+      currentWindow = currentWindow.parent;
+    }
+    return { x, y };
   };
   const control = Array.from(document.querySelectorAll<HTMLElement>(
     'a[href], a[onclick], button, [role="menuitem"], [role="option"], li',

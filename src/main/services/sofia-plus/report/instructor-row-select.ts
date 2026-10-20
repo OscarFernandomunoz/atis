@@ -19,9 +19,11 @@ export async function findInstructorRowSelect(): Promise<ClickPoint | null> {
     let y = rect.top + rect.height / 2;
     let currentWindow: Window = window;
     while (currentWindow.frameElement) {
-      const frameRect = currentWindow.frameElement.getBoundingClientRect();
-      x += frameRect.left;
-      y += frameRect.top;
+      const frameElement = currentWindow.frameElement;
+      if (!frameElement) break;
+      const frameRect = frameElement.getBoundingClientRect();
+      x += frameRect.left + frameElement.clientLeft;
+      y += frameRect.top + frameElement.clientTop;
       currentWindow = currentWindow.parent;
     }
     return { x, y };
@@ -49,16 +51,7 @@ export async function findInstructorRowSelect(): Promise<ClickPoint | null> {
   }
 
   const clickable = (target.closest('a') as HTMLElement | null) ?? target;
-  // Se marca el propio elemento con borde rojo + glow para que la esfera quede
-  // exactamente sobre el botón sin depender de coordenadas del iframe.
-  clickable.style.border = '3px solid #ff3b30';
-  clickable.style.borderRadius = '50%';
-  clickable.style.boxShadow = '0 0 0 3px rgba(255,59,48,0.35)';
-  clickable.style.outline = '3px solid #ff3b30';
-  clickable.style.outlineOffset = '2px';
-  clickable.style.zIndex = '2147483647';
-
-  console.log(`[Reporte] Enlace de selección marcado: ${JSON.stringify({
+  console.log(`[Reporte] Enlace de selección ubicado: ${JSON.stringify({
     id: target.getAttribute('id') ?? '(sin id)',
     onclick: (target.getAttribute('onclick') ?? '').slice(0, 60),
     visible: visible(clickable),
