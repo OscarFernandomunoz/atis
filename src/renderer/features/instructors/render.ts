@@ -38,9 +38,6 @@ export function renderInstructorCards(
     colors.get(instructor.program) ?? FALLBACK_COLOR,
   ));
   board.grid.replaceChildren(...cards);
-  // La casilla "seleccionar todo" actúa sobre las credenciales visibles de cada filtro.
-  // Al marcar una casilla se repinta el filtro para que la vista previa muestre solo lo marcado.
-  bindSelection(board.grid, board.selectAll, () => apply());
 
   const kinds = instructors.map((instructor) => hoursKind(effectiveHours(instructor)));
   const index = instructors.map((instructor) => normalizeText(
@@ -52,7 +49,11 @@ export function renderInstructorCards(
   let hours: HoursFilter = 'all';
   let query = '';
 
-  const apply = (): void => {
+  // Un frame pendiente por rejilla: escribir rápido no dispara un recorrido
+  // completo de credenciales por cada tecla, solo uno por pintado.
+  let applyFrame: number | null = null;
+
+  const applyNow = (): void => {
     let visible = 0;
     const visibleIdentifications = new Set<string>();
     cards.forEach((card, position) => {
@@ -83,19 +84,35 @@ export function renderInstructorCards(
     refreshSelectAll(board.grid, board.selectAll);
   };
 
+  const scheduleApply = (): void => {
+    if (applyFrame !== null) return;
+    applyFrame = window.requestAnimationFrame(() => {
+      applyFrame = null;
+      // La rejilla se repintó o vació antes del frame: este recorrido ya no
+      // corresponde a las credenciales que están en el documento.
+      if (cards.length > 0 && !cards[0]?.isConnected) return;
+      applyNow();
+    });
+  };
+
+  // La casilla "seleccionar todo" actúa sobre las credenciales visibles de cada
+  // filtro. Al marcar una casilla se agenda un repintado: la vista previa muestra
+  // solo lo marcado y el trabajo se agrupa con el de los demás filtros.
+  bindSelection(board.grid, board.selectAll, scheduleApply);
+
   buildProgramFilter(board.programFilter, instructors.map((instructor) => instructor.program), (value) => {
     program = value;
-    apply();
+    scheduleApply();
   });
   buildHoursFilter(board.hoursFilter, (value) => {
     hours = value;
-    apply();
+    scheduleApply();
   });
   bindSearch(board.search, (value) => {
     query = value;
-    apply();
+    scheduleApply();
   });
-  apply();
+  applyNow();
   // La rejilla recién pintada entra en pantalla con la animación en cascada.
   revealCards(board.grid);
 }

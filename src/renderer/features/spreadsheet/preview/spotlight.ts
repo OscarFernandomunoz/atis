@@ -1,24 +1,38 @@
 /**
  * Resplandor que sigue al puntero dentro de la zona de carga.
  *
- * La posición se publica en variables CSS (`--dz-pointer-x/y`) y es el CSS quien
- * pinta el degradado; así el efecto no obliga a recalcular estilos en cada píxel.
- * Se limita a un frame por pintado para no encadenar cálculos.
+ * El foco es una capa propia (`.dropzone-spotlight`) que solo cambia de
+ * `transform`: mover una capa compuesta es mucho más barato que reescribir el
+ * degradado de la tarjeta con variables CSS en cada píxel. Los movimientos se
+ * agrupan en un frame y siempre se pinta la última posición recibida.
  */
 export function initDropzoneSpotlight(dropzone: HTMLElement): void {
+  const glow = dropzone.querySelector<HTMLElement>('.dropzone-spotlight');
+  if (!glow) return;
+
   let frame: number | null = null;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  const paint = (): void => {
+    frame = null;
+    const rect = dropzone.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    // El foco está centrado con márgenes negativos: el desplazamiento se mide
+    // desde el centro de la tarjeta.
+    const x = pointerX - rect.left - rect.width / 2;
+    const y = pointerY - rect.top - rect.height / 2;
+    glow.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  };
+
+  const schedule = (): void => {
+    if (frame === null) frame = window.requestAnimationFrame(paint);
+  };
 
   const move = (event: PointerEvent): void => {
-    if (frame !== null) return;
-    frame = window.requestAnimationFrame(() => {
-      frame = null;
-      const rect = dropzone.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-      const x = ((event.clientX - rect.left) / rect.width) * 100;
-      const y = ((event.clientY - rect.top) / rect.height) * 100;
-      dropzone.style.setProperty('--dz-pointer-x', `${x}%`);
-      dropzone.style.setProperty('--dz-pointer-y', `${y}%`);
-    });
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    schedule();
   };
 
   const reset = (): void => {
@@ -26,10 +40,9 @@ export function initDropzoneSpotlight(dropzone: HTMLElement): void {
       window.cancelAnimationFrame(frame);
       frame = null;
     }
-    dropzone.style.setProperty('--dz-pointer-x', '50%');
-    dropzone.style.setProperty('--dz-pointer-y', '50%');
+    glow.style.transform = 'translate3d(0, 0, 0)';
   };
 
-  dropzone.addEventListener('pointermove', move);
+  dropzone.addEventListener('pointermove', move, { passive: true });
   dropzone.addEventListener('pointerleave', reset);
 }
