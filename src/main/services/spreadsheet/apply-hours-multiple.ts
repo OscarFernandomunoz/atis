@@ -4,14 +4,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { APPLY_HOURS_MULTIPLE_PS1 } from './excel-com-multiple-script.js';
+import { safeWorkbookName, type ApplyHoursMultiplePayload } from './payload.js';
+
+export type { ApplyHoursMultiplePayload } from './payload.js';
 
 const execFileAsync = promisify(execFile);
-
-export interface ApplyHoursMultiplePayload {
-  data: ArrayBuffer | Uint8Array;
-  fileName: string;
-  targets: Array<{ identification: string; totalHours: string }>;
-}
 
 // Aplica las horas a TODAS las cédulas en una sola pasada usando Excel real vía COM
 // (PowerShell), de modo que la copia descargada conserve idéntico el diseño y los
@@ -19,11 +16,16 @@ export interface ApplyHoursMultiplePayload {
 // si Excel no está disponible o ninguna cédula se encontró.
 export async function applyHoursMultipleWithExcel(payload: ApplyHoursMultiplePayload): Promise<Buffer | null> {
   const dir = mkdtempSync(join(tmpdir(), 'aia-excel-'));
-  const inPath = join(dir, payload.fileName.replace(/[^\w.-]/g, '_'));
-  const ext = payload.fileName.match(/\.[^.]+$/)?.[0] ?? '.xlsx';
-  const outPath = join(dir, payload.fileName.replace(/\.[^.]+$/, '') + '-actualizado' + ext);
+  // El nombre de salida se deriva del mismo nombre saneado que el de entrada:
+  // nunca se usa `payload.fileName` directamente para construir una ruta.
+  const inputName = safeWorkbookName(payload.fileName);
+  const extensionIndex = inputName.lastIndexOf('.');
+  const outputName = `${inputName.slice(0, extensionIndex)}-actualizado${inputName.slice(extensionIndex)}`;
+  const inPath = join(dir, inputName);
+  const outPath = join(dir, outputName);
   const scriptPath = join(dir, 'apply-hours-multiple.ps1');
-  writeFileSync(inPath, Buffer.from(payload.data as ArrayBuffer));
+  const data = payload.data instanceof Uint8Array ? payload.data : new Uint8Array(payload.data);
+  writeFileSync(inPath, data);
   writeFileSync(scriptPath, '\uFEFF' + APPLY_HOURS_MULTIPLE_PS1, 'utf8');
   const targetsParam = payload.targets.map((t) => `${t.identification}|${t.totalHours}`).join(';');
   try {

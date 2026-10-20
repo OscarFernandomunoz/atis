@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import { sanitizeLogText, type AppLogEntry, type AppLogLevel } from '../../shared/index.js';
+import { isTrustedSender } from './trusted-sender.js';
 
 const MAX_SCOPE_LENGTH = 80;
 const MAX_MESSAGE_LENGTH = 2000;
@@ -37,7 +38,8 @@ function writeEntry(entry: AppLogEntry): void {
 // Recibe los logs del renderer y los publica en la salida del proceso principal.
 // Así la consola de DevTools queda limpia y la terminal conserva el diagnóstico.
 export function registerLogHandlers(): void {
-  ipcMain.on('app:log', (_event, entry: unknown) => {
+  ipcMain.on('app:log', (event, entry: unknown) => {
+    if (!isTrustedSender(event)) return;
     if (!isAppLogEntry(entry)) return;
     writeEntry(entry);
   });
