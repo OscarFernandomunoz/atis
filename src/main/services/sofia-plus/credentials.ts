@@ -1,3 +1,4 @@
+import { hasUnsafeControlChars } from '../../../shared/index.js';
 import type { SofiaCredentials } from './types.js';
 
 const MAX_USERNAME_LENGTH = 200;
@@ -5,7 +6,6 @@ const MAX_PASSWORD_LENGTH = 512;
 const MAX_IDENTIFICATION_LENGTH = 30;
 const MAX_IDENTIFICATIONS = 500;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const IDENTIFICATION_SEPARATORS = /[;|\u0000-\u001F\u007F]/;
 
 function readText(value: unknown, maxLength: number, trim = true): string | null {
   if (typeof value !== 'string') return null;
@@ -18,7 +18,8 @@ function readIdentification(value: unknown): string | null {
   const text = readText(value, MAX_IDENTIFICATION_LENGTH);
   // Los separadores romperían el mapa "cédula|horas" que consume el script
   // de PowerShell; una cédula real no los necesita.
-  return text && !IDENTIFICATION_SEPARATORS.test(text) ? text : null;
+  if (!text || text.includes(';') || text.includes('|') || hasUnsafeControlChars(text)) return null;
+  return text;
 }
 
 /**

@@ -10,6 +10,23 @@ export interface AppLogEntry {
 }
 
 /**
+ * ¿El texto contiene caracteres de control?
+ *
+ * Se recorre carácter a carácter para no usar una expresión regular con
+ * rangos de control, que ESLint rechaza. Se conservan tabulación y salto de
+ * línea porque son parte normal del diagnóstico.
+ */
+export function hasUnsafeControlChars(value: string): boolean {
+  for (const char of value) {
+    const code = char.charCodeAt(0);
+    if (code === 0x7f || (code < 0x20 && code !== 0x09 && code !== 0x0a)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Limpia secuencias de control antes de escribir en la terminal.
  *
  * El texto puede venir de una página remota o de un archivo del usuario; sin
@@ -17,5 +34,11 @@ export interface AppLogEntry {
  * la terminal. Se conservan saltos de línea y tabulaciones.
  */
 export function sanitizeLogText(value: string): string {
-  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+  let result = '';
+  for (const char of value) {
+    const code = char.charCodeAt(0);
+    if (code === 0x7f || (code < 0x20 && code !== 0x09 && code !== 0x0a)) continue;
+    result += char;
+  }
+  return result;
 }

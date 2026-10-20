@@ -1,10 +1,11 @@
+import { hasUnsafeControlChars } from '../../../shared/index.js';
+
 /** Tope de tamaño para un libro enviado desde el renderer (30 MB). */
 export const MAX_WORKBOOK_BYTES = 30 * 1024 * 1024;
 
 const MAX_FILE_NAME_LENGTH = 160;
 const MAX_TARGETS = 1000;
 const MAX_TARGET_LENGTH = 30;
-const UNSAFE_TARGET_CHARS = /[;|\u0000-\u001F\u007F]/;
 
 export interface ApplyHoursMultiplePayload {
   data: ArrayBuffer | Uint8Array;
@@ -16,7 +17,7 @@ function readTargetText(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const text = value.trim();
   if (text.length === 0 || text.length > MAX_TARGET_LENGTH) return null;
-  return UNSAFE_TARGET_CHARS.test(text) ? null : text;
+  return text.includes(';') || text.includes('|') || hasUnsafeControlChars(text) ? null : text;
 }
 
 function parseTargets(value: unknown): ApplyHoursMultiplePayload['targets'] | null {
