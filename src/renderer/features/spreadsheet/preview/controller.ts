@@ -46,7 +46,15 @@ function validateAndSetFile(file: File, elements: FileElements, state: FileUploa
     void notify('Archivo no válido', 'Solo se permiten archivos Excel en formato .xls o .xlsx');
     return;
   }
-  elements.dropzoneText.innerHTML = `Archivo seleccionado: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+  // El nombre lo elige el sistema de archivos, no la app: se inserta como texto
+  // para que un archivo llamado con etiquetas HTML no ejecute nada en el renderer.
+  const selectedName = document.createElement('strong');
+  selectedName.textContent = file.name;
+  elements.dropzoneText.replaceChildren(
+    'Archivo seleccionado: ',
+    selectedName,
+    ` (${(file.size / 1024).toFixed(1)} KB)`,
+  );
   elements.statusMessage.textContent = `Archivo "${file.name}" cargado. Validando ${REQUIRED_COLUMN_NAME}...`;
   // Un archivo nuevo empieza sin horas leídas del portal.
   forgetLiveHours();
