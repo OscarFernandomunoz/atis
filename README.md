@@ -208,12 +208,17 @@ webPreferences: {
   contextIsolation: true,
   nodeIntegration: false,
   sandbox: true,
+  devTools: !app.isPackaged,
 }
 ```
 
-El renderer solo puede invocar los canales IPC declarados explícitamente en el preload. La sesión de SofiaPlus vive en una partición aislada y se limpia antes y después de cada ejecución.
+El renderer solo puede invocar los canales IPC declarados explícitamente en el preload. Cada mensaje comprueba que venga del frame superior del HTML local y cada payload se normaliza antes de usarlo: credenciales, avisos y libros de Excel tienen forma, longitud y tipo conocidos.
 
-> **Advertencia:** el proceso principal habilita `ignore-certificate-errors`, `disable-web-security` y `allow-running-insecure-content` para poder operar contra SofiaPlus. Estas opciones reducen el aislamiento del navegador y deben revisarse antes de distribuir la aplicación.
+La navegación de la ventana del portal y de sus emergentes se limita al dominio `senasofiaplus.edu.co`. Los permisos web (cámara, micrófono, portapapeles, dispositivos) y las descargas iniciadas por el portal se deniegan por defecto. La sesión de SofiaPlus vive en una partición aislada y se limpia antes y después de cada ejecución.
+
+En la app empaquetada las DevTools están desactivadas. Los mensajes del renderer no se escriben en su consola: viajan por IPC al proceso principal y aparecen en la terminal, junto con los del resto de la aplicación. Los libros temporales que usa Excel COM se crean con permisos restringidos y se borran siempre al terminar.
+
+> **Limitación del portal:** SofiaPlus solo responde por HTTP (`http://senasofiaplus.edu.co`), no por HTTPS. Las credenciales viajan sin cifrar entre el equipo y el servidor del SENA. La aplicación no puede resolverlo desde el cliente: usa una red de confianza, evita redes Wi-Fi públicas y no compartas tu sesión.
 
 ### Salida de compilación
 
@@ -273,8 +278,8 @@ TypeScript y ESLint no detectan este tipo de dependencias. Para cubrir ese hueco
 
 | Constante                | Archivo                                              | Para qué sirve                                                   |
 | ------------------------ | ---------------------------------------------------- | ---------------------------------------------------------------- |
-| `SOFIA_URL`              | `services/sofia-plus/workflow/window-loader.ts`      | URL del portal                                                   |
-| `SOFIA_PARTITION`        | `services/sofia-plus/workflow/window-loader.ts`      | Sesión aislada del portal                                        |
+| `SOFIA_PUBLIC_URL`       | `shared/sofia.ts`                                    | URL del portal                                                   |
+| `SOFIA_PARTITION`        | `shared/sofia.ts`                                    | Sesión aislada del portal                                        |
 | `TOTAL_STEPS`            | `services/sofia-plus/workflow/step-banner.ts`        | Total de pasos del flujo (16)                                    |
 | `ACTION_DELAY_MS`        | `services/sofia-plus/browser/timing.ts`              | Espera entre acciones (800 ms)                                   |
 | `DEMO_MODE`              | `services/sofia-plus/browser/click.ts`               | Marca la posición del clic sin ejecutarlo; debe estar en `false` |
@@ -287,10 +292,10 @@ El proyecto está en desarrollo activo y cubre el flujo principal de consulta y 
 
 - **El portal puede cambiar.** Los selectores y el flujo dependen de la estructura del DOM de SofiaPlus. Cualquier cambio en el portal puede requerir ajustar `report/` y `navigation/`.
 - **La automatización es visible.** La ventana del portal se abre en primer plano y se cierra al terminar. El usuario puede seguir el avance en el banner inyectado en la página.
-- **La sesión se limpia en cada corrida.** Se eliminan cookies, almacenamiento local, caché y credenciales de la partición aislada del portal.
+- **La sesión se limpia en cada corrida.** Se eliminan cookies, almacenamiento local, caché y credenciales de la partición aislada del portal. Los archivos temporales del Excel también se borran al terminar.
 - **Sin integración continua.** No hay workflows de GitHub Actions; la verificación depende de ejecutar `npm run build` antes de publicar.
 - **La interfaz usa tema oscuro.** La barra de título nativa se sincroniza con ese tema.
-- **Las opciones de seguridad del navegador están relajadas** para operar contra SofiaPlus. Revisa la advertencia de la sección [Modelo de seguridad](#modelo-de-seguridad) antes de distribuir la aplicación.
+- **El portal no ofrece HTTPS.** Consulta la advertencia de la sección [Modelo de seguridad](#modelo-de-seguridad) antes de introducir credenciales reales.
 - **La ruta COM depende de Windows y Excel.** En otros sistemas se usa ExcelJS o SheetJS; el resultado puede no conservar todo el formato original.
 
 ## Contribución
