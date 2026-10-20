@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/appearance.js';
+import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/index.js';
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
 import { lockSofiaWindow } from './window-lock.js';
 import { getSofiaWindowSize } from './window-size.js';

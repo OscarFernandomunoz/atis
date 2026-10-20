@@ -9,7 +9,7 @@
 // ⚠️ Esta función se serializa con `.toString()` y se ejecuta dentro de la página de
 // SofiaPlus. NO puede referenciar imports, constantes de módulo ni helpers externos.
 
-export function patchEsperaGuardarScript(): string {
+export function patchWaitSaveScript(): string {
   return `
     (() => {
       // Si la función ya fue parcheada, no hacer nada.

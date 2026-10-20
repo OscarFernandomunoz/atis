@@ -7,7 +7,7 @@ export { fillReportDates } from './dates.js';
 export { findInstructorPicker, findInstructorPickerPoint } from './instructor-picker.js';
 export { openIdentificationTypeSelect, selectCitizenshipId, findIdentificationTypePoint } from './identification-type.js';
 export { fillInstructorIdentification } from './identification-field.js';
-export { clickInstructorSearchInput, findInstructorSearchPoint } from './search-button.js';
+export { clickInstructorSearchInput, findInstructorSearchPoint } from './search-button/index.js';
 export { findInstructorRowSelect, selectInstructorRow } from './instructor-row-select.js';
 export { clickInstructorResultLink } from './result-link.js';
 export { selectLearningResultsOption } from './learning-results-option.js';

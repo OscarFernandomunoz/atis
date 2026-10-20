@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { APP_TITLE, getTitleBarPlatform, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/window.js';
+import { APP_TITLE, getTitleBarPlatform, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/index.js';
 import { TITLE_BAR_THEME_COLORS } from './palette.js';
 
 // Cromo de la barra de título que se inyecta en las páginas remotas (SofiaPlus) mediante un

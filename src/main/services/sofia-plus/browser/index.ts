@@ -4,7 +4,7 @@ export { patchBlockUiScript } from './block-ui-patch.js';
 export { booleanScript, clickScript } from './click.js';
 export { markClickPoint } from './click-marker.js';
 export { executeInAllFrames, executeInEveryFrame, executeInFrames, getTrackedChildWindows, trackChildWindow } from './frames.js';
-export { patchEsperaGuardarScript } from './espera-guardar-patch.js';
+export { patchWaitSaveScript } from './wait-save-patch.js';
 export { clearPageMarkers, clearPageMarkersScript } from './markers.js';
 export { patchOpenerShimScript } from './opener-shim-patch.js';
 export { patchSofiaPageGuards } from './page-guards.js';

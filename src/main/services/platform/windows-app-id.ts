@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { join } from 'node:path';
-import { APP_TITLE } from '../../shared/window.js';
+import { APP_TITLE } from '../../../shared/index.js';
 import { psString, runPowerShell } from './powershell.js';
 
 /**

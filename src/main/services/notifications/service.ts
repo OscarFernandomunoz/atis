@@ -1,6 +1,7 @@
 import { Notification } from 'electron';
-import type { SystemNotification } from '../../shared/notifications.js';
-import { isWsl, showWindowsToast } from './windows-toast.js';
+import type { SystemNotification } from '../../../shared/index.js';
+import { isWsl } from '../platform/index.js';
+import { showWindowsToast } from './windows-toast.js';
 
 // Espera máxima a que el sistema confirme que el aviso llegó a la pantalla.
 const CONFIRMATION_TIMEOUT_MS = 1000;

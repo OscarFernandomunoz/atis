@@ -32,7 +32,7 @@ export {
   findReportsOption,
   openAspiranteOptions,
   selectCurriculumOption,
-} from ${JSON.stringify(resolve(root, 'src/main/services/sofia-plus/navigation.ts'))};
+} from ${JSON.stringify(resolve(root, 'src/main/services/sofia-plus/navigation/index.ts'))};
 export {
   clickInstructorSearchInput,
   fillInstructorIdentification,

@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron';
 import { executeInFrames } from '../browser/index.js';
-import { TITLE_BAR_HEIGHT } from '../../../../shared/window.js';
+import { TITLE_BAR_HEIGHT } from '../../../../shared/index.js';
 
 export const TOTAL_STEPS = 16;
 

@@ -1,7 +1,7 @@
 import type { BrowserWindow } from 'electron';
 import { executeInEveryFrame } from './frames.js';
 import { patchBlockUiScript } from './block-ui-patch.js';
-import { patchEsperaGuardarScript } from './espera-guardar-patch.js';
+import { patchWaitSaveScript } from './wait-save-patch.js';
 import { patchUserInputScript } from './input-guard-patch.js';
 import { patchOpenerShimScript } from './opener-shim-patch.js';
 
@@ -23,7 +23,7 @@ export async function patchSofiaPageGuards(window: BrowserWindow): Promise<void>
   if (!complete) {
     console.warn('[AIA][SofiaPlus] Algún frame no aceptó el parche de blockUI; se reintentará en la siguiente acción.');
   }
-  await executeInEveryFrame(window, patchEsperaGuardarScript(), 3);
+  await executeInEveryFrame(window, patchWaitSaveScript(), 3);
   await executeInEveryFrame(window, patchOpenerShimScript(), 3);
   await executeInEveryFrame(window, patchUserInputScript(), 3);
 }

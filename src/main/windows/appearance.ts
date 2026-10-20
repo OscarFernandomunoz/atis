@@ -4,7 +4,7 @@ import {
   APP_TITLE,
   TITLE_BAR_HEIGHT,
   type TitleBarTheme,
-} from '../../shared/window.js';
+} from '../../shared/index.js';
 import { TITLE_BAR_OVERLAY_COLORS, TITLE_BAR_THEME_COLORS } from './palette.js';
 import { buildRemoteChromeScript } from './remote-chrome.js';
 

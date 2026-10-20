@@ -9,13 +9,13 @@ import {
   findReportsOption,
   openAspiranteOptions,
   selectCurriculumOption,
-} from './navigation.js';
+} from './navigation/index.js';
 import { clickInstructorResultLink, clickInstructorSearchInput, fillInstructorIdentification, fillReportDates, findIdentificationTypePoint, readTotalHours, selectCitizenshipId, selectLearningResultsOption, submitInstructorTimesReport } from './report/index.js';
 import type { ClickPoint, InstructorHours, SofiaCredentials } from './types.js';
-import { resetAutomationPause, waitIfPaused } from './flow/pause-gate.js';
-import { resetSofiaSession } from './flow/session-reset.js';
-import { showStepBanner } from './flow/step-banner.js';
-import { loadWindow } from './flow/window-loader.js';
+import { resetAutomationPause, waitIfPaused } from './workflow/pause-gate.js';
+import { resetSofiaSession } from './workflow/session-reset.js';
+import { showStepBanner } from './workflow/step-banner.js';
+import { loadWindow } from './workflow/window-loader.js';
 
 // Este archivo orquesta el flujo principal de automatización de SofiaPlus.
 export type { InstructorHours, SofiaCredentials } from './types.js';
