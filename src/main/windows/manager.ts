@@ -1,9 +1,12 @@
 import { BrowserWindow } from 'electron';
+import { pathToFileURL } from 'node:url';
 import { appFile } from '../app-paths.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme } from './appearance.js';
 
 // Crea la ventana principal de la aplicación con el renderer HTML y el preload seguro.
 export function createMainWindow(): BrowserWindow {
+  const rendererFile = appFile('dist/renderer/index.html');
+  const rendererUrl = pathToFileURL(rendererFile).href;
   const mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
@@ -42,7 +45,17 @@ export function createMainWindow(): BrowserWindow {
     mainWindow.webContents.send('window:unmaximized');
   });
 
+  // La interfaz local no abre ventanas ni navega fuera de su propio HTML. Si un
+  // contenido comprometido intenta hacerlo, se queda en la ventana de la app.
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (url !== rendererUrl) event.preventDefault();
+  });
+  mainWindow.webContents.on('will-redirect', (event, url) => {
+    if (url !== rendererUrl) event.preventDefault();
+  });
+
   // Carga la interfaz de usuario compilada en la carpeta dist.
-  mainWindow.loadFile(appFile('dist/renderer/index.html'));
+  mainWindow.loadFile(rendererFile);
   return mainWindow;
 }
