@@ -9,14 +9,30 @@ export function createMainWindow(): BrowserWindow {
     height: 700,
     minWidth: 720,
     minHeight: 520,
+    // Se muestra recién cuando el renderer pintó su primer frame: así el arranque
+    // no enseña una ventana vacía ni obliga a recomponer la interfaz a la vista.
+    show: false,
     ...getAppWindowOptions(getCurrentTitleBarTheme()),
     webPreferences: {
       preload: join(process.cwd(), 'dist/preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      // La app no usa corrector ortográfico; desactivarlo evita levantar ese
+      // servicio al escribir en los campos.
+      spellcheck: false,
     },
   });
+
+  // Red de seguridad: si `ready-to-show` no llega, la ventana aparece igual.
+  const showFallback = setTimeout(() => {
+    if (!mainWindow.isDestroyed() && !mainWindow.isVisible()) mainWindow.show();
+  }, 1500);
+  mainWindow.once('ready-to-show', () => {
+    clearTimeout(showFallback);
+    if (!mainWindow.isDestroyed()) mainWindow.show();
+  });
+  mainWindow.once('closed', () => clearTimeout(showFallback));
 
   // También sincroniza el estado cuando el sistema o un atajo maximizan la ventana.
   mainWindow.on('maximize', () => {
