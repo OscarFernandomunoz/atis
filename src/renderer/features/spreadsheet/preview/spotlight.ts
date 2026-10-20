@@ -9,6 +9,9 @@
 export function initDropzoneSpotlight(dropzone: HTMLElement): void {
   const glow = dropzone.querySelector<HTMLElement>('.dropzone-spotlight');
   if (!glow) return;
+  // Con movimiento reducido el foco se queda quieto en el centro, sin seguir al
+  // puntero ni registrar trabajo en cada movimiento.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   let frame: number | null = null;
   let pointerX = 0;
