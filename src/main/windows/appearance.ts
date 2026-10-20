@@ -1,11 +1,18 @@
 import { nativeTheme, type BrowserWindow, type BrowserWindowConstructorOptions } from 'electron';
-import { APP_TITLE, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/index.js';
+import {
+  APP_TITLE,
+  TITLE_BAR_HEIGHT,
+  isSofiaNavigationAllowed,
+  isSofiaPlusUrl,
+  type TitleBarTheme,
+} from '../../shared/index.js';
 import { appFile } from '../app-paths.js';
 import { TITLE_BAR_OVERLAY_COLORS, TITLE_BAR_THEME_COLORS } from './palette.js';
 import { buildRemoteChromeScript } from './remote-chrome.js';
 
 let activeTitleBarTheme: TitleBarTheme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
 const remoteWindows = new WeakSet<BrowserWindow>();
+const restrictedWindows = new WeakSet<BrowserWindow>();
 
 export function getCurrentTitleBarTheme(): TitleBarTheme {
   return activeTitleBarTheme;
@@ -15,7 +22,7 @@ function isRemoteSofiaWindow(window: BrowserWindow): boolean {
   if (remoteWindows.has(window)) return true;
 
   try {
-    return window.webContents.getURL().toLowerCase().includes('senasofiaplus');
+    return isSofiaPlusUrl(window.webContents.getURL());
   } catch {
     return false;
   }
@@ -78,9 +85,36 @@ export function applyTitleBarTheme(window: BrowserWindow, theme: TitleBarTheme):
   }
 }
 
+// Una ventana remota solo puede navegar dentro del portal. Esto evita que el
+// contenido de SofiaPlus (o un enlace malicioso dentro de él) saque al usuario a
+// otro sitio con la misma apariencia y el mismo cromo de la app.
+function restrictRemoteNavigation(window: BrowserWindow): void {
+  if (restrictedWindows.has(window)) return;
+  restrictedWindows.add(window);
+
+  window.webContents.on('will-navigate', (event, url) => {
+    if (!isSofiaNavigationAllowed(url)) event.preventDefault();
+  });
+  window.webContents.on('will-redirect', (event, url) => {
+    if (!isSofiaNavigationAllowed(url)) event.preventDefault();
+  });
+
+  window.webContents.setWindowOpenHandler(({ url }) => (
+    isSofiaNavigationAllowed(url)
+      ? {
+        action: 'allow',
+        // Las emergentes del portal (diálogo de instructor, etc.) acompañan a la ventana
+        // visible de SofiaPlus y conservan su mismo aspecto.
+        overrideBrowserWindowOptions: getAppWindowOptions(getCurrentTitleBarTheme()),
+      }
+      : { action: 'deny' }
+  ));
+}
+
 export function registerRemoteWindow(window: BrowserWindow): void {
   if (remoteWindows.has(window)) return;
   remoteWindows.add(window);
+  restrictRemoteNavigation(window);
 
   const decorate = (): void => {
     if (window.isDestroyed() || window.webContents.isDestroyed()) return;
@@ -119,13 +153,6 @@ export function registerRemoteWindow(window: BrowserWindow): void {
   };
   setTimeout(stopRetries, 10_000);
   window.once('closed', stopRetries);
-
-  window.webContents.setWindowOpenHandler(() => ({
-    action: 'allow',
-    // Las emergentes del portal (diálogo de instructor, etc.) acompañan a la ventana visible
-    // de SofiaPlus y conservan su mismo aspecto.
-    overrideBrowserWindowOptions: getAppWindowOptions(getCurrentTitleBarTheme()),
-  }));
 
   decorate();
 }

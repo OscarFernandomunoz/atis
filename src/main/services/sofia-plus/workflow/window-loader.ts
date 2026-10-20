@@ -1,13 +1,12 @@
 import { BrowserWindow } from 'electron';
+import { isSofiaPlusUrl, SOFIA_PARTITION, SOFIA_PUBLIC_URL } from '../../../../shared/index.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/index.js';
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
 import { lockSofiaWindow } from './window-lock.js';
 import { getSofiaWindowSize } from './window-size.js';
 
-const SOFIA_URL = 'http://senasofiaplus.edu.co/sofia-public/';
 // Partición propia: permite borrar las cookies y la caché de la automatización sin tocar
 // las preferencias de la aplicación, que viven en la sesión por defecto.
-export const SOFIA_PARTITION = 'sofia-automation';
 let sofiaWindow: BrowserWindow | null = null;
 let requestFilterInstalled = false;
 
@@ -17,7 +16,7 @@ async function loadSofiaUrl(window: BrowserWindow): Promise<void> {
   let lastLoadError: Error | undefined;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      await window.loadURL(SOFIA_URL);
+      await window.loadURL(SOFIA_PUBLIC_URL);
       return;
     } catch (error) {
       lastLoadError = error instanceof Error ? error : new Error(String(error));
@@ -128,7 +127,7 @@ export function closeSofiaPopups(): void {
   for (const window of BrowserWindow.getAllWindows()) {
     if (window === mainWindow || window.isDestroyed()) continue;
     try {
-      if (window.webContents.getURL().toLowerCase().includes('senasofiaplus')) {
+      if (isSofiaPlusUrl(window.webContents.getURL())) {
         window.destroy();
       }
     } catch {

@@ -1,7 +1,7 @@
 import { app, BrowserWindow, session } from 'electron';
+import { isSofiaPlusUrl, SOFIA_PARTITION } from '../shared/index.js';
 import { registerIpcHandlers } from './ipc/index.js';
 import { hardenSession } from './security/session.js';
-import { SOFIA_PARTITION } from './services/sofia-plus/workflow/window-loader.js';
 import { createMainWindow, registerRemoteWindow } from './windows/index.js';
 import { isWsl, WINDOWS_AUMID, ensureWindowsAppId } from './services/platform/index.js';
 
@@ -16,7 +16,7 @@ app.on('browser-window-created', (_event, window) => {
     if (window.isDestroyed()) return;
 
     try {
-      if (window.webContents.getURL().toLowerCase().includes('senasofiaplus')) {
+      if (isSofiaPlusUrl(window.webContents.getURL())) {
         registerRemoteWindow(window);
       }
     } catch {

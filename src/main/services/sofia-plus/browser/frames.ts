@@ -1,4 +1,5 @@
 import { type BrowserWindow, type WebContents, type WebFrameMain, webContents } from 'electron';
+import { isSofiaPlusUrl } from '../../../../shared/index.js';
 import { wait } from './timing.js';
 
 // Ventanas emergentes (window.open) registradas por ventana principal. Vive aquí, y no en el
@@ -59,7 +60,7 @@ function collectFrames(window: BrowserWindow): WebFrameMain[] {
     } catch {
       continue;
     }
-    if (url.includes('senasofiaplus')) visitContents(contents);
+    if (isSofiaPlusUrl(url)) visitContents(contents);
   }
 
   return frames;
