@@ -2,7 +2,7 @@ import type { BrowserWindow } from 'electron';
 import { executeInFrames } from '../browser/index.js';
 import { TITLE_BAR_HEIGHT } from '../../../../shared/index.js';
 
-export const TOTAL_STEPS = 16;
+const TOTAL_STEPS = 16;
 
 // Quita los emojis del título: la tarjeta usa la tipografía de la app, que no los necesita.
 function cleanStepTitle(stepTitle: string): string {
