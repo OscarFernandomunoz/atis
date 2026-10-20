@@ -237,24 +237,136 @@ dist/
 src/
 ├── main/                      # Proceso principal
 │   ├── index.ts               # Arranque de la aplicación
+│   ├── logger.ts              # Logger del proceso principal
+│   ├── app-paths.ts           # Rutas de la aplicación
+│   ├── security/              # Seguridad y sesiones
+│   │   └── session.ts         # Limpieza de sesión del portal
 │   ├── ipc/                   # Canales IPC por dominio
+│   │   ├── index.ts           # Registro de todos los grupos
+│   │   ├── automation.ts      # SofiaPlus: ejecución y pausa
+│   │   ├── spreadsheet.ts     # Escritura de horas en Excel
+│   │   ├── notifications.ts   # Permiso y avisos del sistema
+│   │   ├── window.ts          # Barra de título y controles nativos
+│   │   ├── log.ts             # Logging desde renderer
+│   │   └── trusted-sender.ts  # Validación de remitentes IPC
 │   ├── services/
 │   │   ├── sofia-plus/        # Automatización del portal
-│   │   ├── spreadsheet/       # Escritura de horas con Excel
+│   │   │   ├── index.ts       # Orquestación del flujo
+│   │   │   ├── login.ts       # Helper del formulario de login
+│   │   │   ├── credentials.ts # Manejo de credenciales
+│   │   │   ├── types.ts       # Tipos de la automatización
+│   │   │   ├── navigation/    # Un archivo por opción del menú
+│   │   │   │   ├── index.ts   # API pública de navegación
+│   │   │   │   ├── open-aspirante-options.ts
+│   │   │   │   ├── select-curriculum-option.ts
+│   │   │   │   ├── find-environment-management-option.ts
+│   │   │   │   ├── find-ambientes-option.ts
+│   │   │   │   ├── find-instructor-activity-time-option.ts
+│   │   │   │   ├── find-program-lookup-button.ts
+│   │   │   │   └── find-reports-option.ts
+│   │   │   ├── browser/       # Capa de navegador
+│   │   │   │   ├── index.ts   # API pública de la capa
+│   │   │   │   ├── timing.ts  # Espera entre acciones
+│   │   │   │   ├── block-ui-patch.ts    # Parcheo de jQuery blockUI
+│   │   │   │   ├── wait-save-patch.ts   # Parcheo de esperaGuardar
+│   │   │   │   ├── opener-shim-patch.ts # Shim de window.opener
+│   │   │   │   ├── input-guard-patch.ts # Bloqueo de entrada del usuario
+│   │   │   │   ├── input-guard.ts       # Estado del bloqueo de entrada
+│   │   │   │   ├── page-guards.ts       # Aplicación de parches a los frames
+│   │   │   │   ├── frames.ts            # Recorrido de frames
+│   │   │   │   ├── window-tracker.ts    # Ventanas emergentes
+│   │   │   │   ├── click.ts             # Clic por coordenadas
+│   │   │   │   └── click-marker/        # Marcador visual del clic
+│   │   │   ├── workflow/      # Piezas del flujo
+│   │   │   │   ├── step-banner.ts       # Contador de progreso
+│   │   │   │   ├── pause-gate.ts        # Pausa y reanudación
+│   │   │   │   ├── session-reset.ts     # Limpieza de la sesión
+│   │   │   │   ├── window-loader.ts     # Carga de la ventana del portal
+│   │   │   │   ├── window-lock.ts       # Bloqueo de la ventana
+│   │   │   │   └── window-size.ts       # Tamaño de la ventana
+│   │   │   └── report/        # Helpers del reporte
+│   │   │       ├── index.ts             # API pública de los helpers
+│   │   │       ├── dates.ts             # Campos de fecha
+│   │   │       ├── identification-type.ts
+│   │   │       ├── identification-field.ts
+│   │   │       ├── search-button/
+│   │   │       │   ├── index.ts
+│   │   │       │   └── click-search-input.ts
+│   │   │       ├── result-link.ts
+│   │   │       ├── learning-results-option.ts
+│   │   │       ├── form-submit-button.ts
+│   │   │       └── total-hours.ts
+│   │   ├── spreadsheet/       # Escritura de horas con Excel COM
+│   │   │   ├── index.ts                 # API pública
+│   │   │   ├── apply-hours-multiple.ts
+│   │   │   ├── excel-com-multiple-script.ts
+│   │   │   └── payload.ts
 │   │   ├── notifications/     # Avisos del sistema
-│   │   └── platform/          # PowerShell, WSL e identidad de Windows
-│   └── windows/               # Barras de título, paleta y ciclo de vida
+│   │   │   ├── index.ts                 # API pública
+│   │   │   ├── service.ts               # Electron + respaldo WSL
+│   │   │   └── windows-toast.ts         # Toast nativo de Windows
+│   │   ├── platform/          # Utilidades del sistema operativo
+│   │   │   ├── index.ts                 # API pública
+│   │   │   ├── powershell.ts
+│   │   │   ├── windows-app-id.ts
+│   │   │   └── wsl.ts
+│   │   └── settings.ts        # Preferencias persistidas
+│   └── windows/
+│       ├── index.ts           # API pública de ventanas
+│       ├── appearance.ts      # Ciclo de la barra de título
+│       ├── palette.ts         # Colores por tema
+│       ├── remote-chrome.ts   # Cromo de páginas remotas
+│       └── manager.ts         # Ventana principal
 ├── preload/
 │   └── index.ts               # Puente seguro renderer -> main
 ├── renderer/
 │   ├── index.html             # Shell mínimo con directivas @include
 │   ├── partials/              # Secciones HTML de la interfaz
+│   │   ├── title-bar.html
+│   │   ├── content-header.html
+│   │   ├── scheduling.html
+│   │   ├── access-form.html
+│   │   ├── dropzone.html
+│   │   ├── instructors.html
+│   │   ├── placeholders.html
+│   │   ├── player-bar.html
+│   │   ├── preview-modal.html
+│   │   └── notifications-modal.html
 │   ├── index.ts               # Arranque del renderer
-│   ├── app/                   # Tipos del DOM y del estado
-│   ├── features/              # Automatización, instructores, Excel, meses y tema
-│   ├── shell/                 # Barra de título y ventana de vista previa
-│   └── styles/                # CSS modular con barriles por dominio
+│   ├── env.d.ts               # Tipos de variables de entorno
+│   ├── app/
+│   │   ├── types.ts           # Tipos del DOM y del estado
+│   │   └── logger.ts          # Logger del renderer
+│   ├── features/              # Módulos por dominio
+│   │   ├── automation/
+│   │   │   ├── submit.ts      # Orquestación del envío
+│   │   │   ├── consulting.ts  # Instructor en consulta
+│   │   │   └── player-bar/    # Barra de progreso
+│   │   ├── instructors/       # Carnets, filtros y selección
+│   │   ├── notifications/     # Consentimiento y avisos
+│   │   ├── scheduling/        # Carrusel de meses y fechas
+│   │   ├── spreadsheet/
+│   │   │   ├── index.ts       # API pública del dominio
+│   │   │   ├── preview/       # Lectura y tabla del archivo
+│   │   │   └── update/        # Escritura de horas en el libro
+│   │   └── theme/
+│   │       ├── index.ts       # API pública del tema
+│   │       └── background.ts  # Fondo ambiental dinámico
+│   ├── shell/                 # Piezas del armazón de la app
+│   │   ├── preview-modal.ts
+│   │   └── title-bar.ts
+│   └── styles/
+│       ├── index.css          # Entrada de estilos
+│       ├── foundation/        # Tokens, base, animaciones y responsive
+│       ├── shell/             # Layout, barra de título y modal
+│       ├── components/        # Formularios, iconos y avisos
+│       └── features/          # Estilos de cada dominio
 └── shared/                    # Tipos y constantes compartidos
+    ├── index.ts               # API pública de lo compartido
+    ├── logging.ts             # Tipos y utilidades de logging
+    ├── notifications.ts       # Tipos de avisos del sistema
+    ├── sofia.ts               # URL y validación de SofiaPlus
+    └── window.ts              # Tipos y constantes de ventana
 ```
 
 Además, `scripts/` contiene la compilación, el modo desarrollo y la verificación de helpers; `public/` los recursos estáticos; y `docs/` la documentación de arquitectura.

@@ -134,6 +134,13 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
         if (!updated && found.length > 0) {
           elements.statusMessage.textContent = 'No se encontraron cédulas coincidentes en el Excel.';
         }
+        if (found.length > 0) {
+          // La automatización y la escritura en Excel terminaron bien.
+          await notify(
+            'Automatización completada',
+            `Horas actualizadas para ${found.length} de ${results.length} instructores.`,
+          );
+        }
       } catch (updateError) {
         logger.error('Excel', 'No se pudo actualizar el Excel.', updateError);
         const updateMessage = `No se pudo actualizar el Excel: ${updateError instanceof Error ? updateError.message : String(updateError)}`;
