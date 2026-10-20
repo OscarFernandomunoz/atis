@@ -5,6 +5,7 @@ import { withAutomationInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';
 import { ACTION_DELAY_MS, wait } from './timing.js';
 import type { ClickPoint } from '../types.js';
+import { mainLogger } from '../../../logger.js';
 
 // En `true` los pasos que dependen de un clic por coordenadas solo dibujan el puntero
 // visual donde se haría clic, sin pulsarlo. Debe estar en `false` para que el flujo
@@ -33,7 +34,7 @@ export async function clickScript(
   await patchSofiaPageGuards(window);
   const point = await executeInFrames<ClickPoint | null>(window, script, Boolean);
   if (targetDescription) {
-    console.log(`[AIA][SofiaPlus] ${targetDescription}: ${point ? 'encontrado' : 'no encontrado'}.`);
+    mainLogger.info('SofiaPlus', `${targetDescription}: ${point ? 'encontrado' : 'no encontrado'}`);
   }
   if (!point) throw new Error(errorMessage);
 

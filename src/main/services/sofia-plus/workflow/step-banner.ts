@@ -1,6 +1,7 @@
 import type { BrowserWindow } from 'electron';
 import { executeInFrames } from '../browser/index.js';
 import { TITLE_BAR_HEIGHT } from '../../../../shared/index.js';
+import { mainLogger } from '../../../logger.js';
 
 const TOTAL_STEPS = 16;
 
@@ -170,6 +171,6 @@ export function showStepBanner(window: BrowserWindow, stepNumber: number, stepTi
     })();
   `;
   return executeInFrames<boolean>(window, script, Boolean, 5).then(() => {
-    console.log(`[AIA][SofiaPlus] Paso ${stepNumber}/${TOTAL_STEPS}: ${title}`);
+    mainLogger.info('SofiaPlus', `Paso ${stepNumber}/${TOTAL_STEPS}: ${title}`);
   });
 }

@@ -1,4 +1,4 @@
-export const APP_TITLE = 'AIA - Gestión de Nómina';
+export const APP_TITLE = 'ATIS - Automated Time and Instructor System';
 export const TITLE_BAR_HEIGHT = 48;
 
 export type TitleBarTheme = 'light' | 'dark';

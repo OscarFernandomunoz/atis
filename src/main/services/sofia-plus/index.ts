@@ -16,6 +16,7 @@ import { resetAutomationPause, waitIfPaused } from './workflow/pause-gate.js';
 import { resetSofiaSession } from './workflow/session-reset.js';
 import { showStepBanner } from './workflow/step-banner.js';
 import { loadWindow } from './workflow/window-loader.js';
+import { mainLogger } from '../../logger.js';
 
 // Este archivo orquesta el flujo principal de automatización de SofiaPlus.
 export type { InstructorHours, SofiaCredentials } from './types.js';
@@ -120,7 +121,7 @@ export async function openSofiaPlus(
     await booleanScript(window, `(${submitInstructorTimesReport.toString()})()`, 'No se encontró el botón Consultar del reporte de tiempos.');
 
     await markStep(window, 16, '🧮 Leyendo horas adicionales del resultado');
-    console.log(`[AIA][SofiaPlus] Paso 16: buscando el span de horas adicionales (${identification})...`);
+    mainLogger.debug('SofiaPlus', `Paso 16: buscando el span de horas adicionales (${identification})...`);
     const totalHours = await executeInFrames<string | null>(
       window,
       `(${readTotalHours.toString()})()`,
@@ -128,14 +129,14 @@ export async function openSofiaPlus(
       40,
     ) ?? null;
     if (totalHours) {
-      console.log(`[AIA][SofiaPlus] Horas adicionales leídas del span (${identification}): ${totalHours}`);
+      mainLogger.info('SofiaPlus', `Horas adicionales leídas del span (${identification}): ${totalHours}`);
     } else {
-      console.warn(`[AIA][SofiaPlus] No se encontró el span de horas adicionales para ${identification}.`);
+      mainLogger.warn('SofiaPlus', `No se encontró el span de horas adicionales para ${identification}`);
     }
     onProgress?.(identification, totalHours);
     results.push({ identification, totalHours });
     } catch (error) {
-      console.error(`[AIA][SofiaPlus] Falló la consulta de ${identification}; se detiene el bucle.`, error);
+      mainLogger.error('SofiaPlus', `Falló la consulta de ${identification}; se detiene el bucle`, error);
       results.push({ identification, totalHours: null });
       break;
     }

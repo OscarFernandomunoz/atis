@@ -5,6 +5,7 @@ import { registerRemoteWindow } from '../../../windows/index.js';
 import { trackChildWindow } from './frames.js';
 import { blockUserInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';
+import { mainLogger } from '../../../logger.js';
 
 // Registra la ventana de SofiaPlus y las ventanas emergentes que abra (a cualquier nivel)
 // para que el descubrimiento de frames también pueda inspeccionarlas. Además reenvía al
@@ -33,14 +34,16 @@ export function trackSofiaWindow(window: BrowserWindow): void {
           : details.level === 'debug'
             ? 'DEBUG'
             : 'INFO';
-      const formattedMessage = `[AIA][SofiaPlus][${level}] ${message}`;
+      const formattedMessage = `[SofiaPlus][${level}] ${message}`;
 
       if (level === 'ERROR') {
-        console.error(formattedMessage);
+        mainLogger.error('SofiaPlus/Page', formattedMessage);
       } else if (level === 'WARN') {
-        console.warn(formattedMessage);
+        mainLogger.warn('SofiaPlus/Page', formattedMessage);
+      } else if (level === 'DEBUG') {
+        mainLogger.debug('SofiaPlus/Page', formattedMessage);
       } else {
-        console.log(formattedMessage);
+        mainLogger.info('SofiaPlus/Page', formattedMessage);
       }
     });
   };

@@ -5,6 +5,7 @@ import {
   type ApplyHoursMultiplePayload,
 } from '../services/spreadsheet/index.js';
 import { isTrustedSender } from './trusted-sender.js';
+import { mainLogger } from '../logger.js';
 
 // IPC transporta ArrayBuffer; se recorta la vista al rango exacto del buffer.
 function toArrayBuffer(result: Uint8Array | null): ArrayBuffer | null {
@@ -21,14 +22,14 @@ export function registerSpreadsheetHandlers(): void {
 
     const payload: ApplyHoursMultiplePayload | null = parseApplyHoursPayload(raw);
     if (!payload) {
-      console.warn('[AIA][Excel] Se rechazó un libro con formato o tamaño no válido.');
+      mainLogger.warn('Excel', 'Se rechazó un libro con formato o tamaño no válido');
       return null;
     }
 
     try {
       return toArrayBuffer(await applyHoursMultipleWithExcel(payload));
     } catch (error) {
-      console.error('[AIA][Excel] Error al aplicar horas múltiples con Excel COM.', error);
+      mainLogger.error('Excel', 'Error al aplicar horas múltiples con Excel COM', error);
       return null;
     }
   });

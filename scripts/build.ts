@@ -8,31 +8,31 @@ const rootDir: string = process.cwd();
 const isDev: boolean = process.argv.includes('--watch');
 
 async function build(): Promise<void> {
-  console.time('[AIA][Build] Compilación completada');
+  console.time('[Build] Compilación completada');
 
   // 1. Limpiar directorio dist/
   rmSync(resolve(rootDir, 'dist'), { recursive: true, force: true });
 
   // 2. Verificación de tipos estricta sin emitir JS
-  console.log('[AIA][Build] Verificando tipos con TypeScript...');
+  console.log('[Build] Verificando tipos con TypeScript...');
   try {
     execSync('npx tsc --noEmit', { cwd: rootDir, stdio: 'inherit' });
   } catch (error) {
-    console.error('[AIA][Build] La verificación de tipos falló.', error);
+    console.error('[Build] La verificación de tipos falló.', error);
     process.exit(1);
   }
 
   // 3. Verificación de que los helpers inyectados en la página sigan siendo autocontenidos
-  console.log('[AIA][Build] Verificando helpers serializados de SofiaPlus...');
+  console.log('[Build] Verificando helpers serializados de SofiaPlus...');
   try {
     execSync('npx tsx scripts/check-serialized-helpers.ts', { cwd: rootDir, stdio: 'inherit' });
   } catch {
-    console.error('[AIA][Build] Un helper inyectado depende de su ámbito de módulo.');
+    console.error('[Build] Un helper inyectado depende de su ámbito de módulo.');
     process.exit(1);
   }
 
   // 4. Copia de archivos estáticos
-  console.log('[AIA][Build] Copiando archivos estáticos...');
+  console.log('[Build] Copiando archivos estáticos...');
   copyStaticAssets(rootDir);
 
   // 5. Configuración compartida
@@ -76,16 +76,16 @@ async function build(): Promise<void> {
   };
 
   // 7. Bundling paralelo
-  console.log('[AIA][Build] Empaquetando los procesos Main, Preload y Renderer...');
+  console.log('[Build] Empaquetando los procesos Main, Preload y Renderer...');
   try {
     await Promise.all([
       esbuild.build(mainConfig),
       esbuild.build(preloadConfig),
       esbuild.build(rendererConfig),
     ]);
-    console.timeEnd('[AIA][Build] Compilación completada');
+    console.timeEnd('[Build] Compilación completada');
   } catch (error) {
-    console.error('[AIA][Build] La compilación con esbuild falló.', error);
+    console.error('[Build] La compilación con esbuild falló.', error);
     process.exit(1);
   }
 }

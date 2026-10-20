@@ -11,11 +11,11 @@ import { psString, runPowerShell } from './powershell.js';
  * atribuye el aviso al proceso que lo publica y el toast aparece como
  * "Windows PowerShell" con el logo de PowerShell.
  */
-export const WINDOWS_AUMID = 'Aia.GestionNomina';
+export const WINDOWS_AUMID = 'Atis.AutomatedTimeInstructorSystem';
 
 // La primera vez PowerShell prepara módulos y copia el icono; después es inmediato.
 const REGISTRATION_TIMEOUT_MS = 20000;
-const APP_FOLDER = 'AIA';
+const APP_FOLDER = 'ATIS';
 const ICON_NAME = 'logo.png';
 
 let preparation: Promise<boolean> | null = null;

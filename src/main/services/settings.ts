@@ -2,6 +2,7 @@ import { app } from 'electron';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { NotificationPermission } from '../../shared/index.js';
+import { mainLogger } from '../logger.js';
 
 /** Preferencias de la app, guardadas en el directorio de datos del usuario. */
 interface AppSettings {
@@ -36,7 +37,7 @@ export function updateSettings(patch: Partial<AppSettings>): AppSettings {
   try {
     writeFileSync(settingsPath(), JSON.stringify(next, null, 2), { encoding: 'utf8', mode: 0o600 });
   } catch (error) {
-    console.error('[AIA][Settings] No se pudieron guardar las preferencias.', error);
+    mainLogger.error('Settings', 'No se pudieron guardar las preferencias', error);
   }
   return next;
 }

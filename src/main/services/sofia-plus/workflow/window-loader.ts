@@ -4,6 +4,7 @@ import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } fr
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
 import { lockSofiaWindow } from './window-lock.js';
 import { getSofiaWindowSize } from './window-size.js';
+import { mainLogger } from '../../../logger.js';
 
 // Partición propia: permite borrar las cookies y la caché de la automatización sin tocar
 // las preferencias de la aplicación, que viven en la sesión por defecto.
@@ -22,10 +23,10 @@ async function loadSofiaUrl(window: BrowserWindow): Promise<void> {
       lastLoadError = error instanceof Error ? error : new Error(String(error));
       const attemptNumber = attempt + 1;
       if (attemptNumber < 3) {
-        console.warn(`[AIA][SofiaPlus] No se pudo cargar SofiaPlus en el intento ${attemptNumber}/3; se reintentará.`, error);
+        mainLogger.warn('SofiaPlus', `No se pudo cargar SofiaPlus en el intento ${attemptNumber}/3; se reintentará`, error);
         await wait(500 * attemptNumber);
       } else {
-        console.error('[AIA][SofiaPlus] No se pudo cargar SofiaPlus después de 3 intentos.', error);
+        mainLogger.error('SofiaPlus', 'No se pudo cargar SofiaPlus después de 3 intentos', error);
       }
     }
   }
