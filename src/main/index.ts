@@ -1,5 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import { registerIpcHandlers } from './ipc/index.js';
+import { hardenSession } from './security/session.js';
+import { SOFIA_PARTITION } from './services/sofia-plus/workflow/window-loader.js';
 import { createMainWindow, registerRemoteWindow } from './windows/index.js';
 import { isWsl, WINDOWS_AUMID, ensureWindowsAppId } from './services/platform/index.js';
 
@@ -30,6 +32,9 @@ app.on('browser-window-created', (_event, window) => {
 // El proceso principal inicializa la app, registra los canales IPC y crea la ventana principal.
 app.whenReady().then(() => {
   try {
+    // La interfaz y el portal no necesitan permisos del navegador ni descargas.
+    hardenSession(session.defaultSession);
+    hardenSession(session.fromPartition(SOFIA_PARTITION));
     // Se habilitan los handlers del proceso principal para que el renderer pueda pedir acciones.
     registerIpcHandlers();
     // Se registra la identidad de la app en Windows (nombre y logo de los avisos)
