@@ -5,6 +5,10 @@ const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
   + '<path d="m3.6 8.4 3 3 5.8-6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />'
   + '</svg>';
 
+// El check se repite en cada ficha: se parsea una sola vez y se clona.
+const CHECK_TEMPLATE = document.createElement('template');
+CHECK_TEMPLATE.innerHTML = CHECK_SVG;
+
 const CARD_CHECKBOX_SELECTOR = '.carnet-check';
 
 // Crea la casilla para incluir o excluir una credencial de la automatización.
@@ -22,7 +26,7 @@ export function createSelectionCheckbox(instructor: Instructor): HTMLElement {
   const box = document.createElement('span');
   box.className = 'carnet-select-box';
   box.setAttribute('aria-hidden', 'true');
-  box.innerHTML = CHECK_SVG;
+  box.append(CHECK_TEMPLATE.content.cloneNode(true));
 
   label.append(input, box);
   return label;

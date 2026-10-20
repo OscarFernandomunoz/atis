@@ -8,6 +8,11 @@ const PHOTO_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="tru
   + '<path d="M12 14.2c-4.3 0-7.7 2.7-8.6 6.5-.2.9.5 1.8 1.5 1.8h14.2c1 0 1.7-.9 1.5-1.8-.9-3.8-4.3-6.5-8.6-6.5Z" />'
   + '</svg>';
 
+// El mismo retrato se repite en cada carnet: se parsea una vez y se clona. Con
+// cientos de filas, volver a interpretar el SVG en cada ficha se nota.
+const PHOTO_TEMPLATE = document.createElement('template');
+PHOTO_TEMPLATE.innerHTML = PHOTO_SVG;
+
 function el(tag: string, className: string, text?: string): HTMLElement {
   const node = document.createElement(tag);
   node.className = className;
@@ -36,7 +41,7 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
 
   const top = el('div', 'carnet-top');
   const photo = el('div', 'carnet-photo');
-  photo.innerHTML = PHOTO_SVG;
+  photo.append(PHOTO_TEMPLATE.content.cloneNode(true));
   top.appendChild(photo);
 
   // Nombre y rol comparten bloque para que la credencial se lea como una ficha,

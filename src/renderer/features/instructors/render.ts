@@ -37,7 +37,10 @@ export function renderInstructorCards(
     instructor,
     colors.get(instructor.program) ?? FALLBACK_COLOR,
   ));
-  board.grid.replaceChildren(...cards);
+  // Se insertan en un solo fragmento: la rejilla no se repinta por cada ficha.
+  const fragment = document.createDocumentFragment();
+  cards.forEach((card) => fragment.appendChild(card));
+  board.grid.replaceChildren(fragment);
 
   const kinds = instructors.map((instructor) => hoursKind(effectiveHours(instructor)));
   const index = instructors.map((instructor) => normalizeText(
