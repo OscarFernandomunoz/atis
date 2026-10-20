@@ -18,6 +18,7 @@
 }
 
 .player-play {
+  position: relative;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
@@ -138,12 +139,22 @@
   display: block;
 }
 
-/* En pausa el botón ofrece reanudar y late para que se note. */
+/* En pausa el botón ofrece reanudar y un anillo late para que se note. */
 .player-play[data-state='paused'] .player-glyph-play {
   display: block;
 }
 
-.player-play[data-state='paused'] {
+.player-play::after {
+  position: absolute;
+  inset: -5px;
+  border: 2px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: inherit;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.player-play[data-state='paused']::after {
   animation: player-paused-pulse 1.9s var(--ease-smooth) infinite;
 }
 

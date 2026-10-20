@@ -70,7 +70,10 @@
 .dropzone.dragover {
   border-style: solid;
   border-color: color-mix(in srgb, var(--pastel-7) 58%, var(--text));
-  animation: dropzone-invite 1.8s var(--ease-out) infinite;
+}
+
+.dropzone.dragover::after {
+  animation: dropzone-invite 1.8s var(--ease-smooth) infinite;
 }
 
 .dropzone:active {
@@ -90,6 +93,19 @@
   border-color: #e05252;
   background-color: color-mix(in srgb, #e05252 7%, transparent);
   animation: dropzone-error-shake 380ms var(--ease-out);
+}
+
+/* Anillo de invitación mientras se arrastra un archivo. Va en un pseudo-elemento
+   y solo anima opacidad: antes era un box-shadow animado sobre toda la tarjeta. */
+.dropzone::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 2px solid color-mix(in srgb, var(--pastel-7) 58%, transparent);
+  border-radius: inherit;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Las capas internas viven por encima de la aurora. */
