@@ -1,0 +1,4 @@
+TIMS - Time Instructor Management System
+Copyright © 2025 Oscar Fernando
+
+Este software se proporciona "tal cual", sin garantía de ningún tipo.
