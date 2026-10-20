@@ -165,24 +165,29 @@ dist/
 src/
 ├── main/                      # Proceso principal
 │   ├── index.ts               # Arranque de la app
-│   ├── ipc/handlers.ts        # Canales IPC
-│   ├── services/sofia-plus/   # Automatización del portal
-│   │   ├── index.ts           # Orquestación del flujo
-│   │   ├── login.ts           # Credenciales
-│   │   ├── navigation.ts      # Menús del portal
-│   │   ├── types.ts           # Tipos
-│   │   ├── browser/           # Ventanas, frames, parches y clics
-│   │   ├── flow/              # Banner de progreso y carga de la ventana
-│   │   └── report/            # Helpers del reporte y del instructor
+│   ├── ipc/                   # Canales IPC por dominio
+│   ├── services/
+│   │   ├── sofia-plus/        # Automatización del portal
+│   │   │   ├── index.ts       # Orquestación del flujo
+│   │   │   ├── login.ts       # Credenciales
+│   │   │   ├── navigation/    # Helpers de navegación del portal
+│   │   │   ├── types.ts       # Tipos
+│   │   │   ├── browser/       # Ventanas, frames, parches y clics
+│   │   │   ├── workflow/      # Banner de progreso y carga de la ventana
+│   │   │   └── report/        # Helpers del reporte y del instructor
+│   │   ├── spreadsheet/       # Escritura de horas con Excel COM
+│   │   ├── notifications/     # Avisos del sistema
+│   │   └── platform/          # PowerShell, WSL e identidad de Windows
 │   └── windows/               # Barras de título, paleta y ciclo de vida
 ├── preload/index.ts           # Puente seguro renderer -> main
 ├── renderer/                  # Interfaz
 │   ├── index.html
 │   ├── index.ts
-│   ├── components/            # Excel, carnets, barra tipo reproductor y ventanas internas
-│   ├── styles/                # CSS modular (16 hojas)
-│   └── theme/                 # Estado, persistencia y etiquetas del tema
-└── shared/                    # Constantes y tipos compartidos (ventana y notificaciones)
+│   ├── app/                   # Tipos del DOM y del estado
+│   ├── features/              # Automatización, instructores, Excel, meses, tema
+│   ├── shell/                 # Barra de título y ventana de vista previa
+│   └── styles/                # CSS modular por base, armazón, componentes y dominio
+└── shared/                    # Tipos y constantes compartidos
 ```
 
 El detalle completo está en [`docs/architecture.md`](docs/architecture.md); las convenciones de
@@ -193,7 +198,7 @@ estructura que sigue el repositorio, en [`AGENTS.md`](AGENTS.md).
 Esta es la parte más delicada del proyecto y conviene entenderla antes de tocar
 `src/main/services/sofia-plus/`.
 
-Los módulos `login.ts`, `navigation.ts` y `report/` exportan funciones que el proceso principal
+Los módulos `login.ts`, `navigation/` y `report/` exportan funciones que el proceso principal
 serializa con `Function.prototype.toString()` y ejecuta **dentro de la página de SofiaPlus**
 mediante `executeJavaScript`. El código que se inyecta no tiene acceso al ámbito del módulo
 del que salió.
@@ -213,15 +218,14 @@ de fallar en producción.
 
 ## Personalización
 
-| Constant                 | Archivo                                     | Para qué sirve                            |
-| ------------------------ | ------------------------------------------- | ----------------------------------------- |
-| `SOFIA_URL`              | `services/sofia-plus/flow/window-loader.ts` | URL del portal                            |
-| `TOTAL_STEPS`            | `services/sofia-plus/flow/step-banner.ts`   | Total de pasos del flujo                  |
-| `SOFIA_PARTITION`        | `services/sofia-plus/flow/window-loader.ts` | Sesión aislada del portal                 |
-| `ACTION_DELAY_MS`        | `services/sofia-plus/browser/timing.ts`     | Espera entre acciones                     |
-| `DEMO_MODE`              | `services/sofia-plus/browser/click.ts`      | Marca la posición del clic sin ejecutarlo |
-| `REQUIRED_COLUMN_NUMBER` | `renderer/components/excel-preview.ts`      | Columna de la que se extrae la cédula     |
-| `THEME_STORAGE_KEY`      | `renderer/theme/types.ts`                   | Clave de preferencias del tema            |
+| Constant                 | Archivo                                                | Para qué sirve                            |
+| ------------------------ | ------------------------------------------------------ | ----------------------------------------- |
+| `SOFIA_URL`              | `services/sofia-plus/workflow/window-loader.ts`        | URL del portal                            |
+| `TOTAL_STEPS`            | `services/sofia-plus/workflow/step-banner.ts`          | Total de pasos del flujo                  |
+| `SOFIA_PARTITION`        | `services/sofia-plus/workflow/window-loader.ts`        | Sesión aislada del portal                 |
+| `ACTION_DELAY_MS`        | `services/sofia-plus/browser/timing.ts`                | Espera entre acciones                     |
+| `DEMO_MODE`              | `services/sofia-plus/browser/click.ts`                 | Marca la posición del clic sin ejecutarlo |
+| `REQUIRED_COLUMN_NUMBER` | `renderer/features/spreadsheet/preview/constants.ts`   | Columna de la que se extrae la cédula     |
 
 ## Tecnologías utilizadas
 
@@ -256,7 +260,7 @@ Conviene ser explícito sobre el punto en que está el proyecto:
   preferencias de la app.
 - **Sin integración continua.** No hay workflows de GitHub Actions; la verificación depende de ejecutar `npm run build` antes de publicar.
 - **El portal puede cambiar.** Los selectores y el flujo dependen de la estructura del DOM de
-  SofiaPlus. Cualquier cambio en el portal puede requerir ajustar `report/` y `navigation.ts`.
+  SofiaPlus. Cualquier cambio en el portal puede requerir ajustar `report/` y `navigation/`.
 - **`app.commandLine.appendSwitch('ignore-certificate-errors')`** está activo en el proceso
   principal para trabajar contra el certificado del portal. Debe revisarse antes de cualquier
   despliegue real.
