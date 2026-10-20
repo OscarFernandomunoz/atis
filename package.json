@@ -44,7 +44,7 @@
   "build": {
     "appId": "com.atis.app",
     "productName": "ATIS",
-    "copyright": "Copyright © 2025 Oscar Fernando",
+    "copyright": "Copyright © 2026 Oscar Fernando",
     "directories": {
       "output": "dist-installer",
       "buildResources": "build-resources"
