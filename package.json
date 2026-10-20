@@ -12,7 +12,9 @@
     "watch": "tsx scripts/build.ts --watch",
     "lint": "eslint .",
     "dev": "tsx scripts/dev.ts",
-    "start": "npm run lint && npm run build && npx electron ."
+    "start": "npm run lint && npm run build && npx electron .",
+    "dist": "npm run build && electron-builder --win nsis",
+    "dist:portable": "npm run build && electron-builder --win portable"
   },
   "author": {
     "name": "Oscar Fernando"
