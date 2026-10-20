@@ -1,15 +1,9 @@
-import { app, type BrowserWindow } from 'electron';
+import { type BrowserWindow } from 'electron';
 import type { SofiaWindowSize } from './window-size.js';
 
-// Mientras el usuario no cierre la app, la ventana de la automatización no debe cerrarse
-// ni cambiar de tamaño: lo único que puede hacer es minimizarla.
-let allowClose = false;
-app.once('before-quit', () => {
-  allowClose = true;
-});
-
-// Bloquea el cierre, la maximización y el redimensionado de la ventana de SofiaPlus.
-// En Linux las opciones nativas closable/maximizable son no-ops, así que el bloqueo se
+// Bloquea la maximización y el redimensionado de la ventana de SofiaPlus.
+// El usuario PUEDE cerrar la ventana con el botón X (al hacerlo se limpia la sesión).
+// En Linux las opciones nativas maximizable/resizable son no-ops, así que el bloqueo se
 // refuerza con los eventos de la ventana y con la comprobación del tamaño en cada resize.
 export function lockSofiaWindow(window: BrowserWindow, size: SofiaWindowSize): void {
   let applyingSize = false;
@@ -34,13 +28,6 @@ export function lockSofiaWindow(window: BrowserWindow, size: SofiaWindowSize): v
     applyingSize = false;
   };
 
-  // Alt+F4, el menú del sistema y el botón de cerrar pasan todos por 'close'.
-  // destroy() no emite este evento, así que la automatización sí puede cerrarla.
-  window.on('close', (event) => {
-    if (allowClose) return;
-    event.preventDefault();
-  });
-
   // El menú del sistema de la barra de título permite mover y redimensionar la ventana
   // aunque los botones nativos estén deshabilitados.
   window.on('system-context-menu', (event) => {
@@ -61,7 +48,8 @@ export function lockSofiaWindow(window: BrowserWindow, size: SofiaWindowSize): v
   });
   window.on('resize', enforceFixedSize);
 
-  window.setClosable(false);
   window.setMaximizable(false);
   window.setResizable(false);
+  // NOTA: NO se llama a setClosable(false) para permitir que el usuario cierre la ventana.
+  // Al cerrar, window-loader.ts limpia la sesión (cookies, caché, credenciales).
 }

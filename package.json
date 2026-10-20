@@ -12,7 +12,9 @@
     "watch": "tsx scripts/build.ts --watch",
     "lint": "eslint .",
     "dev": "tsx scripts/dev.ts",
-    "start": "npm run lint && npm run build && npx electron ."
+    "start": "npm run lint && npm run build && npx electron .",
+    "dist": "npm run build && electron-builder --win nsis",
+    "dist:portable": "npm run build && electron-builder --win portable"
   },
   "author": {
     "name": "Oscar Fernando"
@@ -23,6 +25,7 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.2",
     "electron": "^43.4.1",
+    "electron-builder": "^26.0.12",
     "esbuild": "0.28.2",
     "eslint": "^10.8.1",
     "prettier": "^3.9.6",
@@ -35,6 +38,59 @@
     "xlsx": "^0.18.5"
   },
   "allowScripts": {
-    "esbuild@0.28.2": true
+    "esbuild@0.28.2": true,
+    "electron-winstaller@5.4.0": true
+  },
+  "build": {
+    "appId": "com.tims.app",
+    "productName": "TIMS",
+    "copyright": "Copyright © 2025 Oscar Fernando",
+    "directories": {
+      "output": "dist-installer",
+      "buildResources": "build-resources"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "public/images",
+        "to": "images",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "public/images/logo.png",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TIMS",
+      "uninstallDisplayName": "TIMS",
+      "license": "build-resources/license.txt"
+    },
+    "portable": {
+      "artifactName": "TIMS-${version}-portable.${ext}"
+    }
   }
 }
