@@ -108,19 +108,19 @@
   border: none;
   border-radius: 999px;
   background: none;
+  color: var(--text-muted);
   cursor: pointer;
   transform: translateY(-50%);
-  transition: opacity 180ms var(--ease-smooth), transform 200ms var(--ease-out);
+  transition: color 180ms var(--ease-smooth), opacity 180ms var(--ease-smooth), transform 200ms var(--ease-out);
 }
 
-.player-locate img {
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-  object-fit: contain;
+.player-locate svg {
+  width: 21px;
+  height: 21px;
 }
 
 .player-locate:hover:not(:disabled) {
+  color: var(--text);
   transform: translateY(-50%) scale(1.12);
 }
 
