@@ -32,9 +32,10 @@ app.on('browser-window-created', (_event, window) => {
 // El proceso principal inicializa la app, registra los canales IPC y crea la ventana principal.
 app.whenReady().then(() => {
   try {
-    // La interfaz y el portal no necesitan permisos del navegador ni descargas.
+    // La interfaz y el portal no necesitan permisos del navegador. Las descargas
+    // se bloquean solo en la sesión del portal: la app sí descarga su Excel.
     hardenSession(session.defaultSession);
-    hardenSession(session.fromPartition(SOFIA_PARTITION));
+    hardenSession(session.fromPartition(SOFIA_PARTITION), { blockDownloads: true });
     // Se habilitan los handlers del proceso principal para que el renderer pueda pedir acciones.
     registerIpcHandlers();
     // Se registra la identidad de la app en Windows (nombre y logo de los avisos)
