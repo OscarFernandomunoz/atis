@@ -20,3 +20,7 @@ pertenece en el carrusel, en inglés.
 | Diciembre | Cañón del Río Chicamocha 02.jpg | Bernard Gagnon | CC BY-SA 4.0 |
 
 Cada foto está disponible en <https://commons.wikimedia.org> con el nombre indicado.
+
+Para el carrusel se guardan en WebP a 480 px de ancho y calidad 80 (72 en abril,
+que es una foto vertical con mucho detalle). Así cada tarjeta de 198 px se ve
+nítida en pantallas de alta densidad sin cargar los originales de varios MB.
