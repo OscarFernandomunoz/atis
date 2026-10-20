@@ -2,9 +2,9 @@ import { HOURS_THRESHOLD, parseHoursValue } from '../spreadsheet/helpers.js';
 import type { Instructor } from './parse.js';
 
 // Clasificación de un valor de horas respecto al umbral del reporte.
-export type HoursKind = 'ok' | 'low' | 'none';
+type HoursKind = 'ok' | 'low' | 'none';
 
-export interface HoursView {
+interface HoursView {
   /** Texto a mostrar: las horas o un guion cuando no hay dato. */
   text: string;
   /** Clase de color asociada. */

@@ -5,7 +5,7 @@ const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
   + '<path d="m3.6 8.4 3 3 5.8-6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />'
   + '</svg>';
 
-export const CARD_CHECKBOX_SELECTOR = '.carnet-check';
+const CARD_CHECKBOX_SELECTOR = '.carnet-check';
 
 // Crea la casilla para incluir o excluir una credencial de la automatización.
 export function createSelectionCheckbox(instructor: Instructor): HTMLElement {

@@ -1,6 +1,6 @@
 import type { MonthRange } from './selection.js';
 
-export interface DateRangeInputs {
+interface DateRangeInputs {
   start: HTMLInputElement;
   end: HTMLInputElement;
 }

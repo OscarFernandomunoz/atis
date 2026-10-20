@@ -107,8 +107,6 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
       fragment.appendChild(section);
     });
     state.file = file;
-    state.firstIdentification = firstIdentification;
-    state.identifications = identifications;
     if (firstIdentification) {
       elements.statusMessage.textContent = `${identifications.length} cédula(s) de instructores extraídas del Excel. ${REQUIRED_COLUMN_LABEL} presente.`;
     }
@@ -129,8 +127,6 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
 
 function rejectFile(elements: FileElements, state: FileUploadState, message: string): void {
   state.file = null;
-  state.firstIdentification = null;
-  state.identifications = [];
   elements.fileInput.value = '';
   elements.dropzone.classList.add('dropzone-error');
   elements.dropzoneText.textContent = DROPZONE_HINT;

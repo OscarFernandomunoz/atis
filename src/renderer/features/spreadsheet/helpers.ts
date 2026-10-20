@@ -1,5 +1,5 @@
 export const HOURS_COLUMN_NAME = 'Horas académicas';
-export const CEDULA_COLUMN_NAMES = ['Columna 3', '# DE DOCUMENTO'];
+const CEDULA_COLUMN_NAMES = ['Columna 3', '# DE DOCUMENTO'];
 export const HOURS_THRESHOLD = 160;
 export const GREEN_FILL = 'FF00B050';
 export const RED_FILL = 'FFFF0000';
@@ -21,24 +21,6 @@ export function sameHeader(a: string, b: string): boolean {
 
 export function isCedulaHeader(text: string): boolean {
   return CEDULA_COLUMN_NAMES.some((name) => sameHeader(text, name));
-}
-
-export function findHoursColumn(headerRow: unknown[]): number {
-  return headerRow.findIndex((cell) => sameHeader(String(cell ?? ''), HOURS_COLUMN_NAME));
-}
-
-// El encabezado puede ocupar dos filas ("COLUMNA 8" arriba y "Horas académicas"
-// abajo). Busca la etiqueta en la fila de encabezados y en las dos siguientes.
-export function findHoursColumnInBlock(rows: unknown[][], headerRowIndex: number): number {
-  for (let r = headerRowIndex; r <= Math.min(headerRowIndex + 2, rows.length - 1); r += 1) {
-    const found = findHoursColumn(rows[r] ?? []);
-    if (found !== -1) return found;
-  }
-  return -1;
-}
-
-export function findCedulaColumn(headerRow: unknown[]): number {
-  return headerRow.findIndex((cell) => isCedulaHeader(String(cell ?? '')));
 }
 
 // Escribe el valor de horas tal como llega del span: número si es plano, si el span

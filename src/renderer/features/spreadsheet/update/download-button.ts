@@ -11,7 +11,7 @@ export function showDownloadButton(elements: FileElements, onDownload: () => voi
 }
 
 // Remueve el botón de descarga si existe.
-export function removeDownloadButton(elements: FileElements): void {
+function removeDownloadButton(elements: FileElements): void {
   const existing = elements.excelPreview.querySelector('.excel-download-btn');
   if (existing) existing.remove();
 }

@@ -5,26 +5,8 @@ import { rebuildFromRowsMultiple } from './xls-rebuild.js';
 import { HOURS_THRESHOLD } from '../helpers.js';
 import { colorHoursCellInPreview } from './preview-color.js';
 import { showDownloadButton } from './download-button.js';
-import * as XLSX from 'xlsx';
 
-// Cuenta las filas con datos en un archivo Excel para depuración.
-function countRows(buffer: ArrayBuffer): number {
-  try {
-    const wb = XLSX.read(buffer, { type: 'array' });
-    let maxRows = 0;
-    for (const name of wb.SheetNames) {
-      const sheet = wb.Sheets[name];
-      if (!sheet) continue;
-      const range = XLSX.utils.decode_range(sheet['!ref'] ?? 'A1:A1');
-      maxRows = Math.max(maxRows, range.e.r + 1);
-    }
-    return maxRows;
-  } catch {
-    return -1;
-  }
-}
-
-export interface InstructorResult {
+interface InstructorResult {
   identification: string;
   totalHours: string | null;
 }
@@ -37,7 +19,6 @@ export async function writeHoursIntoExcel(
   elements: FileElements,
   state: FileUploadState,
 ): Promise<boolean> {
-  console.log('[AIA][Excel] writeHoursIntoExcel:', results.length, 'resultado(s), archivo=', state.file?.name);
   if (!state.file) {
     console.warn('[AIA][Excel] No hay archivo cargado en state.');
     return false;
@@ -50,12 +31,10 @@ export async function writeHoursIntoExcel(
   }
 
   const originalBuffer = await state.file.arrayBuffer();
-  console.log('[AIA][Excel] Buffer inicial:', originalBuffer.byteLength, 'bytes, filas:', countRows(originalBuffer));
 
   // Primera opción: Excel COM múltiple preserva el diseño original al 100%.
   let updatedBuffer: ArrayBuffer | null = null;
   let usedRoute: 'com' | 'exceljs' | 'rebuild' | null = null;
-  const notFound: string[] = [];
 
   try {
     updatedBuffer = await window.electronAPI.applyHoursMultipleToExcel({
@@ -64,7 +43,6 @@ export async function writeHoursIntoExcel(
       targets,
     });
     if (updatedBuffer) {
-      console.log(`[AIA][Excel] Horas aplicadas con Excel COM. Buffer: ${originalBuffer.byteLength} -> ${updatedBuffer.byteLength} bytes`);
       usedRoute = 'com';
     }
   } catch (error) {
@@ -76,7 +54,6 @@ export async function writeHoursIntoExcel(
     try {
       updatedBuffer = await editOriginalWorkbookMultiple(originalBuffer, targets);
       if (updatedBuffer) {
-        console.log(`[AIA][Excel] Horas aplicadas con ExcelJS. Buffer: ${originalBuffer.byteLength} -> ${updatedBuffer.byteLength} bytes, filas: ${countRows(updatedBuffer)}`);
         usedRoute = 'exceljs';
       }
     } catch (error) {
@@ -88,7 +65,6 @@ export async function writeHoursIntoExcel(
     try {
       updatedBuffer = await rebuildFromRowsMultiple(originalBuffer, targets);
       if (updatedBuffer) {
-        console.log(`[AIA][Excel] Horas aplicadas con SheetJS. Buffer: ${originalBuffer.byteLength} -> ${updatedBuffer.byteLength} bytes`);
         usedRoute = 'rebuild';
       }
     } catch (error) {
@@ -108,11 +84,9 @@ export async function writeHoursIntoExcel(
   const baseName = state.file.name.replace(/\.[^.]+$/, '');
   const ext = usedRoute === 'rebuild' ? '.xlsx' : (state.file.name.match(/\.[^.]+$/)?.[0] ?? '.xlsx');
   const isXls = ext.toLowerCase() === '.xls';
-  console.log(`[AIA][Excel] Buffer final: ${updatedBuffer.byteLength} bytes, ruta: ${usedRoute}`);
   const updatedFile = new File([updatedBuffer], `${baseName}-actualizado${ext}`, {
     type: isXls ? 'application/vnd.ms-excel' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
-  console.log('[AIA][Excel] Archivo generado, refrescando vista previa...');
   state.file = updatedFile;
   await refreshExcelPreview(updatedFile, elements, state);
   // Colorar TODAS las celdas "Horas Adicionales" en el preview (una sola llamada)
@@ -121,9 +95,6 @@ export async function writeHoursIntoExcel(
   state.file = new File([highlightedBuffer || updatedBuffer], `${baseName}-actualizado${ext}`, {
     type: isXls ? 'application/vnd.ms-excel' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
-  console.log('[AIA][Excel] Archivo con resaltado de "Horas académicas" generado');
-  console.log('[AIA][Excel] Vista previa refrescada y coloreada.');
-  console.log('[AIA][Excel] Vista previa refrescada y coloreada.');
   showDownloadButton(elements, () => {
     const url = URL.createObjectURL(updatedFile);
     const link = document.createElement('a');
@@ -133,11 +104,10 @@ export async function writeHoursIntoExcel(
     window.setTimeout(() => URL.revokeObjectURL(url), 5000);
   });
 
-  const notFoundNote = notFound.length > 0 ? ` Sin coincidencia en el Excel: ${notFound.join(', ')}.` : '';
   const preservedDesign = usedRoute === 'com' || usedRoute === 'exceljs';
   elements.statusMessage.textContent = preservedDesign
-    ? `Horas escritas para ${targets.length - notFound.length} instructor(es) con color (rojo < ${HOURS_THRESHOLD}, verde ≥ ${HOURS_THRESHOLD}). Diseño y filtros conservados.${notFoundNote} Archivo: ${updatedFile.name}.`
-    : `Horas escritas para ${targets.length - notFound.length} instructor(es). Aviso: el archivo era .xls y se reconstruyó, así que pudo perder el diseño/filtros.${notFoundNote} Archivo: ${updatedFile.name}.`;
+    ? `Horas escritas para ${targets.length} instructor(es) con color (rojo < ${HOURS_THRESHOLD}, verde ≥ ${HOURS_THRESHOLD}). Diseño y filtros conservados. Archivo: ${updatedFile.name}.`
+    : `Horas escritas para ${targets.length} instructor(es). Aviso: el archivo era .xls y se reconstruyó, así que pudo perder el diseño/filtros. Archivo: ${updatedFile.name}.`;
   return true;
 }
 

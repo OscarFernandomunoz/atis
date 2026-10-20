@@ -76,7 +76,6 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
     setPlayerTrack(elements, null);
     setPlayerProgress(elements, 0, total);
 
-    state.isUploading = true;
     running = true;
     pausable = true;
     isPaused = false;
@@ -91,7 +90,6 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
         identification: targets[0] ?? '',
         identifications: targets,
       }, (identification, hours) => {
-        state.currentIdentification = identification;
         setPlayerTrack(elements, identification, identification ? findInstructorName(identification) : null);
         highlightRow(elements, identification);
         if (identification) {
@@ -142,7 +140,6 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
     } finally {
       // Al terminar (o fallar) ningún instructor queda marcado como en consulta.
       stopConsulting(elements.cardsGrid, elements.excelPreview);
-      state.isUploading = false;
       running = false;
       pausable = false;
       button.disabled = false;

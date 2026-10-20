@@ -1,6 +1,6 @@
 import type { AppElements } from '../app/types.js';
 
-export type PreviewModalElements = Pick<
+type PreviewModalElements = Pick<
   AppElements,
   'previewModal' | 'previewBackdrop' | 'previewCloseButton' | 'previewOpenButton' | 'playerTableButton' | 'excelPreview'
 >;

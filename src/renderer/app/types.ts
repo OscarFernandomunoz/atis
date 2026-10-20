@@ -1,9 +1,5 @@
 export interface FileUploadState {
   file: File | null;
-  firstIdentification: string | null;
-  identifications: string[];
-  isUploading: boolean;
-  currentIdentification: string | null;
 }
 
 export interface AppElements {

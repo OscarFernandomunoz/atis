@@ -106,7 +106,7 @@ function initIconScrollAnimations(): void {
 
 function initApp(): void {
   const elements = getElements();
-  const state: FileUploadState = { file: null, firstIdentification: null, identifications: [], isUploading: false, currentIdentification: null };
+  const state: FileUploadState = { file: null };
 
   initDynamicBackground();
   initTitleBar();

@@ -80,7 +80,7 @@ function blobToLayer(blob: Blob): string {
 }
 
 /** Compone los focos; el negro de base lo aporta `background-color` en el CSS. */
-export function createRandomBackground(): string {
+function createRandomBackground(): string {
   return createBlobs().map(blobToLayer).join(', ');
 }
 
