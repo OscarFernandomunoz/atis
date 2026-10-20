@@ -1,7 +1,8 @@
 import * as esbuild from 'esbuild';
-import { rmSync, copyFileSync, cpSync, mkdirSync, existsSync } from 'node:fs';
+import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { execSync } from 'node:child_process';
+import { copyStaticAssets } from './static-assets.js';
 
 const rootDir: string = process.cwd();
 const isDev: boolean = process.argv.includes('--watch');
@@ -32,29 +33,7 @@ async function build(): Promise<void> {
 
   // 4. Copia de archivos estáticos
   console.log('[AIA][Build] Copiando archivos estáticos...');
-  const distRendererDir = resolve(rootDir, 'dist/renderer');
-  const distImagesDir = resolve(distRendererDir, 'images');
-
-  mkdirSync(distImagesDir, { recursive: true });
-
-  const htmlSrc = resolve(rootDir, 'src/renderer/index.html');
-  if (existsSync(htmlSrc)) {
-    copyFileSync(htmlSrc, resolve(distRendererDir, 'index.html'));
-  }
-
-  const stylesSrc = resolve(rootDir, 'src/renderer/styles');
-  const stylesDist = resolve(distRendererDir, 'styles');
-  if (existsSync(stylesSrc)) {
-    cpSync(stylesSrc, stylesDist, { recursive: true });
-  }
-
-  const publicImages: string[] = ['sofia-plus.svg', 'sofia-plus.png'];
-  for (const img of publicImages) {
-    const srcPath = resolve(rootDir, 'public/images', img);
-    if (existsSync(srcPath)) {
-      copyFileSync(srcPath, resolve(distImagesDir, img));
-    }
-  }
+  copyStaticAssets(rootDir);
 
   // 5. Configuración compartida
   const sharedConfig: esbuild.BuildOptions = {

@@ -1,8 +1,9 @@
 import * as esbuild from 'esbuild';
-import { rmSync, copyFileSync, cpSync, mkdirSync, existsSync } from 'node:fs';
+import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawn, ChildProcess } from 'node:child_process';
 import electronPath from 'electron';
+import { copyStaticAssets } from './static-assets.js';
 
 const rootDir: string = process.cwd();
 let electronProcess: ChildProcess | null = null;
@@ -15,38 +16,7 @@ const initialBuildsReady = new Promise<void>((resolve) => {
   resolveInitialBuilds = resolve;
 });
 
-// 1. Copia assets estáticos del Renderer (HTML, CSS e imágenes)
-function copyStaticAssets(): void {
-  const distRendererDir = resolve(rootDir, 'dist/renderer');
-  const distImagesDir = resolve(distRendererDir, 'images');
-
-  mkdirSync(distImagesDir, { recursive: true });
-
-  const htmlSrc = resolve(rootDir, 'src/renderer/index.html');
-  if (existsSync(htmlSrc)) {
-    copyFileSync(htmlSrc, resolve(distRendererDir, 'index.html'));
-  }
-
-  const stylesSrc = resolve(rootDir, 'src/renderer/styles');
-  const stylesDist = resolve(distRendererDir, 'styles');
-  if (existsSync(stylesSrc)) {
-    cpSync(stylesSrc, stylesDist, { recursive: true });
-  }
-
-  const publicImagesDir = resolve(rootDir, 'public/images');
-  if (existsSync(publicImagesDir)) {
-    // Si tienes imágenes estáticas en public/images, se copian a dist/renderer/images
-    const imagesToCopy = ['sofia-plus.svg', 'sofia-plus.png'];
-    for (const img of imagesToCopy) {
-      const srcPath = resolve(publicImagesDir, img);
-      if (existsSync(srcPath)) {
-        copyFileSync(srcPath, resolve(distImagesDir, img));
-      }
-    }
-  }
-}
-
-// 2. Controla la ejecución del proceso de Electron
+// 1. Controla la ejecución del proceso de Electron
 function startElectron(): void {
   if (electronProcess) {
     electronProcess.removeAllListeners('close');
@@ -55,9 +25,9 @@ function startElectron(): void {
   }
 
   console.log('[AIA][Dev] Iniciando el proceso de Electron.');
-  // No activamos --enable-logging para evitar duplicar cada console.log del renderer
-  // como "INFO:CONSOLE". Los logs útiles de SofiaPlus se reenvían desde el proceso main.
-  electronProcess = spawn(String(electronPath), ['.'], {
+  // --disable-gpu: evita el error "WebGL1 blocklisted" en entornos Linux sin GPU.
+  // --no-sandbox: necesario en algunos entornos Linux para que Chromium funcione.
+  electronProcess = spawn(String(electronPath), ['.', '--disable-gpu', '--no-sandbox'], {
     cwd: rootDir,
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'development' },
@@ -72,7 +42,7 @@ function startElectron(): void {
   });
 }
 
-// 3. Plugin de esbuild para detectar cambios en TypeScript y reiniciar Electron
+// 2. Plugin de esbuild para detectar cambios en TypeScript y reiniciar Electron
 const reloadElectronPlugin = (name: string): esbuild.Plugin => ({
   name: `reload-electron-${name}`,
   setup(build) {
@@ -103,13 +73,13 @@ const reloadElectronPlugin = (name: string): esbuild.Plugin => ({
   },
 });
 
-// 4. Función principal de compilación y observación
+// 3. Función principal de compilación y observación
 async function dev(): Promise<void> {
   console.log('[AIA][Dev] Limpiando el directorio dist...');
   rmSync(resolve(rootDir, 'dist'), { recursive: true, force: true });
 
   console.log('[AIA][Dev] Copiando archivos estáticos...');
-  copyStaticAssets();
+  copyStaticAssets(rootDir);
 
   const sharedConfig: esbuild.BuildOptions = {
     bundle: true,

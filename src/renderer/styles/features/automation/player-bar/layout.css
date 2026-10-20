@@ -1,0 +1,129 @@
+.player-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 26px;
+  min-height: var(--player-bar-height);
+  padding: 13px 20px;
+  border-top: 1px solid var(--border);
+  background: #000000;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface) 72%, transparent);
+  color: var(--text-muted);
+  user-select: none;
+  transition: background 280ms var(--ease-smooth), border-color 280ms var(--ease-smooth);
+}
+
+/* Bloque izquierdo: carátula genérica + cédula en ejecución y mensaje. */
+.player-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.player-artwork {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--text) 9%, transparent);
+  color: var(--text-muted);
+}
+
+.player-artwork svg {
+  width: 24px;
+  height: 24px;
+}
+
+.player-meta {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.player-title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
+
+/* Nombre del instructor que se está procesando, secundario a la cédula. */
+.player-name {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.player-subtitle {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Bloque derecho: pista de horas del carnet que se está mirando. */
+.player-right {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.player-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  text-align: right;
+}
+
+.player-hours[hidden] {
+  display: none;
+}
+
+.player-hours-main {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-hours-who {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Faltan horas: el mismo tono de alerta que usa la insignia del carnet. */
+.player-hours[data-kind='low'] .player-hours-main {
+  color: #ff9a93;
+}
+
+/* Meta alcanzada o superada. */
+.player-hours[data-kind='ok'] .player-hours-main {
+  color: #9fe6b8;
+}
+
+/* Sin dato en el Excel ni en el portal. */
+.player-hours[data-kind='none'] .player-hours-main {
+  color: var(--text-muted);
+}
+

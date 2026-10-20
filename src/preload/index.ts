@@ -1,10 +1,15 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { getTitleBarPlatform, type TitleBarTheme } from '../shared/window.js';
+import { getTitleBarPlatform, type AppLogEntry, type TitleBarTheme } from '../shared/index.js';
+import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
 // Se limita a invocar canales IPC definidos en el proceso principal sin permitir acceso directo a Node.
-export const electronAPI = {
+const electronAPI = {
   titleBarPlatform: getTitleBarPlatform(),
+
+  // El renderer no escribe en la consola de DevTools: envía sus mensajes al
+  // proceso principal, que los imprime en la terminal.
+  log: (entry: AppLogEntry): void => ipcRenderer.send('app:log', entry),
 
   openSofiaAndFill: (credentials: {
     username: string;
@@ -13,14 +18,35 @@ export const electronAPI = {
     endDate: string;
     identification: string;
     identifications?: string[];
-  }): Promise<Array<{ identification: string; totalHours: string | null }>> => ipcRenderer.invoke('sofia:open-and-fill', credentials),
+  }, onProgress?: (identification: string | null, hours: string | null) => void): Promise<Array<{ identification: string; totalHours: string | null }>> => {
+    if (onProgress) {
+      const channel = 'sofia:progress';
+      const listener = (_event: Electron.IpcRendererEvent, identification: string | null, hours: string | null): void => onProgress(identification, hours);
+      ipcRenderer.on(channel, listener);
+      return ipcRenderer.invoke('sofia:open-and-fill', credentials).finally(() => {
+        ipcRenderer.removeListener(channel, listener);
+      });
+    }
+    return ipcRenderer.invoke('sofia:open-and-fill', credentials);
+  },
 
-  // Escribe las horas en el Excel con Excel real (COM), preservando diseño y filtros.
-  applyHoursToExcel: (payload: { data: ArrayBuffer; fileName: string; cedula: string; hours: string }): Promise<ArrayBuffer | null> =>
-    ipcRenderer.invoke('excel:apply-hours', payload),
+  // Pausa o reanuda la automatización en curso; reanuda justo donde quedó.
+  setAutomationPaused: (paused: boolean): void => ipcRenderer.send('sofia:set-paused', paused),
+
+  // Aplica las horas a TODAS las cédulas en una sola pasada con Excel real (COM).
+  applyHoursMultipleToExcel: (payload: { data: ArrayBuffer; fileName: string; targets: Array<{ identification: string; totalHours: string }> }): Promise<ArrayBuffer | null> =>
+    ipcRenderer.invoke('excel:apply-hours-multiple', payload),
 
   // Sincroniza el color del overlay nativo de Windows/Linux.
   setTitleBarTheme: (theme: TitleBarTheme): void => ipcRenderer.send('window:set-title-bar-theme', theme),
+
+  // Notificaciones del computador: el renderer pregunta, recuerda la decisión y avisa.
+  getNotificationPermission: (): Promise<NotificationPermission | null> =>
+    ipcRenderer.invoke('notifications:permission'),
+  setNotificationPermission: (permission: NotificationPermission): Promise<NotificationPermission | null> =>
+    ipcRenderer.invoke('notifications:set-permission', permission),
+  notifySystem: (payload: SystemNotification): Promise<boolean> =>
+    ipcRenderer.invoke('notifications:show', payload),
 
   // Controles propios usados únicamente como fallback.
   minimize: (): void => ipcRenderer.send('window:minimize'),

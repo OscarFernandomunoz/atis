@@ -1,0 +1,135 @@
+/* Barra de herramientas: buscador y filtro por horas. */
+.cards-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 34px;
+}
+
+.cards-search {
+  display: flex;
+  flex: 1 1 280px;
+  align-items: center;
+  gap: 10px;
+  max-width: 380px;
+  padding: 10px 18px;
+  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 6%, transparent);
+  transition: border-color 200ms var(--ease-smooth), background-color 200ms var(--ease-smooth);
+}
+
+.cards-search:focus-within {
+  border-color: color-mix(in srgb, #fff 40%, transparent);
+  background: color-mix(in srgb, #fff 10%, transparent);
+}
+
+.cards-search-icon {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+}
+
+.cards-search:focus-within .cards-search-icon {
+  color: var(--text);
+}
+
+.cards-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.cards-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.cards-search input::-webkit-search-cancel-button {
+  cursor: pointer;
+  filter: invert(0.7);
+}
+
+/* Control "seleccionar todo": mismo lenguaje que los chips del filtro. */
+.select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 16px 8px 12px;
+  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 5%, transparent);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 620;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 200ms var(--ease-smooth), background-color 200ms var(--ease-smooth), color 200ms var(--ease-smooth);
+}
+
+.select-all:hover {
+  border-color: color-mix(in srgb, #fff 18%, transparent);
+  color: var(--text);
+}
+
+.select-all input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.select-all-box {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid color-mix(in srgb, #fff 24%, transparent);
+  border-radius: 6px;
+  color: transparent;
+  background: color-mix(in srgb, #fff 6%, transparent);
+  transition: background-color 180ms var(--ease-smooth), border-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
+}
+
+.select-all-box svg {
+  width: 12px;
+  height: 12px;
+}
+
+.select-all-dash {
+  display: none;
+}
+
+.select-all input:focus-visible + .select-all-box {
+  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline-offset: 2px;
+}
+
+.select-all input:checked + .select-all-box {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+.select-all input:indeterminate + .select-all-box {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+.select-all input:indeterminate + .select-all-box .select-all-check {
+  display: none;
+}
+
+.select-all input:indeterminate + .select-all-box .select-all-dash {
+  display: block;
+}

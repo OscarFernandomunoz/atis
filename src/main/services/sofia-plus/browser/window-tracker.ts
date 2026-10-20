@@ -1,7 +1,9 @@
 import type { BrowserWindow } from 'electron';
 import type { WebContents } from 'electron';
-import { registerRemoteWindow } from '../../../windows/appearance.js';
+import { sanitizeLogText } from '../../../../shared/index.js';
+import { registerRemoteWindow } from '../../../windows/index.js';
 import { trackChildWindow } from './frames.js';
+import { blockUserInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';
 
 // Registra la ventana de SofiaPlus y las ventanas emergentes que abra (a cualquier nivel)
@@ -10,16 +12,18 @@ import { patchSofiaPageGuards } from './page-guards.js';
 // vive toda la depuración de los pasos (botones encontrados, listas de inputs, coordenadas) y
 // sin este reenvío esos mensajes nunca se ven en la consola de la aplicación.
 const consoleTracked = new WeakSet<WebContents>();
+const MAX_FORWARDED_MESSAGE_LENGTH = 4000;
 
 export function trackSofiaWindow(window: BrowserWindow): void {
   const forwardConsole = (contents: WebContents): void => {
     if (consoleTracked.has(contents)) return;
     consoleTracked.add(contents);
     contents.on('console-message', (details) => {
-      const message = details.message
-        ?.replace(/\p{Extended_Pictographic}/gu, '')
+      const message = sanitizeLogText(details.message ?? '')
+        .replace(/\p{Extended_Pictographic}/gu, '')
         .replace(/\uFE0F/g, '')
-        .trim();
+        .trim()
+        .slice(0, MAX_FORWARDED_MESSAGE_LENGTH);
       if (!message) return;
 
       const level = details.level === 'error'
@@ -43,6 +47,7 @@ export function trackSofiaWindow(window: BrowserWindow): void {
 
   const track = (target: BrowserWindow): void => {
     const contents = target.webContents;
+    blockUserInput(target);
     forwardConsole(contents);
     // Se aplica sobre TODOS los frames, no solo el principal: el diálogo de instructor vive
     // en un iframe que el sitio crea más tarde y su jQuery necesita el shim de blockUI.

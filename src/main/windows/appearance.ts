@@ -1,15 +1,18 @@
-import { nativeTheme, type BrowserWindow, type BrowserWindowConstructorOptions } from 'electron';
-import { join } from 'node:path';
+import { app, nativeTheme, type BrowserWindow, type BrowserWindowConstructorOptions } from 'electron';
 import {
   APP_TITLE,
   TITLE_BAR_HEIGHT,
+  isSofiaNavigationAllowed,
+  isSofiaPlusUrl,
   type TitleBarTheme,
-} from '../../shared/window.js';
+} from '../../shared/index.js';
+import { appFile } from '../app-paths.js';
 import { TITLE_BAR_OVERLAY_COLORS, TITLE_BAR_THEME_COLORS } from './palette.js';
 import { buildRemoteChromeScript } from './remote-chrome.js';
 
 let activeTitleBarTheme: TitleBarTheme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
 const remoteWindows = new WeakSet<BrowserWindow>();
+const restrictedWindows = new WeakSet<BrowserWindow>();
 
 export function getCurrentTitleBarTheme(): TitleBarTheme {
   return activeTitleBarTheme;
@@ -19,7 +22,7 @@ function isRemoteSofiaWindow(window: BrowserWindow): boolean {
   if (remoteWindows.has(window)) return true;
 
   try {
-    return window.webContents.getURL().toLowerCase().includes('senasofiaplus');
+    return isSofiaPlusUrl(window.webContents.getURL());
   } catch {
     return false;
   }
@@ -31,7 +34,7 @@ function getWindowAppearanceOptions(
   if (process.platform === 'darwin') {
     return {
       titleBarStyle: 'hiddenInset',
-      trafficLightPosition: { x: 14, y: 12 },
+      trafficLightPosition: { x: 16, y: 18 },
     };
   }
 
@@ -53,9 +56,18 @@ export function getAppWindowOptions(
 ): BrowserWindowConstructorOptions {
   return {
     title: APP_TITLE,
-    icon: join(process.cwd(), 'public/images/sofia-plus.png'),
+    icon: appFile('public/images/logo.png'),
     autoHideMenuBar: true,
     backgroundColor: TITLE_BAR_THEME_COLORS[initialTheme].background,
+    // En la app empaquetada no se abren DevTools: el usuario final no necesita
+    // el contexto de depuración y una página remota no debe poder inspeccionarse.
+    // Las emergentes del portal heredan esta misma configuración restrictiva.
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      devTools: !app.isPackaged,
+    },
     ...getWindowAppearanceOptions(initialTheme),
   };
 }
@@ -82,9 +94,36 @@ export function applyTitleBarTheme(window: BrowserWindow, theme: TitleBarTheme):
   }
 }
 
+// Una ventana remota solo puede navegar dentro del portal. Esto evita que el
+// contenido de SofiaPlus (o un enlace malicioso dentro de él) saque al usuario a
+// otro sitio con la misma apariencia y el mismo cromo de la app.
+function restrictRemoteNavigation(window: BrowserWindow): void {
+  if (restrictedWindows.has(window)) return;
+  restrictedWindows.add(window);
+
+  window.webContents.on('will-navigate', (event, url) => {
+    if (!isSofiaNavigationAllowed(url)) event.preventDefault();
+  });
+  window.webContents.on('will-redirect', (event, url) => {
+    if (!isSofiaNavigationAllowed(url)) event.preventDefault();
+  });
+
+  window.webContents.setWindowOpenHandler(({ url }) => (
+    isSofiaNavigationAllowed(url)
+      ? {
+        action: 'allow',
+        // Las emergentes del portal (diálogo de instructor, etc.) acompañan a la ventana
+        // visible de SofiaPlus y conservan su mismo aspecto.
+        overrideBrowserWindowOptions: getAppWindowOptions(getCurrentTitleBarTheme()),
+      }
+      : { action: 'deny' }
+  ));
+}
+
 export function registerRemoteWindow(window: BrowserWindow): void {
   if (remoteWindows.has(window)) return;
   remoteWindows.add(window);
+  restrictRemoteNavigation(window);
 
   const decorate = (): void => {
     if (window.isDestroyed() || window.webContents.isDestroyed()) return;
@@ -96,22 +135,33 @@ export function registerRemoteWindow(window: BrowserWindow): void {
     });
   };
 
-  window.webContents.on('dom-ready', decorate);
-  window.webContents.on('did-start-navigation', decorate);
-  window.webContents.on('did-finish-load', decorate);
-  window.webContents.on('did-frame-finish-load', decorate);
+  // Una navegación dispara varios eventos seguidos. Se agrupan en una sola
+  // decoración para no reescribir la barra varias veces en el mismo instante.
+  let decorateTimer: ReturnType<typeof setTimeout> | null = null;
+  const scheduleDecorate = (): void => {
+    if (decorateTimer !== null) return;
+    decorateTimer = setTimeout(() => {
+      decorateTimer = null;
+      decorate();
+    }, 60);
+  };
+
+  window.webContents.on('dom-ready', scheduleDecorate);
+  window.webContents.on('did-start-navigation', scheduleDecorate);
+  window.webContents.on('did-finish-load', scheduleDecorate);
+  window.webContents.on('did-frame-finish-load', scheduleDecorate);
 
   // Algunos portales reescriben el documento después de dom-ready; estos
-  // reintentos garantizan que la barra vuelva a quedar visible sin tocar su contenido.
-  const retryTimer = setInterval(decorate, 500);
-  const stopRetries = (): void => clearInterval(retryTimer);
+  // reintentos garantizan que la barra vuelva a quedar visible sin tocar su
+  // contenido. Una vez decorado, el script sale sin rehacer el cromo.
+  const retryTimer = setInterval(decorate, 1_000);
+  const stopRetries = (): void => {
+    clearInterval(retryTimer);
+    if (decorateTimer !== null) clearTimeout(decorateTimer);
+    decorateTimer = null;
+  };
   setTimeout(stopRetries, 10_000);
   window.once('closed', stopRetries);
-
-  window.webContents.setWindowOpenHandler(() => ({
-    action: 'allow',
-    overrideBrowserWindowOptions: getAppWindowOptions(getCurrentTitleBarTheme()),
-  }));
 
   decorate();
 }

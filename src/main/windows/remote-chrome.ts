@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { APP_TITLE, getTitleBarPlatform, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/window.js';
+import { APP_TITLE, getTitleBarPlatform, TITLE_BAR_HEIGHT, type TitleBarTheme } from '../../shared/index.js';
+import { appFile } from '../app-paths.js';
 import { TITLE_BAR_THEME_COLORS } from './palette.js';
 
 // Cromo de la barra de título que se inyecta en las páginas remotas (SofiaPlus) mediante un
@@ -12,7 +12,7 @@ function getAppIconDataUrl(): string {
   if (appIconDataUrl) return appIconDataUrl;
 
   try {
-    const icon = readFileSync(join(process.cwd(), 'public/images/sofia-plus.png'));
+    const icon = readFileSync(appFile('public/images/logo.png'));
     appIconDataUrl = `data:image/png;base64,${icon.toString('base64')}`;
   } catch {
     appIconDataUrl = '';
@@ -34,6 +34,8 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
     ? '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     : '"Segoe UI Variable Text", "Segoe UI", sans-serif';
   const iconDataUrl = getAppIconDataUrl();
+  const iconSize = 22;
+  const iconTop = (TITLE_BAR_HEIGHT - iconSize) / 2;
   const iconMarkup = iconDataUrl
     ? `<img class="icon" src="${iconDataUrl}" alt="" aria-hidden="true">`
     : '';
@@ -53,11 +55,11 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
     }
     .icon {
       position: absolute;
-      top: 9px;
-      left: 10px;
+      top: ${iconTop}px;
+      left: 12px;
       display: ${isMac ? 'none' : 'block'};
-      width: 18px;
-      height: 18px;
+      width: ${iconSize}px;
+      height: ${iconSize}px;
       object-fit: contain;
       pointer-events: none;
       -webkit-user-drag: none;
@@ -69,7 +71,7 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
       max-width: calc(100% - ${titleMaxWidth});
       overflow: hidden;
       color: ${titleBarText};
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 500;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -80,11 +82,18 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
   const markup = `<style>${shadowCss}</style><div class="bar">${iconMarkup}<span class="title">${APP_TITLE}</span></div>`;
   const hostId = '__aia_remote_window_chrome__';
   const pageStyleId = '__aia_remote_window_chrome_style__';
+  // Si el documento ya tiene este mismo cromo, el script termina enseguida en
+  // lugar de reconstruir la sombra y el estilo en cada reintento.
+  const chromeKey = `${theme}:${platform}`;
 
   return `(() => {
     const hostId = ${JSON.stringify(hostId)};
     const pageStyleId = ${JSON.stringify(pageStyleId)};
+    const chromeKey = ${JSON.stringify(chromeKey)};
     let host = document.getElementById(hostId);
+    const pageStyleExists = Boolean(document.getElementById(pageStyleId));
+    if (host && host.dataset.aiaChrome === chromeKey && pageStyleExists) return true;
+
     if (!host) {
       host = document.createElement('div');
       host.id = hostId;
@@ -95,6 +104,7 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
     host.style.setProperty('-webkit-app-region', 'drag');
     const shadow = host.shadowRoot;
     if (shadow) shadow.innerHTML = ${JSON.stringify(markup)};
+    host.dataset.aiaChrome = chromeKey;
 
     let pageStyle = document.getElementById(pageStyleId);
     if (!pageStyle) {

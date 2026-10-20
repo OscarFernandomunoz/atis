@@ -1,0 +1,61 @@
+.excel-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-muted);
+}
+
+.excel-filter-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.excel-column-select,
+.excel-filter-input {
+  min-height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  transition: border-color 180ms var(--ease-smooth), box-shadow 180ms var(--ease-smooth), background-color 180ms var(--ease-smooth);
+}
+
+.excel-column-select {
+  min-width: 180px;
+  padding: 0 10px;
+}
+
+.excel-filter-input {
+  min-width: 220px;
+  flex: 1;
+  padding: 7px 11px;
+}
+
+.excel-column-select:focus,
+.excel-filter-input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.excel-column-select:hover,
+.excel-filter-input:hover {
+  border-color: color-mix(in srgb, var(--text) 42%, var(--border-strong));
+  background: color-mix(in srgb, var(--surface) 92%, var(--surface-muted));
+}
+
+.excel-filter-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+}

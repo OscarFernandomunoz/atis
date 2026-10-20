@@ -1,0 +1,77 @@
+/* Control segmentado del filtro por horas. */
+.hours-filter {
+  display: inline-flex;
+  gap: 3px;
+  padding: 4px;
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 5%, transparent);
+}
+
+.hours-chip {
+  padding: 8px 15px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 620;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 200ms var(--ease-smooth), color 200ms var(--ease-smooth);
+}
+
+.hours-chip:hover {
+  color: var(--text);
+}
+
+.hours-chip:focus-visible {
+  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline-offset: 2px;
+}
+
+.hours-chip.is-active {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+/* Filtro por programa: pills oscuras con la activa en blanco. */
+.program-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 56px;
+}
+
+.program-chip {
+  padding: 8px 17px;
+  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #fff 7%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 620;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 180ms var(--ease-smooth), border-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth), transform 180ms var(--ease-out);
+}
+
+.program-chip:hover {
+  background: color-mix(in srgb, #fff 15%, transparent);
+  transform: translateY(-1px);
+}
+
+.program-chip:focus-visible {
+  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline-offset: 2px;
+}
+
+.program-chip.is-active {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #0a0a0a;
+}

@@ -1,0 +1,36 @@
+/* Carnets de instructores: una credencial por fila del Excel, al estilo Spotify. */
+
+.cards-showcase {
+  width: 100%;
+  /* Bastante aire respecto al panel de vista previa que queda arriba. */
+  margin: clamp(72px, 8vw, 112px) 0 var(--section-gap);
+  padding: 0 clamp(20px, 5vw, 64px);
+}
+
+.cards-showcase-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.cards-count {
+  font-size: 13px;
+  font-weight: 620;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.cards-showcase-title {
+  margin-top: 9px;
+  font-size: clamp(17px, 1.6vw, 21px);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* Los carnets solo aparecen cuando el Excel trae al menos un instructor. */
+.cards-showcase:has(.cards-grid:empty) {
+  display: none;
+}

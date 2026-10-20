@@ -1,0 +1,36 @@
+        <section class="cards-showcase" id="cardsPanel">
+          <div class="cards-showcase-heading">
+            <div>
+              <p class="section-kicker">Instructores de la nómina</p>
+              <h2 class="cards-showcase-title">Elige a quién automatizar las horas</h2>
+            </div>
+            <p class="cards-count" id="cardsCount" aria-live="polite"></p>
+          </div>
+          <div class="cards-toolbar">
+            <label class="cards-search">
+              <svg class="cards-search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                <path d="m20 20-3.2-3.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <input type="search" id="cardsSearch" placeholder="Buscar por nombre o documento"
+                aria-label="Buscar instructor por nombre o documento" autocomplete="off" />
+            </label>
+            <label class="select-all">
+              <input type="checkbox" id="cardsSelectAll" />
+              <span class="select-all-box" aria-hidden="true">
+                <svg class="select-all-check" viewBox="0 0 16 16" fill="none">
+                  <path d="m3.6 8.4 3 3 5.8-6.4" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <svg class="select-all-dash" viewBox="0 0 16 16" fill="none">
+                  <path d="M3.5 8h9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
+              </span>
+              <span class="select-all-label">Seleccionar todo</span>
+            </label>
+            <div class="hours-filter" id="hoursFilter" role="group" aria-label="Filtrar carnets por horas"></div>
+          </div>
+          <div class="program-filter" id="programFilter" role="group" aria-label="Filtrar carnets por programa"></div>
+          <div class="cards-grid" id="cardsGrid"></div>
+          <p class="cards-empty" id="cardsEmpty" hidden>Ningún instructor coincide con los filtros.</p>
+        </section>

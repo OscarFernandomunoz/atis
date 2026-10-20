@@ -1,0 +1,53 @@
+/* SVG icons: reveal con clip-path + dasharray generoso a prueba de repaints */
+.svg-icon-path,
+.svg-cloud,
+.svg-arrow,
+.svg-check {
+  stroke-dashoffset: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform-origin: center;
+}
+
+/* Aplicar reveal al SVG padre con opacidad y transform: clip-path obligaba a
+   recortar la capa en cada frame. */
+.app-icon.is-visible {
+  animation: svg-reveal 620ms var(--ease-out) var(--icon-delay, 0ms) both;
+}
+
+@keyframes svg-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Anclaje EXTRA nuclear: sin importar qué pase, los paths de SVG se mantienen visibles */
+.input-wrapper .svg-icon-path,
+.input-wrapper .svg-check,
+.input-wrapper .svg-cloud,
+.input-wrapper .svg-arrow,
+.input-wrapper .svg-lock-core,
+.input-wrapper .svg-cal-dot {
+  stroke-dashoffset: 0 !important;
+  stroke-dasharray: 1000 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+}
+
+.input-wrapper .svg-lock-core,
+.input-wrapper .svg-cal-dot {
+  transform: scale(1);
+  visibility: visible;
+  display: inline-block !important;
+}

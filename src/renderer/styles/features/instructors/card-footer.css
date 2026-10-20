@@ -1,0 +1,50 @@
+.carnet-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 12px;
+  margin-top: auto;
+  border-top: 1px solid color-mix(in srgb, #fff 7%, transparent);
+}
+
+.carnet-foot-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.carnet-foot-value {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.carnet-foot-value::before {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-top: 6px;
+  border-radius: 50%;
+  content: "";
+  background: var(--card-accent);
+}
+
+.cards-empty {
+  padding: 34px;
+  border: 1px dashed color-mix(in srgb, #fff 13%, transparent);
+  border-radius: 18px;
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.cards-empty[hidden] {
+  display: none;
+}

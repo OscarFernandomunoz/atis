@@ -1,0 +1,79 @@
+@keyframes dropzone-invite {
+
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes dropzone-halo-pulse {
+
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes dropzone-sheet-float {
+
+  0%,
+  100% {
+    transform: translate3d(0, 1px, 0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate3d(0, -3px, 0) rotate(1.5deg);
+  }
+}
+
+@keyframes dropzone-check-pop {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes dropzone-error-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  30% {
+    transform: translateX(-4px);
+  }
+
+  65% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes dropzone-spark {
+
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: scale(0.72) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.12) rotate(35deg);
+  }
+}

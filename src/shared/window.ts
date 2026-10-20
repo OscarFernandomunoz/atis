@@ -1,5 +1,5 @@
 export const APP_TITLE = 'AIA - Gestión de Nómina';
-export const TITLE_BAR_HEIGHT = 36;
+export const TITLE_BAR_HEIGHT = 48;
 
 export type TitleBarTheme = 'light' | 'dark';
 export type TitleBarPlatform = 'darwin' | 'win32' | 'linux' | 'custom';

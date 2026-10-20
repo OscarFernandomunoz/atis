@@ -1,0 +1,103 @@
+.excel-table-wrapper {
+  max-width: 100%;
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 38%, transparent), var(--shadow-soft);
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+  /* Aísla el pintado de la tabla del resto de la modal: al desplazarse solo se
+     repinta esta caja, no la ventana completa. */
+  contain: layout paint;
+  overscroll-behavior: contain;
+  transition: border-color 220ms var(--ease-out);
+}
+
+.excel-table-wrapper:hover {
+  border-color: color-mix(in srgb, var(--text) 34%, var(--border-strong));
+}
+
+.excel-table-wrapper::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.excel-table-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.excel-table-wrapper::-webkit-scrollbar-thumb {
+  border: 3px solid var(--surface);
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.excel-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.excel-preview table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.excel-preview th,
+.excel-preview td {
+  max-width: 320px;
+  height: 42px;
+  padding: 10px 14px;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  text-align: left;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  transition: background-color 220ms var(--ease-out), color 180ms var(--ease-smooth);
+}
+
+.excel-preview th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-width: 150px;
+  background: var(--table-header);
+  border-right-color: var(--table-header-border);
+  border-bottom-color: var(--table-header-border);
+  color: var(--table-header-text);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.excel-preview tbody tr {
+  background: var(--surface);
+  /* La fila y sus celdas comparten duración y curva para que el hover avance
+     como un solo bloque; antes la fila (100 ms) y la columna requerida (180 ms)
+     terminaban en momentos distintos y el cambio se veía a saltos. */
+  transition: background-color 220ms var(--ease-out);
+}
+
+.excel-preview tbody tr:nth-child(even) {
+  background: var(--table-stripe);
+}
+
+.excel-preview tbody tr:hover {
+  background: var(--table-hover);
+}
+
+.excel-preview tbody tr.excel-row-active {
+  background: color-mix(in srgb, var(--accent) 26%, var(--surface));
+}
+
+.excel-preview tbody tr.excel-row-active td {
+  color: var(--text);
+  font-weight: 650;
+}

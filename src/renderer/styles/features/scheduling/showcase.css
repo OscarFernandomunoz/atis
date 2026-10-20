@@ -1,0 +1,52 @@
+/* Selector de meses del periodo a automatizar, al estilo de las tarjetas de Spotify. */
+
+.months-showcase {
+  width: 100%;
+  margin: 18px 0 var(--section-gap);
+  padding: 0 clamp(20px, 5vw, 64px);
+}
+
+.months-showcase-heading {
+  margin-bottom: 28px;
+}
+
+.months-showcase-title {
+  margin-top: 6px;
+  font-size: clamp(17px, 1.6vw, 21px);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.months-track {
+  display: flex;
+  gap: 40px;
+  overflow-x: auto;
+  padding: 8px 4px 18px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 26%, transparent) transparent;
+  /* Difumina el borde derecho mientras queden tarjetas por descubrir. La clase
+     `is-at-end` la pone `scroll-fade.ts` al llegar al final del recorrido. */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 84px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 84px), transparent);
+}
+
+.months-track.is-at-end {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.months-track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.months-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.months-track::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  border-radius: 999px;
+}
+

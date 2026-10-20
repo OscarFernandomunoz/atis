@@ -1,0 +1,159 @@
+/* Shared layout and icon keyframes. */
+
+@keyframes background-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes carnet-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-from, 26px), 0) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Barrido de brillo de izquierda a derecha sobre la credencial. */
+@keyframes carnet-consult-scan {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes carnet-photo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* Punto que late: identifica la credencial y la fila en consulta. Solo opacidad
+   y escala para que el navegador no tenga que repintar la sombra cada frame. */
+@keyframes consulting-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: scale(1.45);
+  }
+}
+
+/* Igual que el punto del carnet, pero en la tabla el acento no viene del programa. */
+@keyframes row-consulting-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: scale(1.45);
+  }
+}
+
+@keyframes content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes icon-scroll-in {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) rotate(-8deg) scale(0.86);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateY(-3px) rotate(2deg) scale(1.04);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes input-icon-scroll-in {
+  0% {
+    opacity: 0;
+    transform: translateY(calc(-50% + 14px)) rotate(-8deg) scale(0.86);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateY(calc(-50% - 3px)) rotate(2deg) scale(1.04);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) rotate(0) scale(1);
+  }
+}
+
+/* Los avisos flotantes entran desde el borde derecho y salen con un desvanecido. */
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translate3d(22px, 0, 0) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes notice-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(12px, 0, 0) scale(0.97);
+  }
+}
+
+/* Las transiciones de tema se aplican directamente mediante el atributo data-theme. */

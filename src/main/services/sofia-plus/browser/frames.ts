@@ -1,4 +1,5 @@
 import { type BrowserWindow, type WebContents, type WebFrameMain, webContents } from 'electron';
+import { isSofiaPlusUrl } from '../../../../shared/index.js';
 import { wait } from './timing.js';
 
 // Ventanas emergentes (window.open) registradas por ventana principal. Vive aquí, y no en el
@@ -14,8 +15,15 @@ export function trackChildWindow(parent: BrowserWindow, child: BrowserWindow): v
   child.on('closed', () => childWindows.get(parent)?.delete(child));
 }
 
-function getTrackedChildWindows(parent: BrowserWindow): ReadonlySet<BrowserWindow> {
+export function getTrackedChildWindows(parent: BrowserWindow): ReadonlySet<BrowserWindow> {
   return childWindows.get(parent) ?? new Set<BrowserWindow>();
+}
+
+// Solo se inyectan scripts en frames del propio portal (o en el `about:blank`
+// temporal que usa el sitio antes de escribir su contenido). Un iframe externo
+// dentro de SofiaPlus no debe recibir ni ejecutar los helpers de la app.
+function isInjectableFrame(url: string): boolean {
+  return url === '' || url === 'about:blank' || isSofiaPlusUrl(url);
 }
 
 // Reúne todos los frames sobre los que se puede inyectar el script.
@@ -27,6 +35,15 @@ function collectFrames(window: BrowserWindow): WebFrameMain[] {
   const visited = new Set<number>();
 
   const visitFrame = (frame: WebFrameMain): void => {
+    let url: string;
+    try {
+      url = frame.url;
+    } catch {
+      // El frame puede haberse destruido mientras se recorre el árbol.
+      return;
+    }
+    if (!isInjectableFrame(url)) return;
+
     frames.push(frame);
     for (const child of frame.frames) visitFrame(child);
   };
@@ -59,30 +76,10 @@ function collectFrames(window: BrowserWindow): WebFrameMain[] {
     } catch {
       continue;
     }
-    if (url.includes('senasofiaplus')) visitContents(contents);
+    if (isSofiaPlusUrl(url)) visitContents(contents);
   }
 
   return frames;
-}
-
-// Ejecuta un script en todos los frames y devuelve TODOS los resultados, sin cortar en el
-// primero. executeInFrames se queda con el primer valor que satisface el predicado, así que
-// para inspeccionar el portal entero servía de poco: el diálogo del instructor vive en un
-// iframe distinto del frame principal, y quedarse con el primero mostraba siempre la página
-// de inicio en lugar del diálogo.
-export async function executeInAllFrames<T>(
-  window: BrowserWindow,
-  script: string,
-): Promise<T[]> {
-  const results: T[] = [];
-  for (const frame of collectFrames(window)) {
-    try {
-      results.push(await frame.executeJavaScript(script) as T);
-    } catch {
-      // El frame puede cambiar durante una redirección o una carga parcial.
-    }
-  }
-  return results;
 }
 
 // Inyecta un script en TODOS los frames de la ventana, sin cortar en el primero que responde.

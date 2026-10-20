@@ -1,0 +1,223 @@
+/* Bloque central: play sobre la barra de progreso, como un reproductor. */
+.player-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+}
+
+.player-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary-start);
+  color: var(--primary-contrast);
+  cursor: pointer;
+  box-shadow: 0 6px 16px var(--primary-shadow);
+  transition: background-color 180ms var(--ease-smooth), transform 180ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+
+.player-play:hover:not(:disabled) {
+  background: var(--primary-hover-start);
+  box-shadow: 0 9px 22px var(--primary-shadow);
+  transform: translateY(-1px) scale(1.05);
+}
+
+.player-play:active:not(:disabled) {
+  transform: translateY(0) scale(0.96);
+}
+
+.player-play:disabled {
+  cursor: wait;
+}
+
+.player-play:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  outline-offset: 3px;
+}
+
+/* Acceso a la tabla de vista previa: solo el ícono, sin fondo ni borde, junto al
+   play. Se posiciona en absoluto para que el botón de reproducción siga clavado en
+   el centro, alineado con la barra de progreso. */
+.player-table {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 40px);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 180ms var(--ease-smooth), transform 200ms var(--ease-out);
+}
+
+.player-table svg {
+  width: 21px;
+  height: 21px;
+}
+
+.player-table:hover {
+  color: var(--text);
+  transform: translateY(-50%) scale(1.12);
+}
+
+.player-table:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.player-table:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 48%, transparent);
+  outline-offset: 2px;
+}
+
+/* Atajo al carnet que la automatización está consultando: mismo peso visual que
+   el botón de la tabla, pero a la izquierda del play. Solo se activa mientras
+   haya una cédula en consulta. */
+.player-locate {
+  position: absolute;
+  top: 50%;
+  right: calc(50% + 40px);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 180ms var(--ease-smooth), opacity 180ms var(--ease-smooth), transform 200ms var(--ease-out);
+}
+
+.player-locate svg {
+  width: 21px;
+  height: 21px;
+}
+
+.player-locate:hover:not(:disabled) {
+  color: var(--text);
+  transform: translateY(-50%) scale(1.12);
+}
+
+.player-locate:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.player-locate:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.player-locate:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 48%, transparent);
+  outline-offset: 2px;
+}
+
+.player-play-svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  overflow: visible;
+}
+
+/* Solo se dibuja el glifo del estado activo; el resto queda oculto. */
+.player-glyph {
+  display: none;
+}
+
+.player-glyph-play {
+  fill: currentColor;
+  stroke: none;
+}
+
+.player-glyph-pause {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.player-glyph-success,
+.player-glyph-error {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.player-play[data-state='idle'] .player-glyph-play {
+  display: block;
+}
+
+/* En curso el botón pausa: se dibujan las barras de pausa. */
+.player-play[data-state='loading'] {
+  background: var(--primary-hover-start);
+}
+
+.player-play[data-state='loading'] .player-glyph-pause {
+  display: block;
+}
+
+/* En pausa el botón ofrece reanudar y un anillo late para que se note. */
+.player-play[data-state='paused'] .player-glyph-play {
+  display: block;
+}
+
+.player-play::after {
+  position: absolute;
+  inset: -5px;
+  border: 2px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: inherit;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.player-play[data-state='paused']::after {
+  animation: player-paused-pulse 1.9s var(--ease-smooth) infinite;
+}
+
+.player-play[data-state='success'] {
+  background: var(--success);
+}
+
+.player-play[data-state='success'] .player-glyph-success {
+  display: block;
+  animation: svg-pop 460ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.player-play[data-state='error'] {
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+.player-play[data-state='error'] .player-glyph-error {
+  display: block;
+  animation: player-error-pulse 1.6s var(--ease-smooth) infinite;
+}
