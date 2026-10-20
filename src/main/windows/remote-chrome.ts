@@ -82,11 +82,18 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
   const markup = `<style>${shadowCss}</style><div class="bar">${iconMarkup}<span class="title">${APP_TITLE}</span></div>`;
   const hostId = '__aia_remote_window_chrome__';
   const pageStyleId = '__aia_remote_window_chrome_style__';
+  // Si el documento ya tiene este mismo cromo, el script termina enseguida en
+  // lugar de reconstruir la sombra y el estilo en cada reintento.
+  const chromeKey = `${theme}:${platform}`;
 
   return `(() => {
     const hostId = ${JSON.stringify(hostId)};
     const pageStyleId = ${JSON.stringify(pageStyleId)};
+    const chromeKey = ${JSON.stringify(chromeKey)};
     let host = document.getElementById(hostId);
+    const pageStyleExists = Boolean(document.getElementById(pageStyleId));
+    if (host && host.dataset.aiaChrome === chromeKey && pageStyleExists) return true;
+
     if (!host) {
       host = document.createElement('div');
       host.id = hostId;
@@ -97,6 +104,7 @@ export function buildRemoteChromeScript(theme: TitleBarTheme): string {
     host.style.setProperty('-webkit-app-region', 'drag');
     const shadow = host.shadowRoot;
     if (shadow) shadow.innerHTML = ${JSON.stringify(markup)};
+    host.dataset.aiaChrome = chromeKey;
 
     let pageStyle = document.getElementById(pageStyleId);
     if (!pageStyle) {

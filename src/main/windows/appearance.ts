@@ -96,15 +96,31 @@ export function registerRemoteWindow(window: BrowserWindow): void {
     });
   };
 
-  window.webContents.on('dom-ready', decorate);
-  window.webContents.on('did-start-navigation', decorate);
-  window.webContents.on('did-finish-load', decorate);
-  window.webContents.on('did-frame-finish-load', decorate);
+  // Una navegación dispara varios eventos seguidos. Se agrupan en una sola
+  // decoración para no reescribir la barra varias veces en el mismo instante.
+  let decorateTimer: ReturnType<typeof setTimeout> | null = null;
+  const scheduleDecorate = (): void => {
+    if (decorateTimer !== null) return;
+    decorateTimer = setTimeout(() => {
+      decorateTimer = null;
+      decorate();
+    }, 60);
+  };
+
+  window.webContents.on('dom-ready', scheduleDecorate);
+  window.webContents.on('did-start-navigation', scheduleDecorate);
+  window.webContents.on('did-finish-load', scheduleDecorate);
+  window.webContents.on('did-frame-finish-load', scheduleDecorate);
 
   // Algunos portales reescriben el documento después de dom-ready; estos
-  // reintentos garantizan que la barra vuelva a quedar visible sin tocar su contenido.
-  const retryTimer = setInterval(decorate, 500);
-  const stopRetries = (): void => clearInterval(retryTimer);
+  // reintentos garantizan que la barra vuelva a quedar visible sin tocar su
+  // contenido. Una vez decorado, el script sale sin rehacer el cromo.
+  const retryTimer = setInterval(decorate, 1_000);
+  const stopRetries = (): void => {
+    clearInterval(retryTimer);
+    if (decorateTimer !== null) clearTimeout(decorateTimer);
+    decorateTimer = null;
+  };
   setTimeout(stopRetries, 10_000);
   window.once('closed', stopRetries);
 
