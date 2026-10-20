@@ -1,0 +1,78 @@
+          <form id="accessForm" class="access-card" onsubmit="return false;">
+            <div class="access-card-head">
+              <span class="access-card-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <rect x="4" y="10.5" width="16" height="9.5" rx="2.6" stroke="currentColor" stroke-width="1.8" />
+                  <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" />
+                </svg>
+              </span>
+              <div class="access-card-heading">
+                <p class="access-card-title">Datos de acceso</p>
+                <p class="access-card-subtitle">Credenciales de SofiaPlus y rango de fechas</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="usuario">Usuario</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 20ms;">
+                    <circle class="svg-icon-path" cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <path class="svg-icon-path" d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                  <input type="text" id="usuario" class="input-control" value="juan.perez" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 40ms;">
+                    <rect class="svg-icon-path" x="4" y="11" width="16" height="10" rx="2" stroke="currentColor"
+                      stroke-width="2" />
+                    <path class="svg-icon-path" d="M8 11V7.5C8 5.3 9.8 3.5 12 3.5s4 1.8 4 4V11" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round" />
+                    <circle class="svg-lock-core" cx="12" cy="16" r="1.2" fill="currentColor" opacity="0.85" />
+                  </svg>
+                  <input type="password" id="password" class="input-control" value="password123" required />
+                </div>
+              </div>
+            </div>
+            <p class="form-separator"><span>Rango de fechas</span></p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fechaInicio">Fecha de inicio</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 60ms;">
+                    <rect class="svg-icon-path" x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor"
+                      stroke-width="2" />
+                    <path class="svg-icon-path" d="M3.5 9.5h17" stroke="currentColor" stroke-width="2" />
+                    <path class="svg-icon-path" d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <circle class="svg-cal-dot" cx="12" cy="15" r="1.5" fill="currentColor" opacity="0.85" />
+                  </svg>
+                  <input type="date" id="fechaInicio" class="input-control" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="fechaFin">Fecha de fin</label>
+                <div class="input-wrapper">
+                  <svg class="app-icon input-icon is-visible" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                    style="--icon-delay: 80ms;">
+                    <rect class="svg-icon-path" x="3.5" y="5" width="17" height="16" rx="2.5" stroke="currentColor"
+                      stroke-width="2" />
+                    <path class="svg-icon-path" d="M3.5 9.5h17" stroke="currentColor" stroke-width="2" />
+                    <path class="svg-icon-path" d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" />
+                    <path class="svg-check" d="M9.5 14.5l2 2 4-4" stroke="currentColor" stroke-width="2.3"
+                      stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                  </svg>
+                  <input type="date" id="fechaFin" class="input-control" required />
+                </div>
+              </div>
+            </div>
+          </form>
