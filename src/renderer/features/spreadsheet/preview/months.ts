@@ -18,6 +18,10 @@ export function forgetSheets(): void {
   cached = null;
 }
 
+export function getCurrentMonths(): readonly number[] | null {
+  return currentMonths;
+}
+
 // Registro que ejecuta cada repintado: el controlador vuelve a aplicar el
 // filtro de carnets y las marcas de "instructor nuevo" sobre las filas nuevas.
 export function onPreviewRepainted(callback: () => void): void {

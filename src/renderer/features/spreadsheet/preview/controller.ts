@@ -1,11 +1,23 @@
 import * as XLSX from 'xlsx';
 import type { FileUploadState } from '../../../app/types.js';
-import { clearInstructorCards, forgetLiveHours, newInstructorIdentifications, renderInstructorCards } from '../../instructors/index.js';
+import {
+  clearInstructorCards,
+  forgetLiveHours,
+  newInstructorIdentifications,
+  renderInstructorCards,
+  updateCardAdditionalHours,
+} from '../../instructors/index.js';
 import { notify } from '../../notifications/index.js';
 import { cardBoard, type FileElements } from './card-board.js';
 import { getAllIdentifications, validateRequiredColumn } from './column.js';
 import { DROPZONE_HINT, REQUIRED_COLUMN_LABEL, REQUIRED_COLUMN_NAME } from './constants.js';
-import { forgetSheets, onPreviewRepainted, paintPreview, rememberSheets } from './months.js';
+import {
+  forgetSheets,
+  getCurrentMonths,
+  onPreviewRepainted,
+  paintPreview,
+  rememberSheets,
+} from './months.js';
 import type { SheetSectionInfo } from './sections.js';
 import { applyCardFilter, markNewInstructorRows } from './view.js';
 
@@ -110,7 +122,9 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
       // carnets sobre ellas y las marcas de "instructor nuevo".
       applyCardFilter(elements, lastVisible);
       markNewInstructorRows(elements.excelPreview, newInstructorIdentifications());
+      updateCardAdditionalHours(elements.cardsGrid, getCurrentMonths());
     });
+    updateCardAdditionalHours(elements.cardsGrid, getCurrentMonths());
     if (!firstIdentification) {
       elements.statusMessage.textContent = `Información de ${file.name} lista para revisar. ${REQUIRED_COLUMN_LABEL} presente, pero no se encontraron cédulas válidas.`;
     }

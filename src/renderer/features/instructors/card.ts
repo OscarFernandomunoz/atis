@@ -3,6 +3,8 @@ import { isContractStartNearToday } from '../spreadsheet/helpers.js';
 import { createSelectionCheckbox } from './selection.js';
 import { effectiveHours, hoursView } from './hours.js';
 import { refreshHoursHint } from './hours-hint.js';
+import { MONTH_BLOCK_LABELS } from '../spreadsheet/preview/constants.js';
+import { parseHoursValue } from '../spreadsheet/helpers.js';
 
 // Retrato genérico para credenciales sin foto de perfil (estilo intranet).
 const PHOTO_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
@@ -14,6 +16,9 @@ const PHOTO_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="tru
 // cientos de filas, volver a interpretar el SVG en cada ficha se nota.
 const PHOTO_TEMPLATE = document.createElement('template');
 PHOTO_TEMPLATE.innerHTML = PHOTO_SVG;
+const additionalHoursByCard = new WeakMap<HTMLElement, Readonly<Record<number, string>>>();
+const HOURS_FORMAT = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
+let selectedMonths: readonly number[] | null = null;
 
 function el(tag: string, className: string, text?: string): HTMLElement {
   const node = document.createElement(tag);
@@ -23,9 +28,11 @@ function el(tag: string, className: string, text?: string): HTMLElement {
 }
 
 // Insignia de horas con su color según el umbral; un guion si no hay dato.
-function createHoursBadge(hours: string): HTMLElement {
+function createHoursBadge(hours: string, total = false): HTMLElement {
   const view = hoursView(hours);
   const badge = el('span', `carnet-hours is-${view.kind}`);
+  badge.classList.add('carnet-total-hours');
+  if (total) badge.appendChild(el('span', 'carnet-hours-label', 'Total'));
   badge.appendChild(el('span', 'carnet-hours-value', view.text));
   if (view.hasHours) badge.appendChild(el('span', 'carnet-hours-unit', 'h'));
   return badge;
@@ -39,6 +46,7 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   card.dataset.program = instructor.program;
   // La cédula queda a mano para refrescar las horas del portal en vivo.
   card.dataset.identification = instructor.identification;
+  additionalHoursByCard.set(card, instructor.additionalHoursByMonth);
   card.appendChild(el('span', 'carnet-band'));
 
   const top = el('div', 'carnet-top');
@@ -74,10 +82,18 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   // Las horas quedan en el dataset para que el pie del reproductor calcule el
   // avance al pasar el cursor, sin volver a interpretar la insignia.
   card.dataset.hours = hours;
+  card.dataset.baseHours = hours;
   const meta = el('div', 'carnet-meta');
   meta.appendChild(el('span', 'carnet-doc', `C.C. ${instructor.identification}`));
   meta.appendChild(createHoursBadge(hours));
   card.appendChild(meta);
+
+  const monthlyHours = el('div', 'carnet-monthly-hours');
+  monthlyHours.hidden = true;
+  card.appendChild(monthlyHours);
+  const baseHours = el('span', 'carnet-base-hours');
+  baseHours.hidden = true;
+  card.appendChild(baseHours);
 
   const foot = el('div', 'carnet-foot');
   foot.appendChild(el('span', 'carnet-foot-label', 'Programa'));
@@ -87,14 +103,67 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   return card;
 }
 
+export function updateCardAdditionalHours(grid: HTMLElement, months: readonly number[] | null): void {
+  selectedMonths = months;
+  Array.from(grid.children).forEach((node) => {
+    if (!(node instanceof HTMLElement)) return;
+    const monthlyHours = node.querySelector<HTMLElement>('.carnet-monthly-hours');
+    const baseHours = node.querySelector<HTMLElement>('.carnet-base-hours');
+    const values = additionalHoursByCard.get(node);
+    if (!monthlyHours || !baseHours || !values || !months?.length) {
+      if (monthlyHours) monthlyHours.hidden = true;
+      if (baseHours) baseHours.hidden = true;
+      const badge = node.querySelector('.carnet-total-hours');
+      if (badge) badge.replaceWith(createHoursBadge(node.dataset.baseHours ?? ''));
+      node.dataset.hours = node.dataset.baseHours ?? '';
+      return;
+    }
+
+    const selectedMonths = months.filter((month) => Object.hasOwn(values, month));
+    if (!selectedMonths.length) {
+      monthlyHours.hidden = true;
+      baseHours.hidden = true;
+      const badge = node.querySelector('.carnet-total-hours');
+      if (badge) badge.replaceWith(createHoursBadge(node.dataset.baseHours ?? ''));
+      node.dataset.hours = node.dataset.baseHours ?? '';
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    let additionalTotal = 0;
+    selectedMonths.forEach((month) => {
+      const item = el('span', 'carnet-monthly-hour');
+      const label = MONTH_BLOCK_LABELS[month] ?? `Mes ${month + 1}`;
+      const hours = values[month]?.trim() || '—';
+      item.textContent = `${label}: ${hours}${hours === '—' ? '' : ' h'}`;
+      fragment.appendChild(item);
+      const numericHours = parseHoursValue(hours);
+      if (Number.isFinite(numericHours)) additionalTotal += numericHours;
+    });
+    monthlyHours.replaceChildren(fragment);
+    monthlyHours.hidden = false;
+    const base = node.dataset.baseHours ?? '';
+    const label = node.dataset.hoursSource === 'sofiaplus' ? 'Horas de SofiaPlus' : 'Horas académicas';
+    baseHours.textContent = `${label}: ${base || '—'}${base ? ' h' : ''}`;
+    baseHours.hidden = false;
+
+    const baseTotal = parseHoursValue(base);
+    const total = Number.isFinite(baseTotal) ? baseTotal + additionalTotal : Number.NaN;
+    const totalText = Number.isFinite(total) ? HOURS_FORMAT.format(total) : base;
+    const badge = node.querySelector('.carnet-total-hours');
+    if (badge) badge.replaceWith(createHoursBadge(totalText, true));
+  });
+  refreshHoursHint();
+}
+
 // Repinta las horas de las credenciales de una cédula (puede haber varias por programa).
 export function updateCardHours(grid: HTMLElement, identification: string, hours: string): void {
   Array.from(grid.children).forEach((node) => {
     if (!(node instanceof HTMLElement) || node.dataset.identification !== identification) return;
-    node.dataset.hours = hours;
-    const badge = node.querySelector('.carnet-hours');
-    if (badge) badge.replaceWith(createHoursBadge(hours));
+    node.dataset.baseHours = hours;
+    node.dataset.hoursSource = 'sofiaplus';
   });
+  updateCardAdditionalHours(grid, selectedMonths);
   // Si el cursor sigue sobre la ficha, la pista del pie muestra las horas nuevas.
   refreshHoursHint();
 }
