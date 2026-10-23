@@ -11,7 +11,7 @@
   min-height: var(--player-bar-height);
   padding: 13px 20px;
   border-top: 1px solid var(--border);
-  background: #000000;
+  background: var(--surface);
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface) 72%, transparent);
   color: var(--text-muted);
   user-select: none;
@@ -114,16 +114,15 @@
 
 /* Faltan horas: el mismo tono de alerta que usa la insignia del carnet. */
 .player-hours[data-kind='low'] .player-hours-main {
-  color: #ff9a93;
+  color: #b42318;
 }
 
 /* Meta alcanzada o superada. */
 .player-hours[data-kind='ok'] .player-hours-main {
-  color: #9fe6b8;
+  color: #167a35;
 }
 
 /* Sin dato en el Excel ni en el portal. */
 .player-hours[data-kind='none'] .player-hours-main {
   color: var(--text-muted);
 }
-

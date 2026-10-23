@@ -14,15 +14,15 @@
   gap: 10px;
   max-width: 380px;
   padding: 10px 18px;
-  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, #fff 6%, transparent);
+  background: var(--surface);
   transition: border-color 200ms var(--ease-smooth), background-color 200ms var(--ease-smooth);
 }
 
 .cards-search:focus-within {
-  border-color: color-mix(in srgb, #fff 40%, transparent);
-  background: color-mix(in srgb, #fff 10%, transparent);
+  border-color: var(--accent);
+  background: var(--surface-muted);
 }
 
 .cards-search-icon {
@@ -62,9 +62,9 @@
   align-items: center;
   gap: 9px;
   padding: 8px 16px 8px 12px;
-  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: var(--surface);
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 620;
@@ -76,7 +76,7 @@
 }
 
 .select-all:hover {
-  border-color: color-mix(in srgb, #fff 18%, transparent);
+  border-color: var(--border-strong);
   color: var(--text);
 }
 
@@ -93,10 +93,10 @@
   place-items: center;
   width: 18px;
   height: 18px;
-  border: 1px solid color-mix(in srgb, #fff 24%, transparent);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   color: transparent;
-  background: color-mix(in srgb, #fff 6%, transparent);
+  background: var(--surface-muted);
   transition: background-color 180ms var(--ease-smooth), border-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
 }
 
@@ -110,20 +110,20 @@
 }
 
 .select-all input:focus-visible + .select-all-box {
-  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
 
 .select-all input:checked + .select-all-box {
-  border-color: #ffffff;
-  background: #ffffff;
-  color: #0a0a0a;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
 }
 
 .select-all input:indeterminate + .select-all-box {
-  border-color: #ffffff;
-  background: #ffffff;
-  color: #0a0a0a;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
 }
 
 .select-all input:indeterminate + .select-all-box .select-all-check {

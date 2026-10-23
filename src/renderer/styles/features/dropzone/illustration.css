@@ -77,8 +77,8 @@
 }
 
 .illustration-check circle {
-  fill: #161616;
-  stroke: color-mix(in srgb, var(--text) 30%, var(--surface));
+  fill: var(--primary-start);
+  stroke: color-mix(in srgb, var(--accent-warm) 70%, var(--surface));
   stroke-width: 1.5;
   transform-origin: 72px 70px;
   animation: dropzone-check-pop 2.4s var(--ease-smooth) infinite;

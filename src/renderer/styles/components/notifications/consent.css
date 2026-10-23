@@ -17,13 +17,13 @@
   place-items: center;
   width: 52px;
   height: 52px;
-  border: 1px solid color-mix(in srgb, var(--pastel-4) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
   border-radius: 16px;
-  color: color-mix(in srgb, var(--pastel-4) 88%, #ffffff);
+  color: var(--accent-warm);
   background:
-    radial-gradient(120% 120% at 28% 12%, color-mix(in srgb, var(--pastel-4) 40%, transparent) 0%, transparent 72%),
-    color-mix(in srgb, var(--pastel-4) 10%, #0b0b0c);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+    radial-gradient(120% 120% at 28% 12%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 72%),
+    var(--accent-soft);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 80%, transparent);
 }
 
 .consent-badge svg {
@@ -64,16 +64,16 @@
 }
 
 .consent-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
 
-/* Permitir: el mismo botón principal blanco del resto de la app. */
+/* Permitir: el botón principal comparte el verde institucional de la app. */
 .consent-button-primary {
   border-color: var(--primary-border);
   background: var(--primary-start);
   color: var(--primary-contrast);
-  box-shadow: 0 8px 18px var(--primary-shadow), inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent);
+  box-shadow: 0 8px 18px var(--primary-shadow), inset 0 1px 0 color-mix(in srgb, #fff 30%, transparent);
 }
 
 .consent-button-primary:hover {
@@ -87,12 +87,12 @@
 
 /* Ahora no: pastilla de cristal, discreta para no competir con el permiso. */
 .consent-button-ghost {
-  border-color: color-mix(in srgb, #fff 10%, transparent);
-  background: color-mix(in srgb, #fff 6%, transparent);
+  border-color: var(--border);
+  background: var(--surface-muted);
   color: var(--text);
 }
 
 .consent-button-ghost:hover {
-  border-color: color-mix(in srgb, #fff 22%, transparent);
-  background: color-mix(in srgb, #fff 13%, transparent);
+  border-color: var(--border-strong);
+  background: var(--accent-soft);
 }

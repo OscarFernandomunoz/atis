@@ -45,13 +45,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 48px clamp(20px, 5vw, 64px) 48px;
-  background: transparent;
+  padding: 36px clamp(20px, 5vw, 64px);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   -webkit-app-region: no-drag;
   z-index: 10;
 }
-
-/* El encabezado vive por encima del degradado ambiental; no necesita fondo propio. */
 
 .content-header>* {
   position: relative;
@@ -64,7 +63,7 @@
 
 .eyebrow,
 .section-kicker {
-  color: var(--accent-warm);
+  color: var(--accent);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -90,12 +89,13 @@
 }
 
 .dashboard-panel {
-  /* Sin fondo ni borde propios: el degradado ambiental pasa por detrás, igual
-     que en las secciones de paisajes y carnets. Solo aporta el margen lateral
-     compartido para que formulario, vista previa y carnets quedan alineados. */
-  width: 100%;
+  width: calc(100% - clamp(40px, 10vw, 128px));
   margin: 0 auto var(--section-gap);
-  padding: 0 clamp(20px, 5vw, 64px);
+  padding: clamp(24px, 3vw, 40px);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
 }
 
 .placeholder-view {
