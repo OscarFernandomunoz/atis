@@ -4,9 +4,9 @@
   gap: 3px;
   padding: 4px;
   margin-left: auto;
-  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: var(--surface-muted);
 }
 
 .hours-chip {
@@ -29,16 +29,16 @@
 }
 
 .hours-chip:focus-visible {
-  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
 
 .hours-chip.is-active {
-  background: #ffffff;
-  color: #0a0a0a;
+  background: var(--accent);
+  color: #ffffff;
 }
 
-/* Filtro por programa: pills oscuras con la activa en blanco. */
+/* Filtro por programa: chips claros con selección institucional. */
 .program-filter {
   display: flex;
   flex-wrap: wrap;
@@ -48,9 +48,9 @@
 
 .program-chip {
   padding: 8px 17px;
-  border: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, #fff 7%, transparent);
+  background: var(--surface);
   color: var(--text);
   font: inherit;
   font-size: 13.5px;
@@ -61,26 +61,26 @@
 }
 
 .program-chip:hover {
-  background: color-mix(in srgb, #fff 15%, transparent);
+  background: var(--accent-soft);
   transform: translateY(-1px);
 }
 
 .program-chip:focus-visible {
-  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
 
 .program-chip.is-active {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #0a0a0a;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 /* Chip "Nuevos": alterna (no excluye como los de programa), así que se distingue
    del grupo con el salmón de la insignia del carné y del velo de la vista previa. */
 .program-chip.chip-new {
   border-color: color-mix(in srgb, var(--pastel-6) 55%, transparent);
-  color: var(--pastel-6);
+  color: var(--accent-warm);
 }
 
 .program-chip.chip-new:hover {
@@ -90,5 +90,5 @@
 .program-chip.chip-new.is-active {
   background: var(--pastel-6);
   border-color: var(--pastel-6);
-  color: #151515;
+  color: #1d2b1e;
 }

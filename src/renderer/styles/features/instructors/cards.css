@@ -4,8 +4,7 @@
   gap: 22px;
 }
 
-/* Ficha de cristal sobre el degradado ambiental: el color del programa entra
-   solo como un velo tenue y como acento puntual, igual que en el resto de la app. */
+/* Credencial clara con acentos verdes de la identidad institucional. */
 .carnet {
   position: relative;
   display: flex;
@@ -15,14 +14,13 @@
   overflow: hidden;
   /* Aísla el layout de cada credencial del resto de la rejilla. */
   contain: layout style;
-  background-color: color-mix(in srgb, #08080a 68%, transparent);
+  background-color: var(--surface);
   background-image:
-    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 16%, transparent) 0%, transparent 62%),
-    linear-gradient(158deg, color-mix(in srgb, #fff 6%, transparent) 0%, color-mix(in srgb, #fff 1.5%, transparent) 100%);
-  border: 1px solid color-mix(in srgb, #fff 9%, transparent);
+    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 44%, transparent) 0%, transparent 62%),
+    linear-gradient(158deg, #ffffff 0%, var(--surface-muted) 100%);
+  border: 1px solid var(--border);
   border-radius: 18px;
-  box-shadow: 0 12px 30px color-mix(in srgb, #000 28%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent);
+  box-shadow: var(--shadow-soft);
   transition: transform 320ms var(--ease-out), border-color 320ms var(--ease-smooth), box-shadow 320ms var(--ease-smooth);
 }
 
@@ -56,9 +54,8 @@
 .carnet:hover {
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--card-accent) 46%, transparent);
-  box-shadow: 0 20px 44px color-mix(in srgb, #000 36%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--card-accent) 22%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+  box-shadow: var(--shadow),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 30%, transparent);
 }
 
 /* Destino del atajo del reproductor: un anillo con el color del programa señala
@@ -86,9 +83,8 @@
 /* La selección tiñe la ficha entera, no solo la casilla. */
 .carnet:has(.carnet-check:checked) {
   border-color: color-mix(in srgb, var(--card-accent) 56%, transparent);
-  box-shadow: 0 16px 38px color-mix(in srgb, #000 34%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--card-accent) 30%, transparent),
-    inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent);
+  box-shadow: var(--shadow),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 36%, transparent);
 }
 
 /* Consulta en curso: el borde se enciende y un brillo recorre la ficha. El pulso

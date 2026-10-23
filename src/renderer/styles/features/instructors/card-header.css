@@ -35,7 +35,7 @@
   padding: 3px 9px;
   border-radius: 999px;
   background: var(--pastel-6);
-  color: #151515;
+  color: #1d2b1e;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -64,10 +64,10 @@
   place-items: center;
   width: 24px;
   height: 24px;
-  border: 1px solid color-mix(in srgb, #fff 20%, transparent);
+  border: 1px solid var(--border);
   border-radius: 7px;
   color: transparent;
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: var(--surface-muted);
   transition: background-color 180ms var(--ease-smooth), border-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth);
 }
 
@@ -77,19 +77,19 @@
 }
 
 .carnet-select:hover .carnet-select-box {
-  border-color: color-mix(in srgb, #fff 42%, transparent);
-  background: color-mix(in srgb, #fff 9%, transparent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .carnet-check:focus-visible + .carnet-select-box {
-  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
 
 /* Blanco como los chips activos y el "seleccionar todo": nada que compita
    con el acento del programa dentro de la ficha. */
 .carnet-check:checked + .carnet-select-box {
-  border-color: #ffffff;
-  color: #0a0a0a;
-  background: #ffffff;
+  border-color: var(--accent);
+  color: #ffffff;
+  background: var(--accent);
 }

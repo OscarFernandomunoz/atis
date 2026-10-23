@@ -31,12 +31,12 @@
   max-height: 100%;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, #fff 12%, transparent);
+  border: 1px solid var(--border);
   border-radius: 22px;
-  background: #0a0a0a;
+  background: var(--surface);
   box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent),
-    0 24px 48px color-mix(in srgb, #000 55%, transparent);
+    inset 0 1px 0 color-mix(in srgb, #fff 80%, transparent),
+    0 24px 48px color-mix(in srgb, #173d1d 22%, transparent);
   transform-origin: 50% 50%;
   animation: modal-rise 420ms var(--modal-ease) both;
 }
@@ -47,7 +47,7 @@
   justify-content: space-between;
   gap: 20px;
   padding: 20px clamp(18px, 2.4vw, 28px);
-  border-bottom: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-title {
@@ -64,9 +64,9 @@
   place-items: center;
   width: 38px;
   height: 38px;
-  border: 1px solid color-mix(in srgb, #fff 9%, transparent);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in srgb, #fff 6%, transparent);
+  background: var(--surface-muted);
   color: var(--text-muted);
   cursor: pointer;
   transition: background-color 180ms var(--ease-smooth), color 180ms var(--ease-smooth), transform 180ms var(--ease-out);
@@ -78,13 +78,13 @@
 }
 
 .modal-close:hover {
-  background: color-mix(in srgb, #fff 14%, transparent);
+  background: var(--accent-soft);
   color: var(--text);
   transform: rotate(90deg);
 }
 
 .modal-close:focus-visible {
-  outline: 2px solid color-mix(in srgb, #fff 60%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
 
@@ -127,4 +127,3 @@
 .modal-dialog .excel-preview.is-entering section:nth-child(n+4) {
   animation-delay: 260ms;
 }
-
