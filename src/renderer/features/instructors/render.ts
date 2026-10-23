@@ -9,6 +9,7 @@ import { forgetCardReveal, revealCards } from './reveal.js';
 import { forgetInstructors, rememberInstructors } from './roster.js';
 import { bindSearch, normalizeText } from './search.js';
 import { bindSelection, refreshSelectAll, resetSelection, selectedIdentifications } from './selection.js';
+import { isContractStartNearToday } from '../spreadsheet/helpers.js';
 
 // Partes del tablero de carnets que el render necesita tocar.
 export interface CardBoard {
@@ -46,13 +47,17 @@ export function renderInstructorCards(
   board.grid.replaceChildren(fragment);
 
   const kinds = instructors.map((instructor) => hoursKind(effectiveHours(instructor)));
+  // La ventana de "nuevo instructor" (contrato cerca de arrancar o recién
+  // empezado) es un filtro más, así que se calcula al armar las fichas.
+  const esNuevo = instructors.map((instructor) => isContractStartNearToday(instructor.contractStart));
   const index = instructors.map((instructor) => normalizeText(
     `${instructor.name} ${instructor.identification} ${instructor.program}`,
   ));
 
-  // Los tres filtros se combinan: programa + horas + búsqueda.
+  // Los cuatro filtros se combinan: programa + horas + nuevos + búsqueda.
   let program: string | null = null;
   let hours: HoursFilter = 'all';
+  let nuevos = false;
   let query = '';
 
   // Un frame pendiente por rejilla: escribir rápido no dispara un recorrido
@@ -65,6 +70,7 @@ export function renderInstructorCards(
     cards.forEach((card, position) => {
       const shown = (program === null || card.dataset.program === program)
         && (hours === 'all' || kinds[position] === hours)
+        && (!nuevos || (esNuevo[position] ?? false))
         && (query === '' || (index[position] ?? '').includes(query));
       card.hidden = !shown;
       if (shown) {
@@ -77,7 +83,7 @@ export function renderInstructorCards(
     board.count.textContent = visible === cards.length
       ? `${cards.length} ${cards.length === 1 ? 'instructor' : 'instructores'}`
       : `${visible} de ${cards.length} instructores`;
-    const hasFilter = program !== null || hours !== 'all' || query !== '';
+    const hasFilter = program !== null || hours !== 'all' || nuevos || query !== '';
     // Las cédulas marcadas con la casilla son un filtro más de la vista previa:
     // solo se muestran las filas de lo seleccionado que además pasa los filtros.
     const selection = selectedIdentifications(board.grid);
@@ -110,6 +116,9 @@ export function renderInstructorCards(
 
   buildProgramFilter(board.programFilter, instructors.map((instructor) => instructor.program), (value) => {
     program = value;
+    scheduleApply();
+  }, (soloNuevos) => {
+    nuevos = soloNuevos;
     scheduleApply();
   });
   buildHoursFilter(board.hoursFilter, (value) => {

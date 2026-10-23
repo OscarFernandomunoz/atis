@@ -1,4 +1,10 @@
-import { HOURS_COLUMN_NAME, isCedulaHeader, sameHeader } from '../spreadsheet/helpers.js';
+import {
+  CONTRACT_START_COLUMN_NAME,
+  HOURS_COLUMN_NAME,
+  excelSerialToDate,
+  isCedulaHeader,
+  sameHeader,
+} from '../spreadsheet/helpers.js';
 
 // Datos de un instructor tomados directamente de las columnas del Excel.
 export interface Instructor {
@@ -6,6 +12,9 @@ export interface Instructor {
   name: string;
   program: string;
   hours: string;
+  // Fecha de inicio del contrato tal como trae la celda (serial de Excel):
+  // null si la hoja no trae la columna o la celda no es una fecha.
+  contractStart: Date | null;
 }
 
 const NAME_HEADER_HINT = 'NOMBRE';
@@ -49,6 +58,9 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
     const programCol = findColumn(rows, headerRow, (header) => header.toLocaleUpperCase().includes(PROGRAM_HEADER_HINT));
     const hoursCol = findColumn(rows, headerRow, (header) => sameHeader(header, HOURS_COLUMN_NAME)
       || header.toLocaleUpperCase().includes(HOURS_HEADER_HINT));
+    // La fecha de inicio del contrato puede quedar una o dos filas bajo la de la
+    // cédula (encabezados fusionados); si no existe, el instructor no se marca.
+    const startCol = findColumn(rows, headerRow, (header) => sameHeader(header, CONTRACT_START_COLUMN_NAME));
     for (let row = headerRow + 1; row < rows.length; row += 1) {
       const cells = rows[row] ?? [];
       const identification = clean(cells[cedulaCol]);
@@ -58,6 +70,7 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
         name: nameCol === -1 ? SIN_NOMBRE : clean(cells[nameCol]) || SIN_NOMBRE,
         program: programCol === -1 ? 'Sin programa' : clean(cells[programCol]) || 'Sin programa',
         hours: hoursCol === -1 ? '' : clean(cells[hoursCol]),
+        contractStart: startCol === -1 ? null : excelSerialToDate(cells[startCol]),
       };
       // Clave por fila completa: dos filas idénticas se colapsan, pero la misma
       // persona en dos programas distintos conserva su carnet.

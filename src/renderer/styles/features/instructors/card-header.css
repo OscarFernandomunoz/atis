@@ -23,6 +23,26 @@
   min-width: 0;
 }
 
+/* Marca de "instructor nuevo": contrato que arranca dentro de la ventana de
+   aviso (por empezar o recién empezado). Ocupa su propia línea bajo el nombre
+   (en la del rol no cabe). Va en pastel cálido con texto oscuro: sobre la
+   credencial oscura se lee de un vistazo y aporta el único color "de alerta"
+   que la paleta de la app permite. */
+.carnet-new-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--pastel-6);
+  color: #151515;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 /* Casilla de selección en la esquina de la credencial (sustituye al logo). */
 .carnet-select {
   position: relative;

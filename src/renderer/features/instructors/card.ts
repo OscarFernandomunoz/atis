@@ -1,4 +1,5 @@
 import type { Instructor } from './parse.js';
+import { isContractStartNearToday } from '../spreadsheet/helpers.js';
 import { createSelectionCheckbox } from './selection.js';
 import { effectiveHours, hoursView } from './hours.js';
 import { refreshHoursHint } from './hours-hint.js';
@@ -60,6 +61,12 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   head.appendChild(createSelectionCheckbox(instructor));
   identity.appendChild(head);
   identity.appendChild(el('h3', 'carnet-name', instructor.name));
+  // Los instructores cuyo contrato arranca dentro de la ventana de aviso
+  // (por empezar o recién empezado) llevan su propia línea: en la del rol no
+  // cabe sin recortarse junto a la casilla.
+  if (isContractStartNearToday(instructor.contractStart)) {
+    identity.appendChild(el('span', 'carnet-new-badge', 'Nuevo instructor'));
+  }
   top.appendChild(identity);
   card.appendChild(top);
 
