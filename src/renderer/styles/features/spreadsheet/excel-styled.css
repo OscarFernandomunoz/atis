@@ -1,0 +1,171 @@
+/* Tabla montada con el formato del propio Excel (`excel-table.ts` fija el
+   relleno de cada celda como estilo inline). Aquí se apartan los adornos de la
+   vista genérica: el archivo ya pinta cada fila y cada bloque de mes.
+   Ojo con el combinator: `excel-preview` vive en el contenedor y `excel-styled`
+   en la tabla, así que el selector debe ser descendente, no compuesto. */
+
+/* Fondo blanco y texto negro como el archivo original. Los rellenos inline de
+   las celdas que sí tienen fondo prevalecen; el resto queda blanco. */
+.excel-preview .excel-styled tbody tr,
+.excel-preview .excel-styled tbody tr:nth-child(even),
+.excel-preview .excel-styled tbody tr:hover {
+  background: #ffffff;
+}
+
+/* Encabezados del Excel a varias líneas dentro de columnas angostas: la
+   generación es tal cual el archivo. La cabecera queda pegajosa al nivel de
+   `thead` para que las dos filas (meses + encabezados) se pegen juntas. */
+.excel-preview .excel-styled thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.excel-preview .excel-styled thead th {
+  position: static;
+  top: auto;
+  height: auto;
+  min-width: 0;
+  padding: 6px 8px;
+  /* Texto negro como el Excel, sin pasar a mayúsculas ni espaciar. */
+  color: #1c1c1c;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+}
+
+.excel-preview .excel-styled tbody td {
+  color: #1c1c1c;
+  height: auto;
+  padding: 4px 8px;
+}
+
+/* El "*" de la columna de cédula no existe en el archivo: no se añade.
+   Los encabezados tampoco se fuerzan a mayúsculas ni espaciado letter-spacing. */
+.excel-preview .excel-styled th.excel-required-column::after {
+  content: none;
+}
+
+/* La columna de cédula conserva su marca de la app solo cuando la celda no
+   viene pintada: el fondo del Excel manda (los estilos inline ya ganan). */
+.excel-preview .excel-styled td.excel-required-column {
+  background: transparent;
+}
+
+/* El hover y los estados de la automatización no cambian el fondo del Excel:
+   dibujan un velo translúcido por encima de cualquier relleno. */
+.excel-preview .excel-styled tbody tr:hover td {
+  color: #1c1c1c;
+  box-shadow: inset 0 0 0 999px rgb(0 0 0 / 4%);
+}
+
+.excel-preview .excel-styled tbody tr.excel-row-consulting td,
+.excel-preview .excel-styled tbody tr.excel-row-active td {
+  color: #1c1c1c;
+  box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.excel-preview .excel-styled tbody tr.excel-row-consulting td:first-child {
+  box-shadow:
+    inset 0 0 0 999px color-mix(in srgb, var(--accent) 24%, transparent),
+    inset 3px 0 0 var(--accent);
+}
+
+/* Filas de "instructor nuevo" (contrato que arranca dentro de la ventana de
+   ±30 días de hoy): velo pastel por `background-image` y barra de acento al
+   borde, recursos que conviven con los rellenos inline del Excel y con los
+   estados hover/automatización. Color distinto al gris de "consultando" para
+   que una fila no pueda ser ambas cosas a la vista. Sin la clase `excel-styled`
+   para que también valga en la tabla genérica cuando el archivo no trae
+   formato. */
+.excel-preview tbody tr.excel-new-instructor td {
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--pastel-6) 40%, transparent),
+    color-mix(in srgb, var(--pastel-6) 40%, transparent)
+  );
+}
+
+.excel-preview tbody tr.excel-new-instructor td:first-child {
+  box-shadow: inset 4px 0 0 var(--pastel-6);
+}
+
+/* Fechas del contrato resaltadas: `outline` para el borde marcado y
+   `background-image` para el velo translúcido; ambos conviven con los rellenos
+   inline del Excel y con los estados de hover/automatización. */
+.excel-preview .excel-styled th.excel-contract-column,
+.excel-preview .excel-styled tbody td.excel-contract-column {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    color-mix(in srgb, var(--accent) 18%, transparent)
+  );
+}
+
+/* Barra de fórmulas: muestra el contenido crudo de la celda seleccionada (la
+   fórmula tal cual o el valor editable) y confirma con Enter. */
+.excel-formula-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 10px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, Canvas 82%, CanvasText);
+}
+
+.excel-formula-bar-fx {
+  font-style: italic;
+  font-weight: 600;
+  opacity: 0.65;
+  user-select: none;
+}
+
+.excel-formula-bar input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 2px;
+  font: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+}
+
+/* Celda seleccionada para edición, como la caja de Excel. */
+.excel-preview .excel-styled td.excel-selected {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  cursor: cell;
+}
+
+.excel-preview .excel-styled td[data-r] {
+  cursor: cell;
+}
+
+/* Editor en línea dentro de la celda: ocupa todo el alto sin mover el diseño. */
+.excel-preview .excel-styled td .excel-cell-input {
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Sello de fórmula: triangulito en la esquina, como la marca verde de Excel. */
+.excel-preview .excel-styled td.excel-formula {
+  position: relative;
+}
+
+.excel-preview .excel-styled td.excel-formula::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-top: 7px solid color-mix(in srgb, var(--accent) 75%, transparent);
+  border-left: 7px solid transparent;
+}

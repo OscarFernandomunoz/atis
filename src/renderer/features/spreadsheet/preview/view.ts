@@ -53,3 +53,14 @@ export function applyCardFilter(elements: FileElements, visible: string[] | null
     });
   });
 }
+
+// Marca las filas del preview cuya cédula corresponde a un "instructor nuevo"
+// (contrato que arranca dentro de la ventana de ±30 días de hoy). Es solo
+// informativo: no cambia filtros ni automatización. No hay que retirar marcas
+// previas porque la tabla se reconstruye completa en cada carga del archivo.
+export function markNewInstructorRows(preview: HTMLElement, identifications: Set<string>): void {
+  if (identifications.size === 0) return;
+  preview.querySelectorAll<HTMLTableRowElement>('tbody tr[data-identification]').forEach((row) => {
+    if (identifications.has(row.dataset.identification ?? '')) row.classList.add('excel-new-instructor');
+  });
+}

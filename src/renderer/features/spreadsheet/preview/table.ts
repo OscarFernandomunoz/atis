@@ -38,7 +38,10 @@ export function createFilterBar(table: HTMLTableElement): HTMLDivElement {
   select.className = 'excel-column-select';
   select.setAttribute('aria-label', 'Seleccionar columna para buscar');
   select.innerHTML = '<option value="all">Todas las columnas</option>';
-  Array.from(table.tHead?.rows[0]?.cells ?? []).forEach((cell, index) => {
+  // El encabezado útil es la última fila del thead: la primera puede ser la fila
+  // de meses combinados que el propio Excel junta con celdas fusionadas.
+  const lastHeaderRow = table.tHead?.rows[table.tHead.rows.length - 1];
+  Array.from(lastHeaderRow?.cells ?? []).forEach((cell, index) => {
     const option = document.createElement('option');
     option.value = String(index);
     option.textContent = cell.textContent || `Columna ${index + 1}`;

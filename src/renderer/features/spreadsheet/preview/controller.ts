@@ -1,12 +1,13 @@
 import * as XLSX from 'xlsx';
 import type { FileUploadState } from '../../../app/types.js';
-import { clearInstructorCards, forgetLiveHours, renderInstructorCards } from '../../instructors/index.js';
+import { clearInstructorCards, forgetLiveHours, newInstructorIdentifications, renderInstructorCards } from '../../instructors/index.js';
 import { notify } from '../../notifications/index.js';
 import { cardBoard, type FileElements } from './card-board.js';
-import { findRequiredColumnIndex, getAllIdentifications, validateRequiredColumn } from './column.js';
+import { getAllIdentifications, validateRequiredColumn } from './column.js';
 import { DROPZONE_HINT, REQUIRED_COLUMN_LABEL, REQUIRED_COLUMN_NAME } from './constants.js';
-import { createFilterBar, createTable } from './table.js';
-import { applyCardFilter } from './view.js';
+import { forgetSheets, onPreviewRepainted, paintPreview, rememberSheets } from './months.js';
+import type { SheetSectionInfo } from './sections.js';
+import { applyCardFilter, markNewInstructorRows } from './view.js';
 
 export function initFileHandling(elements: FileElements, state: FileUploadState): void {
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
@@ -66,13 +67,14 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
   elements.excelPreview.textContent = 'Leyendo información del Excel...';
   clearInstructorCards(cardBoard(elements));
   try {
-    const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+    const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellStyles: true });
     // Detectar si alguna hoja tiene filtro autofilter aplicado (Excel nativo)
-    const sheetFilterInfos = workbook.SheetNames.map((sheetName) => {
-      const sheet = workbook.Sheets[sheetName];
-      const autofilter = sheet ? sheet['!autofilter'] : null;
+    const sheetFilterInfos: SheetSectionInfo[] = workbook.SheetNames.map((sheetName) => {
+      const sheet = workbook.Sheets[sheetName] ?? null;
+      const autofilter = sheet ? sheet['!autofilter'] ?? null : null;
       return {
         sheetName,
+        sheet,
         autofilter,
         rows: sheet ? XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '' }) : [],
       };
@@ -86,55 +88,41 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     const identifications = [...new Set(sheetFilterInfos
       .flatMap(({ rows }) => getAllIdentifications(rows)))];
     const firstIdentification = identifications[0] ?? null;
-    const fragment = document.createDocumentFragment();
-    sheetFilterInfos.forEach(({ sheetName, rows, autofilter }) => {
-      const section = document.createElement('section');
-      const title = document.createElement('h3');
-      title.textContent = sheetName;
-      section.appendChild(title);
-      if (!rows.length) {
-        const empty = document.createElement('p');
-        empty.textContent = 'Esta hoja está vacía.';
-        section.appendChild(empty);
-      } else {
-        const table = createTable(rows, findRequiredColumnIndex(rows)?.columnIndex ?? -1);
-        // Agregar barra de filtros que respeta filas ocultas
-        section.appendChild(createFilterBar(table));
-        const wrapper = document.createElement('div');
-        wrapper.className = 'excel-table-wrapper';
-        wrapper.appendChild(table);
-        section.appendChild(wrapper);
-        // Si el archivo tiene filtro autofilter nativo, agregar indicación visual
-        if (autofilter) {
-          const filterNote = document.createElement('p');
-          filterNote.className = 'excel-filter-note';
-          filterNote.textContent = `• Hoja tiene filtro autofilter aplicado (rango: ${autofilter.ref})`;
-          section.appendChild(filterNote);
-        }
-      }
-      fragment.appendChild(section);
-    });
+    // Las hojas quedan a mano para repintar el preview por meses, sin releer.
+    rememberSheets(sheetFilterInfos);
     state.file = file;
     if (firstIdentification) {
       elements.statusMessage.textContent = `${identifications.length} cédula(s) de instructores extraídas del Excel. ${REQUIRED_COLUMN_LABEL} presente.`;
     }
     elements.dropzone.classList.remove('dropzone-error');
     elements.dropzone.classList.add('dropzone-valid');
-    elements.excelPreview.replaceChildren(fragment);
+    // Monta las secciones respetando la ventana de meses activa (si el usuario
+    // ya había elegido meses antes de cargar el archivo, se aplican igual).
+    paintPreview(elements);
     // Con las tablas ya montadas, el filtro de carnets oculta las filas que no aplican.
+    let lastVisible: string[] | null = null;
     renderInstructorCards(cardBoard(elements), sheetFilterInfos.map(({ rows }) => rows), (visible) => {
+      lastVisible = visible;
       applyCardFilter(elements, visible);
+    });
+    onPreviewRepainted(() => {
+      // El repintado por meses monta filas nuevas: se reponen el filtro de
+      // carnets sobre ellas y las marcas de "instructor nuevo".
+      applyCardFilter(elements, lastVisible);
+      markNewInstructorRows(elements.excelPreview, newInstructorIdentifications());
     });
     if (!firstIdentification) {
       elements.statusMessage.textContent = `Información de ${file.name} lista para revisar. ${REQUIRED_COLUMN_LABEL} presente, pero no se encontraron cédulas válidas.`;
     }
   } catch {
+    forgetSheets();
     rejectFile(elements, state, 'No se pudo leer este archivo Excel.');
   }
 }
 
 function rejectFile(elements: FileElements, state: FileUploadState, message: string): void {
   state.file = null;
+  forgetSheets();
   elements.fileInput.value = '';
   elements.dropzone.classList.add('dropzone-error');
   elements.dropzoneText.textContent = DROPZONE_HINT;
