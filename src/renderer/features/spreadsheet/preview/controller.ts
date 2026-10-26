@@ -4,12 +4,14 @@ import {
   clearInstructorCards,
   forgetLiveHours,
   newInstructorIdentifications,
+  refreshInstructorCards,
   renderInstructorCards,
   updateCardAdditionalHours,
 } from '../../instructors/index.js';
 import { notify } from '../../notifications/index.js';
+import { normalizeIdentification } from '../helpers.js';
 import { cardBoard, type FileElements } from './card-board.js';
-import { getAllIdentifications, validateRequiredColumn } from './column.js';
+import { findRequiredColumnIndex, getAllIdentifications, validateRequiredColumn } from './column.js';
 import { DROPZONE_HINT, REQUIRED_COLUMN_LABEL, REQUIRED_COLUMN_NAME } from './constants.js';
 import {
   forgetSheets,
@@ -20,6 +22,8 @@ import {
 } from './months.js';
 import type { SheetSectionInfo } from './sections.js';
 import { applyCardFilter, markNewInstructorRows } from './view.js';
+
+const editControllers = new WeakMap<HTMLElement, AbortController>();
 
 export function initFileHandling(elements: FileElements, state: FileUploadState): void {
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
@@ -117,6 +121,38 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
       lastVisible = visible;
       applyCardFilter(elements, visible);
     });
+    editControllers.get(elements.excelPreview)?.abort();
+    const editController = new AbortController();
+    editControllers.set(elements.excelPreview, editController);
+    elements.excelPreview.addEventListener('excel-cell-updated', () => {
+      sheetFilterInfos.forEach((info) => {
+        if (info.sheet) {
+          info.rows = XLSX.utils.sheet_to_json<unknown[]>(info.sheet, { header: 1, defval: '' });
+        }
+      });
+      Array.from(elements.excelPreview.querySelectorAll<HTMLElement>(':scope > section')).forEach((section, index) => {
+        const info = sheetFilterInfos[index];
+        const required = info ? findRequiredColumnIndex(info.rows) : null;
+        if (!info || !required) return;
+        section.querySelectorAll<HTMLTableRowElement>('tbody tr').forEach((row) => {
+          const firstCell = row.querySelector<HTMLTableCellElement>('td[data-r]');
+          const rowIndex = firstCell ? Number(firstCell.dataset.r) : Number.NaN;
+          if (!Number.isInteger(rowIndex)) return;
+          const identification = normalizeIdentification(info.rows[rowIndex]?.[required.columnIndex]);
+          if (identification.length >= 6) row.dataset.identification = identification;
+          else delete row.dataset.identification;
+        });
+      });
+      refreshInstructorCards(
+        cardBoard(elements),
+        sheetFilterInfos.map(({ rows }) => rows),
+        (visible) => {
+          lastVisible = visible;
+          applyCardFilter(elements, visible);
+        },
+      );
+      updateCardAdditionalHours(elements.cardsGrid, getCurrentMonths());
+    }, { signal: editController.signal });
     onPreviewRepainted(() => {
       // El repintado por meses monta filas nuevas: se reponen el filtro de
       // carnets sobre ellas y las marcas de "instructor nuevo".

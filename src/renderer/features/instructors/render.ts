@@ -24,6 +24,14 @@ export interface CardBoard {
   empty: HTMLElement;
 }
 
+export interface CardRenderState {
+  program: string | null;
+  hours: HoursFilter;
+  newOnly: boolean;
+  query: string;
+  selectedIdentifications: ReadonlySet<string>;
+}
+
 // Reconstruye el tablero de carnets a partir de las filas de cada hoja del Excel.
 // `onVisibleChange` recibe las cédulas que pasan los filtros y la selección de
 // casillas (o `null` si no hay ningún filtro activo), para que la vista previa
@@ -32,6 +40,7 @@ export function renderInstructorCards(
   board: CardBoard,
   sheets: unknown[][][],
   onVisibleChange?: (identifications: string[] | null) => void,
+  initialState?: CardRenderState,
 ): void {
   filterUpdateControllers.get(board.grid)?.abort();
   // La pista del pie apunta a fichas que están a punto de reemplazarse.
@@ -44,6 +53,10 @@ export function renderInstructorCards(
     instructor,
     colors.get(instructor.program) ?? FALLBACK_COLOR,
   ));
+  cards.forEach((card) => {
+    const checkbox = card.querySelector<HTMLInputElement>('.carnet-check');
+    if (checkbox) checkbox.checked = initialState?.selectedIdentifications.has(instructorId(card)) ?? false;
+  });
   // Se insertan en un solo fragmento: la rejilla no se repinta por cada ficha.
   const fragment = document.createDocumentFragment();
   cards.forEach((card) => fragment.appendChild(card));
@@ -57,10 +70,11 @@ export function renderInstructorCards(
   ));
 
   // Los cuatro filtros se combinan: programa + horas + nuevos + búsqueda.
-  let program: string | null = null;
-  let hours: HoursFilter = 'all';
-  let nuevos = false;
-  let query = '';
+  let program = initialState?.program ?? null;
+  if (program !== null && !instructors.some((instructor) => instructor.program === program)) program = null;
+  let hours: HoursFilter = initialState?.hours ?? 'all';
+  let nuevos = initialState?.newOnly ?? false;
+  let query = normalizeText(initialState?.query ?? '');
 
   // Un frame pendiente por rejilla: escribir rápido no dispara un recorrido
   // completo de credenciales por cada tecla, solo uno por pintado.
@@ -135,6 +149,20 @@ export function renderInstructorCards(
     hours = value;
     scheduleApply();
   });
+  board.programFilter.querySelectorAll<HTMLButtonElement>('.program-chip:not(.chip-new)').forEach((button) => {
+    const active = (button.dataset.program || null) === program;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  const newToggle = board.programFilter.querySelector<HTMLButtonElement>('.chip-new');
+  newToggle?.classList.toggle('is-active', nuevos);
+  newToggle?.setAttribute('aria-pressed', String(nuevos));
+  board.hoursFilter.querySelectorAll<HTMLButtonElement>('.hours-chip').forEach((button) => {
+    const active = button.dataset.hours === hours;
+    button.classList.toggle('is-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  board.search.value = initialState?.query ?? '';
   bindSearch(board.search, (value) => {
     query = value;
     scheduleApply();
@@ -142,6 +170,10 @@ export function renderInstructorCards(
   applyNow();
   // La rejilla recién pintada entra en pantalla con la animación en cascada.
   revealCards(board.grid);
+}
+
+function instructorId(card: HTMLElement): string {
+  return card.dataset.identification ?? '';
 }
 
 export function clearInstructorCards(board: CardBoard): void {
