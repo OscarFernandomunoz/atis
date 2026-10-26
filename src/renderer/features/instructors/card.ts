@@ -3,7 +3,6 @@ import { isContractStartNearToday } from '../spreadsheet/helpers.js';
 import { createSelectionCheckbox } from './selection.js';
 import { effectiveHours, hoursView } from './hours.js';
 import { refreshHoursHint } from './hours-hint.js';
-import { MONTH_BLOCK_LABELS } from '../spreadsheet/preview/constants.js';
 import { parseHoursValue } from '../spreadsheet/helpers.js';
 
 // Retrato genérico para credenciales sin foto de perfil (estilo intranet).
@@ -133,9 +132,8 @@ export function updateCardAdditionalHours(grid: HTMLElement, months: readonly nu
     let additionalTotal = 0;
     selectedMonths.forEach((month) => {
       const item = el('span', 'carnet-monthly-hour');
-      const label = MONTH_BLOCK_LABELS[month] ?? `Mes ${month + 1}`;
       const hours = values[month]?.trim() || '—';
-      item.textContent = `${label}: ${hours}${hours === '—' ? '' : ' h'}`;
+      item.textContent = `Horas Adicionales: ${hours}${hours === '—' ? '' : ' h'}`;
       fragment.appendChild(item);
       const numericHours = parseHoursValue(hours);
       if (Number.isFinite(numericHours)) additionalTotal += numericHours;
