@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { sameHeader } from '../helpers.js';
+import { normalizeIdentification, sameHeader } from '../helpers.js';
 import { CONTRACT_DATE_COLUMN_NAMES } from './constants.js';
 import { columnWindowOf, type ColumnWindow } from './column-window.js';
 import type { StyledCell } from './styled-cell.js';
@@ -131,10 +131,11 @@ export function buildStyledTable(
     if (!isHeader && requiredColumnIndex <= maxColumn) {
       const identification = textOf(
         sheet[XLSX.utils.encode_cell({ r, c: requiredColumnIndex })] as StyledCell | undefined,
-      ).trim();
+      );
       // Misma convención que la vista genérica: los filtros de carnets y la
       // automatización localizan la fila por `data-identification`.
-      if (identification.replace(/\D/g, '').length >= 6) row.dataset.identification = identification;
+      const normalizedIdentification = normalizeIdentification(identification);
+      if (normalizedIdentification.length >= 6) row.dataset.identification = normalizedIdentification;
     }
     for (let c = 0; c <= maxColumn; c += 1) {
       // Con ventana de meses, las columnas apartadas no se pintan.

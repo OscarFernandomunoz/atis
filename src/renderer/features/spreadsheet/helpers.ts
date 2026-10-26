@@ -28,6 +28,12 @@ export function isCedulaHeader(text: string): boolean {
   return CEDULA_COLUMN_NAMES.some((name) => sameHeader(text, name));
 }
 
+// Excel puede mostrar la cédula con separadores aunque el carnet use el valor numérico.
+export function normalizeIdentification(value: unknown): string {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(Math.trunc(value));
+  return String(value ?? '').replace(/\D/g, '');
+}
+
 // Serial de Excel (días desde el 1899-12-30) a fecha de calendario. Se trabaja
 // en UTC medianoche porque un serial son días exactos; convertir a hora local
 // desplazaría el día en zonas horarias (como la de Colombia, UTC-5).

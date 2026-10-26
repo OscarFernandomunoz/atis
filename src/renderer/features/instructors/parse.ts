@@ -4,6 +4,7 @@ import {
   HOURS_COLUMN_NAME,
   excelSerialToDate,
   isCedulaHeader,
+  normalizeIdentification,
   sameHeader,
 } from '../spreadsheet/helpers.js';
 import { MONTH_BLOCK_LABELS } from '../spreadsheet/preview/constants.js';
@@ -95,8 +96,8 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
     const startCol = findColumn(rows, headerRow, (header) => sameHeader(header, CONTRACT_START_COLUMN_NAME));
     for (let row = headerRow + 1; row < rows.length; row += 1) {
       const cells = rows[row] ?? [];
-      const identification = clean(cells[cedulaCol]);
-      if (identification.replace(/\D/g, '').length < MIN_IDENTIFICATION_DIGITS) continue;
+      const identification = normalizeIdentification(cells[cedulaCol]);
+      if (identification.length < MIN_IDENTIFICATION_DIGITS) continue;
       const instructor: Instructor = {
         identification,
         name: nameCol === -1 ? SIN_NOMBRE : clean(cells[nameCol]) || SIN_NOMBRE,

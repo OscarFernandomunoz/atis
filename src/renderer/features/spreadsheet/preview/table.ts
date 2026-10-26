@@ -1,3 +1,5 @@
+import { normalizeIdentification } from '../helpers.js';
+
 // Una fila del preview se oculta por el filtro de carnets o por el buscador de la tabla.
 export function isRowHidden(row: HTMLTableRowElement): boolean {
   return row.dataset.cardHidden === 'true' || row.dataset.searchHidden === 'true';
@@ -19,8 +21,8 @@ export function createTable(rows: unknown[][], requiredColumnIndex: number): HTM
       tableRow.appendChild(tableCell);
     });
     if (rowIndex > 0 && requiredColumnIndex >= 0) {
-      const identification = String((row ?? [])[requiredColumnIndex] ?? '').trim();
-      if (identification.replace(/\D/g, '').length >= 6) tableRow.dataset.identification = identification;
+      const identification = normalizeIdentification((row ?? [])[requiredColumnIndex]);
+      if (identification.length >= 6) tableRow.dataset.identification = identification;
     }
     (rowIndex === 0 ? head : body).appendChild(tableRow);
   });

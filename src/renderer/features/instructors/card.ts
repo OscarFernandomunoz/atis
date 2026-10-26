@@ -149,17 +149,20 @@ export function updateCardAdditionalHours(grid: HTMLElement, months: readonly nu
       return;
     }
 
-    const fragment = document.createDocumentFragment();
     let additionalTotal = 0;
+    let hasAdditionalHours = false;
     selectedMonths.forEach((month) => {
-      const item = el('span', 'carnet-monthly-hour');
       const hours = values[month]?.trim() || '—';
-      item.textContent = `Horas Adicionales: ${hours}${hours === '—' ? '' : ' h'}`;
-      fragment.appendChild(item);
       const numericHours = parseHoursValue(hours);
-      if (Number.isFinite(numericHours)) additionalTotal += numericHours;
+      if (Number.isFinite(numericHours)) {
+        additionalTotal += numericHours;
+        hasAdditionalHours = true;
+      }
     });
-    monthlyHours.replaceChildren(fragment);
+    const additionalHours = el('span', 'carnet-monthly-hour');
+    const additionalText = hasAdditionalHours ? HOURS_FORMAT.format(additionalTotal) : '—';
+    additionalHours.textContent = `Horas Adicionales: ${additionalText}${hasAdditionalHours ? ' h' : ''}`;
+    monthlyHours.replaceChildren(additionalHours);
     monthlyHours.hidden = false;
     const base = node.dataset.baseHours ?? '';
     const label = node.dataset.hoursSource === 'sofiaplus' ? 'Horas de SofiaPlus' : 'Horas académicas';

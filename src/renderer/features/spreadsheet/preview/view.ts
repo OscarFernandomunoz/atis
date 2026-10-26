@@ -1,25 +1,13 @@
 import type { FileElements } from './card-board.js';
-import { findRequiredColumnIndex } from './column.js';
+import { normalizeIdentification } from '../helpers.js';
 import { isRowHidden } from './table.js';
 
-// Recolecta las cédulas de las filas VISIBLES (no ocultas por el filtro de búsqueda).
-// Si no hay filtro activo, devuelve todas las cédulas.
+// Recolecta las cédulas guardadas en las filas visibles del preview.
 export function getVisibleIdentifications(elements: FileElements): string[] {
-  const tables = elements.excelPreview.querySelectorAll('table');
   const visible: string[] = [];
-  tables.forEach((table) => {
-    const requiredIndex = findRequiredColumnIndex(
-      Array.from(table.tBodies[0]?.rows ?? []).map((row) => (
-        Array.from(row.cells, (cell) => cell.textContent ?? '')
-      )),
-    )?.columnIndex;
-    if (requiredIndex === undefined) return;
-    table.tBodies[0]?.querySelectorAll('tr:not([hidden])').forEach((row) => {
-      const tableRow = row as HTMLTableRowElement;
-      const cell = tableRow.cells[requiredIndex];
-      const value = (cell?.textContent ?? '').trim();
-      if (value.replace(/\D/g, '').length >= 6) visible.push(value);
-    });
+  elements.excelPreview.querySelectorAll<HTMLTableRowElement>('tbody tr:not([hidden])').forEach((row) => {
+    const identification = normalizeIdentification(row.dataset.identification);
+    if (identification.length >= 6) visible.push(identification);
   });
   return [...new Set(visible)];
 }
