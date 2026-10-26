@@ -44,11 +44,12 @@
 
   .content-header {
     align-items: flex-start;
-    padding: 50px 20px 32px;
+    padding: 28px 20px 24px;
   }
 
   .dashboard-panel {
-    padding: 0 20px;
+    width: calc(100% - 32px);
+    padding: 22px 16px;
   }
 
   .dropzone {

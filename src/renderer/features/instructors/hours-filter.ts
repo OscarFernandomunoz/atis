@@ -1,13 +1,12 @@
-import { HOURS_THRESHOLD } from '../spreadsheet/helpers.js';
-
 // Filtro por horas: control segmentado independiente del filtro por programa.
-export type HoursFilter = 'all' | 'ok' | 'low' | 'none';
+export type HoursFilter = 'all' | 'equal' | 'low' | 'over' | 'none';
 
 const OPTIONS: Array<{ value: HoursFilter; label: string }> = [
   { value: 'all', label: 'Todas' },
-  { value: 'ok', label: `≥ ${HOURS_THRESHOLD} h` },
-  { value: 'low', label: `< ${HOURS_THRESHOLD} h` },
-  { value: 'none', label: 'Sin horas' },
+  { value: 'equal', label: '= Requeridas' },
+  { value: 'low', label: '< Requeridas' },
+  { value: 'over', label: '> Requeridas' },
+  { value: 'none', label: 'Sin datos' },
 ];
 
 export function buildHoursFilter(container: HTMLElement, onFilter: (value: HoursFilter) => void): void {

@@ -1,3 +1,5 @@
+import { normalizeIdentification } from '../helpers.js';
+
 // Una fila del preview se oculta por el filtro de carnets o por el buscador de la tabla.
 export function isRowHidden(row: HTMLTableRowElement): boolean {
   return row.dataset.cardHidden === 'true' || row.dataset.searchHidden === 'true';
@@ -19,8 +21,8 @@ export function createTable(rows: unknown[][], requiredColumnIndex: number): HTM
       tableRow.appendChild(tableCell);
     });
     if (rowIndex > 0 && requiredColumnIndex >= 0) {
-      const identification = String((row ?? [])[requiredColumnIndex] ?? '').trim();
-      if (identification.replace(/\D/g, '').length >= 6) tableRow.dataset.identification = identification;
+      const identification = normalizeIdentification((row ?? [])[requiredColumnIndex]);
+      if (identification.length >= 6) tableRow.dataset.identification = identification;
     }
     (rowIndex === 0 ? head : body).appendChild(tableRow);
   });
@@ -38,7 +40,10 @@ export function createFilterBar(table: HTMLTableElement): HTMLDivElement {
   select.className = 'excel-column-select';
   select.setAttribute('aria-label', 'Seleccionar columna para buscar');
   select.innerHTML = '<option value="all">Todas las columnas</option>';
-  Array.from(table.tHead?.rows[0]?.cells ?? []).forEach((cell, index) => {
+  // El encabezado útil es la última fila del thead: la primera puede ser la fila
+  // de meses combinados que el propio Excel junta con celdas fusionadas.
+  const lastHeaderRow = table.tHead?.rows[table.tHead.rows.length - 1];
+  Array.from(lastHeaderRow?.cells ?? []).forEach((cell, index) => {
     const option = document.createElement('option');
     option.value = String(index);
     option.textContent = cell.textContent || `Columna ${index + 1}`;

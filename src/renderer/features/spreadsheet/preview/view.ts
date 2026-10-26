@@ -1,25 +1,13 @@
 import type { FileElements } from './card-board.js';
-import { findRequiredColumnIndex } from './column.js';
+import { normalizeIdentification } from '../helpers.js';
 import { isRowHidden } from './table.js';
 
-// Recolecta las cédulas de las filas VISIBLES (no ocultas por el filtro de búsqueda).
-// Si no hay filtro activo, devuelve todas las cédulas.
+// Recolecta las cédulas guardadas en las filas visibles del preview.
 export function getVisibleIdentifications(elements: FileElements): string[] {
-  const tables = elements.excelPreview.querySelectorAll('table');
   const visible: string[] = [];
-  tables.forEach((table) => {
-    const requiredIndex = findRequiredColumnIndex(
-      Array.from(table.tBodies[0]?.rows ?? []).map((row) => (
-        Array.from(row.cells, (cell) => cell.textContent ?? '')
-      )),
-    )?.columnIndex;
-    if (requiredIndex === undefined) return;
-    table.tBodies[0]?.querySelectorAll('tr:not([hidden])').forEach((row) => {
-      const tableRow = row as HTMLTableRowElement;
-      const cell = tableRow.cells[requiredIndex];
-      const value = (cell?.textContent ?? '').trim();
-      if (value.replace(/\D/g, '').length >= 6) visible.push(value);
-    });
+  elements.excelPreview.querySelectorAll<HTMLTableRowElement>('tbody tr:not([hidden])').forEach((row) => {
+    const identification = normalizeIdentification(row.dataset.identification);
+    if (identification.length >= 6) visible.push(identification);
   });
   return [...new Set(visible)];
 }
@@ -51,5 +39,16 @@ export function applyCardFilter(elements: FileElements, visible: string[] | null
       row.dataset.cardHidden = shownByCards ? 'false' : 'true';
       row.hidden = isRowHidden(row);
     });
+  });
+}
+
+// Marca las filas del preview cuya cédula corresponde a un "instructor nuevo"
+// (contrato que arranca dentro de la ventana de ±30 días de hoy). Es solo
+// informativo: no cambia filtros ni automatización. No hay que retirar marcas
+// previas porque la tabla se reconstruye completa en cada carga del archivo.
+export function markNewInstructorRows(preview: HTMLElement, identifications: Set<string>): void {
+  if (identifications.size === 0) return;
+  preview.querySelectorAll<HTMLTableRowElement>('tbody tr[data-identification]').forEach((row) => {
+    if (identifications.has(row.dataset.identification ?? '')) row.classList.add('excel-new-instructor');
   });
 }

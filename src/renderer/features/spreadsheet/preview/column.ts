@@ -1,3 +1,4 @@
+import { normalizeIdentification } from '../helpers.js';
 import { REQUIRED_COLUMN_LABEL, REQUIRED_COLUMN_NAMES } from './constants.js';
 
 // Busca en qué fila y columna aparece el encabezado obligatorio. Se compara sin
@@ -23,8 +24,8 @@ export function getAllIdentifications(rows: unknown[][]): string[] {
   const requiredColumn = findRequiredColumnIndex(rows);
   if (!requiredColumn) return [];
   return rows.slice(requiredColumn.headerRowIndex + 1)
-    .map((row) => String((row ?? [])[requiredColumn.columnIndex] ?? '').trim())
+    .map((row) => normalizeIdentification((row ?? [])[requiredColumn.columnIndex]))
     // Con encabezados de dos filas, la fila descriptiva ("Cédula", etc.) aparece
     // justo debajo; una cédula real siempre tiene 6+ dígitos.
-    .filter((value) => value.replace(/\D/g, '').length >= 6);
+    .filter((value) => value.length >= 6);
 }

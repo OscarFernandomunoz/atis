@@ -1,5 +1,10 @@
 export const HOURS_COLUMN_NAME = 'Horas académicas';
 const CEDULA_COLUMN_NAMES = ['Columna 3', '# DE DOCUMENTO'];
+// Fecha cuyo adelanto marca al "instructor nuevo" y ventana del aviso, en días
+// desde hoy de la máquina del usuario.
+export const CONTRACT_START_COLUMN_NAME = 'INICIO DEL CONTRATO';
+export const CONTRACT_REQUIRED_HOURS_COLUMN_NAME = 'Horas requeridas por contrato';
+export const CONTRACT_START_WINDOW_DAYS = 30;
 export const HOURS_THRESHOLD = 160;
 export const GREEN_FILL = 'FF00B050';
 export const RED_FILL = 'FFFF0000';
@@ -21,6 +26,35 @@ export function sameHeader(a: string, b: string): boolean {
 
 export function isCedulaHeader(text: string): boolean {
   return CEDULA_COLUMN_NAMES.some((name) => sameHeader(text, name));
+}
+
+// Excel puede mostrar la cédula con separadores aunque el carnet use el valor numérico.
+export function normalizeIdentification(value: unknown): string {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(Math.trunc(value));
+  return String(value ?? '').replace(/\D/g, '');
+}
+
+// Serial de Excel (días desde el 1899-12-30) a fecha de calendario. Se trabaja
+// en UTC medianoche porque un serial son días exactos; convertir a hora local
+// desplazaría el día en zonas horarias (como la de Colombia, UTC-5).
+export function excelSerialToDate(value: unknown): Date | null {
+  if (value instanceof Date) {
+    return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()));
+  }
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  // 25569 días separa el epoch de Unix del del Excel (días entre 1970-01-01 y 1899-12-30).
+  return new Date(Math.round((value - 25569) * 86400000));
+}
+
+// ¿El contrato arranca cerca de hoy (nuevo instructor)? Cubre los dos casos que
+// se pueden ver en la nómina: el que recién entró (27 días atrás, por ejemplo)
+// y el que entra enseguida. La ventana es en días calendario, no hábiles.
+export function isContractStartNearToday(contractStart: Date | null, today: Date = new Date()): boolean {
+  if (!contractStart) return false;
+  // Ambos extremos a medianoche UTC para comparar fechas enteras, no horas.
+  const todayUtc = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const differences = Math.abs(contractStart.getTime() - todayUtc);
+  return differences < CONTRACT_START_WINDOW_DAYS * 86400000;
 }
 
 // Escribe el valor de horas tal como llega del span: número si es plano, si el span

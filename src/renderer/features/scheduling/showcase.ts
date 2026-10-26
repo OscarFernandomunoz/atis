@@ -4,8 +4,11 @@ import { MONTHS } from './months.js';
 import { initScrollFade } from './scroll-fade.js';
 import { isMonthSelected, toggleMonth, type MonthRange } from './selection.js';
 
-/** Rellena el carrusel y enlaza cada mes con el rango de fechas del formulario. */
-export function initMonthsShowcase(): void {
+/** Rellena el carrusel y enlaza cada mes con el rango de fechas del formulario.
+ *
+ * `onMonthsChange` recibe los meses activos (0 = enero) o null cuando queda sin
+ * selección: el preview de la nómina muestra solo los bloques de esos meses. */
+export function initMonthsShowcase(onMonthsChange?: (months: number[] | null) => void): void {
   const track = document.getElementById('monthsTrack');
   if (!track) return;
 
@@ -33,6 +36,12 @@ export function initMonthsShowcase(): void {
       render();
       // Solo se tocan las fechas al elegir meses: no pisa un rango escrito a mano al cargar.
       if (startInput && endInput) writeDateRange({ start: startInput, end: endInput }, range, year);
+      // El rango es contiguo: los meses que van de start a end.
+      const vigente = range;
+      const months = vigente
+        ? Array.from({ length: vigente.end - vigente.start + 1 }, (_, offset) => vigente.start + offset)
+        : null;
+      onMonthsChange?.(months);
     });
   });
 

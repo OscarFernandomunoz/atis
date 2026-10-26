@@ -1,8 +1,8 @@
 // Paleta de la barra de título nativa, compartida por las opciones de ventana y por el
 // script de cromo que se inyecta en las páginas remotas.
 export const TITLE_BAR_THEME_COLORS = {
-  light: { background: '#f7f7f5', text: '#5f5f5b', border: '#f7f7f5' },
-  dark: { background: '#000000', text: '#c7c7c4', border: '#000000' },
+  light: { background: '#006b2e', text: '#f4fff1', border: '#006b2e' },
+  dark: { background: '#006b2e', text: '#f4fff1', border: '#006b2e' },
 } as const;
 
 export const TITLE_BAR_OVERLAY_COLORS = {

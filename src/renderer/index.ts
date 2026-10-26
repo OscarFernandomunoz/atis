@@ -4,7 +4,7 @@ import { initSubmit } from './features/automation/submit.js';
 import { initHoursHint } from './features/instructors/index.js';
 import { initNotificationConsent } from './features/notifications/index.js';
 import { initMonthsShowcase } from './features/scheduling/index.js';
-import { initDropzoneSpotlight, initFileHandling } from './features/spreadsheet/index.js';
+import { applyMonthWindow, initDropzoneSpotlight, initFileHandling } from './features/spreadsheet/index.js';
 import { initDynamicBackground } from './features/theme/index.js';
 import { initPreviewModal } from './shell/preview-modal.js';
 import { initTitleBar } from './shell/title-bar.js';
@@ -86,7 +86,10 @@ function initApp(): void {
   initDynamicBackground();
   initTitleBar();
   initNotificationConsent();
-  initMonthsShowcase();
+  initMonthsShowcase((months) => {
+    // El preview sigue la selección del carrusel: solo los bloques de esos meses.
+    applyMonthWindow(elements, months);
+  });
   initPlayerBar(elements);
   initHoursHint(elements);
   initDropzoneSpotlight(elements.dropzone);

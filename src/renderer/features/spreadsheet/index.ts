@@ -1,5 +1,6 @@
 // API pública de la función de hojas de cálculo: vista previa y escritura de horas.
 export {
+  applyMonthWindow,
   getVisibleIdentifications,
   highlightRow,
   initDropzoneSpotlight,

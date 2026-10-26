@@ -1,9 +1,7 @@
 /* Formulario de acceso: credenciales y fechas que alimentan la automatización. */
 
-/* El formulario no es una tarjeta aparte: flota sobre el degradado ambiental de
-   la página, sin fondo propio, igual que los encabezados de paisajes y carnets. */
 .access-card {
-  margin-bottom: var(--section-gap);
+  margin-bottom: 44px;
 }
 
 .access-card-head {
@@ -21,8 +19,8 @@
   height: 40px;
   border-radius: 12px;
   color: var(--accent-contrast);
-  background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 100%, #fff 8%), color-mix(in srgb, var(--accent) 84%, #000 8%));
-  box-shadow: 0 6px 16px color-mix(in srgb, #000 38%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent);
+  background: linear-gradient(150deg, var(--primary-start), var(--accent-warm));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 22%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent);
 }
 
 .access-card-badge svg {
@@ -66,7 +64,7 @@
 .form-separator::before,
 .form-separator::after {
   height: 1px;
-  background: color-mix(in srgb, #fff 10%, transparent);
+  background: var(--border);
   content: "";
 }
 
@@ -117,11 +115,9 @@
 .input-control {
   width: 100%;
   padding: 14px 16px 14px 42px;
-  /* Misma superficie translúcida que el buscador de carnets: cristal esmerilado
-     sobre el degradado, no un relleno opaco que corte la atmósfera. */
-  border: 1px solid color-mix(in srgb, #fff 9%, transparent);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: color-mix(in srgb, #fff 6%, transparent);
+  background: var(--surface-muted);
   color: var(--text);
   font: inherit;
   font-size: 13.5px;
@@ -140,8 +136,8 @@
 
 .input-control:focus {
   border-color: color-mix(in srgb, var(--accent) 68%, transparent);
-  background: color-mix(in srgb, #fff 10%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 /* El selector nativo del input de fecha ya aporta su propio icono a la derecha. */

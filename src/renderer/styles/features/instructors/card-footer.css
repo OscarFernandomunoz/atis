@@ -4,7 +4,58 @@
   gap: 4px;
   padding-top: 12px;
   margin-top: auto;
-  border-top: 1px solid color-mix(in srgb, #fff 7%, transparent);
+  border-top: 1px solid var(--border);
+}
+
+.carnet-monthly-hours {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.carnet-monthly-hours[hidden] {
+  display: none;
+}
+
+.carnet-monthly-hour {
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent-warm);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.carnet-contract-hours {
+  align-self: flex-start;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent-warm);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.carnet-base-hours {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.carnet-base-hours[hidden] {
+  display: none;
+}
+
+.carnet-hours-label {
+  margin-right: 3px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 650;
 }
 
 .carnet-foot-label {
@@ -33,12 +84,12 @@
   margin-top: 6px;
   border-radius: 50%;
   content: "";
-  background: var(--card-accent);
+  background: var(--primary-start);
 }
 
 .cards-empty {
   padding: 34px;
-  border: 1px dashed color-mix(in srgb, #fff 13%, transparent);
+  border: 1px dashed var(--border-strong);
   border-radius: 18px;
   color: var(--text-muted);
   font-size: 14px;
