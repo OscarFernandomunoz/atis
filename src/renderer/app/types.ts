@@ -11,6 +11,12 @@ export interface AppElements {
   previewModal: HTMLElement;
   previewBackdrop: HTMLElement;
   previewCloseButton: HTMLButtonElement;
+  availabilityResultsButton: HTMLButtonElement;
+  availabilityResultsModal: HTMLElement;
+  availabilityResultsBackdrop: HTMLElement;
+  availabilityResultsCloseButton: HTMLButtonElement;
+  availabilityResultsCount: HTMLElement;
+  availabilityResultsList: HTMLElement;
   playerTableButton: HTMLButtonElement;
   playerLocateButton: HTMLButtonElement;
   cardsGrid: HTMLElement;

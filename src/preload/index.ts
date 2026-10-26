@@ -1,5 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { getTitleBarPlatform, type AppLogEntry, type TitleBarTheme } from '../shared/index.js';
+import {
+  getTitleBarPlatform,
+  type AppLogEntry,
+  type SofiaAvailabilityEntry,
+  type TitleBarTheme,
+} from '../shared/index.js';
 import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Este API expone una interfaz segura desde el preload hacia el renderer.
@@ -14,21 +19,10 @@ const electronAPI = {
   openSofiaAndFill: (credentials: {
     username: string;
     password: string;
+    identifications: string[];
     startDate: string;
     endDate: string;
-    identification: string;
-    identifications?: string[];
-  }, onProgress?: (identification: string | null, hours: string | null) => void): Promise<Array<{ identification: string; totalHours: string | null }>> => {
-    if (onProgress) {
-      const channel = 'sofia:progress';
-      const listener = (_event: Electron.IpcRendererEvent, identification: string | null, hours: string | null): void => onProgress(identification, hours);
-      ipcRenderer.on(channel, listener);
-      return ipcRenderer.invoke('sofia:open-and-fill', credentials).finally(() => {
-        ipcRenderer.removeListener(channel, listener);
-      });
-    }
-    return ipcRenderer.invoke('sofia:open-and-fill', credentials);
-  },
+  }): Promise<SofiaAvailabilityEntry[]> => ipcRenderer.invoke('sofia:open-and-fill', credentials),
 
   // Pausa o reanuda la automatización en curso; reanuda justo donde quedó.
   setAutomationPaused: (paused: boolean): void => ipcRenderer.send('sofia:set-paused', paused),

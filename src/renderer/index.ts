@@ -1,6 +1,7 @@
 import type { AppElements, FileUploadState } from './app/types.js';
 import { initPlayerBar } from './features/automation/player-bar/index.js';
 import { initSubmit } from './features/automation/submit.js';
+import { initAvailabilityResults } from './features/automation/availability-results.js';
 import { initHoursHint } from './features/instructors/index.js';
 import { initNotificationConsent } from './features/notifications/index.js';
 import { initMonthsShowcase } from './features/scheduling/index.js';
@@ -19,6 +20,12 @@ function getElements(): AppElements {
     previewModal: document.getElementById('previewModal') as HTMLElement,
     previewBackdrop: document.getElementById('previewBackdrop') as HTMLElement,
     previewCloseButton: document.getElementById('previewCloseButton') as HTMLButtonElement,
+    availabilityResultsButton: document.getElementById('availabilityResultsButton') as HTMLButtonElement,
+    availabilityResultsModal: document.getElementById('availabilityResultsModal') as HTMLElement,
+    availabilityResultsBackdrop: document.getElementById('availabilityResultsBackdrop') as HTMLElement,
+    availabilityResultsCloseButton: document.getElementById('availabilityResultsCloseButton') as HTMLButtonElement,
+    availabilityResultsCount: document.getElementById('availabilityResultsCount') as HTMLElement,
+    availabilityResultsList: document.getElementById('availabilityResultsList') as HTMLElement,
     playerTableButton: document.getElementById('playerTableButton') as HTMLButtonElement,
     playerLocateButton: document.getElementById('playerLocateButton') as HTMLButtonElement,
     cardsGrid: document.getElementById('cardsGrid') as HTMLElement,
@@ -91,11 +98,12 @@ function initApp(): void {
     applyMonthWindow(elements, months);
   });
   initPlayerBar(elements);
+  initAvailabilityResults(elements);
   initHoursHint(elements);
   initDropzoneSpotlight(elements.dropzone);
   initFileHandling(elements, state);
   initPreviewModal(elements);
-  initSubmit(elements, state);
+  initSubmit(elements);
   initIconScrollAnimations();
 }
 

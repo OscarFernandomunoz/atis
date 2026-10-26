@@ -1,4 +1,4 @@
-import type { AppLogEntry, TitleBarPlatform } from '../shared/index.js';
+import type { AppLogEntry, SofiaAvailabilityEntry, TitleBarPlatform } from '../shared/index.js';
 import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Define la forma del API expuesto desde el preload para que TypeScript reconozca window.electronAPI.
@@ -6,15 +6,14 @@ export interface IElectronAPI {
   // Envía un log del renderer al proceso principal para verlo en la terminal.
   log: (entry: AppLogEntry) => void;
 
-  // Abre SofiaPlus y llena las credenciales y fechas solicitadas.
+  // Inicia sesión y navega hasta Gestión de Ambientes.
   openSofiaAndFill: (credentials: {
     username: string;
     password: string;
+    identifications: string[];
     startDate: string;
     endDate: string;
-    identification: string;
-    identifications?: string[];
-  }, onProgress?: (identification: string | null, hours: string | null) => void) => Promise<Array<{ identification: string; totalHours: string | null }>>;
+  }) => Promise<SofiaAvailabilityEntry[]>;
 
   // Pausa o reanuda la automatización en curso; al reanudar continúa donde quedó.
   setAutomationPaused: (paused: boolean) => void;

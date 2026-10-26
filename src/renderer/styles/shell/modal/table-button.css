@@ -20,8 +20,13 @@
   transition: background-color 200ms var(--ease-smooth), border-color 200ms var(--ease-smooth), transform 200ms var(--ease-out);
 }
 
-body:has(.excel-preview section) .table-button {
+body:has(.excel-preview section) #previewOpenButton,
+body:has(#availabilityResultsButton:not([hidden])) #availabilityResultsButton {
   display: inline-flex;
+}
+
+.table-button[hidden] {
+  display: none;
 }
 
 .table-button:hover {
