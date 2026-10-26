@@ -92,6 +92,11 @@
    frame; el barrido y el punto animado ya comunican que hay trabajo en curso. */
 .carnet.is-consulting {
   border-color: color-mix(in srgb, var(--card-accent) 78%, transparent);
+  box-shadow:
+    var(--shadow),
+    0 0 0 2px color-mix(in srgb, var(--card-accent) 42%, transparent),
+    0 12px 34px color-mix(in srgb, var(--card-accent) 24%, transparent);
+  animation: carnet-consult-lift 2.8s var(--ease-smooth) infinite;
 }
 
 /* El velo va por encima del contenido, pero es tan tenue que no lo tapa. */

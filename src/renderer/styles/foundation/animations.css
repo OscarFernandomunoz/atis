@@ -39,9 +39,19 @@
   from {
     transform: translateX(-110%);
   }
-
   to {
     transform: translateX(110%);
+  }
+}
+
+@keyframes carnet-consult-lift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
   }
 }
 
@@ -78,10 +88,35 @@
     opacity: 1;
     transform: scale(1);
   }
-
   50% {
     opacity: 0.55;
     transform: scale(1.45);
+  }
+}
+
+@keyframes row-consulting-glow {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  50% {
+    box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--accent) 31%, transparent);
+  }
+}
+
+@keyframes row-consulting-glow-first {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 999px color-mix(in srgb, var(--accent) 15%, transparent),
+      inset 3px 0 0 var(--accent);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 0 0 999px color-mix(in srgb, var(--accent) 31%, transparent),
+      inset 3px 0 0 var(--accent);
   }
 }
 

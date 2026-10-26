@@ -20,6 +20,7 @@ export function clickAvailabilityResult(): boolean {
   console.log(`[Reporte] Abriendo enlace Ver Disponibilidad: id="${link.id}".`);
   link.focus();
   link.click();
+  link.style.display = 'none';
   return true;
 }
 
