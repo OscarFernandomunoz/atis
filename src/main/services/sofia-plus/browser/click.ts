@@ -1,7 +1,6 @@
 import type { BrowserWindow } from 'electron';
 import { showClickMarker } from './click-marker/index.js';
 import { executeInFrames } from './frames.js';
-import { withAutomationInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';
 import { ACTION_DELAY_MS, wait } from './timing.js';
 import type { ClickPoint } from '../types.js';
@@ -14,13 +13,9 @@ const DEMO_MODE = false;
 
 // Simula un movimiento y clic del mouse en la posición detectada en la pantalla del navegador.
 function clickAtPoint(window: BrowserWindow, point: ClickPoint): void {
-  // El guard de entrada distingue estos clics de los del usuario: sin la marca, el bloqueo
-  // los descartaría igual que cualquier otro evento de mouse.
-  withAutomationInput(() => {
-    window.webContents.sendInputEvent({ type: 'mouseMove', x: point.x, y: point.y });
-    window.webContents.sendInputEvent({ type: 'mouseDown', x: point.x, y: point.y, button: 'left' });
-    window.webContents.sendInputEvent({ type: 'mouseUp', x: point.x, y: point.y, button: 'left' });
-  });
+  window.webContents.sendInputEvent({ type: 'mouseMove', x: point.x, y: point.y });
+  window.webContents.sendInputEvent({ type: 'mouseDown', x: point.x, y: point.y, button: 'left' });
+  window.webContents.sendInputEvent({ type: 'mouseUp', x: point.x, y: point.y, button: 'left' });
 }
 
 // Ejecuta una acción basada en un script que debe devolver una posición y luego hace clic en esa coordenada.

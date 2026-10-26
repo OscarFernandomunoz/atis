@@ -1,39 +1,42 @@
 import { ipcMain } from 'electron';
-import { parseSofiaCredentials } from '../services/sofia-plus/credentials.js';
-import { openSofiaPlus, type InstructorHours } from '../services/sofia-plus/index.js';
+import {
+  parseSofiaCredentials,
+  parseSofiaEndDate,
+  parseSofiaIdentifications,
+  parseSofiaStartDate,
+} from '../services/sofia-plus/credentials.js';
+import { openSofiaPlus } from '../services/sofia-plus/index.js';
 import { setAutomationPaused } from '../services/sofia-plus/workflow/pause-gate.js';
 import { resetSofiaSession } from '../services/sofia-plus/workflow/session-reset.js';
 import { isTrustedSender } from './trusted-sender.js';
 import { mainLogger } from '../logger.js';
 
-// Envía un evento de progreso al renderer (resaltado de fila y horas en la vista previa).
-function sendProgress(webContents: Electron.WebContents, identification: string | null, hours: string | null): void {
-  if (!webContents.isDestroyed()) {
-    webContents.send('sofia:progress', identification, hours);
-  }
-}
-
 // Canales de la automatización de SofiaPlus.
 export function registerAutomationHandlers(): void {
-  // Ejecuta el flujo completo de login y manejo de SofiaPlus con las credenciales recibidas.
-  ipcMain.handle('sofia:open-and-fill', async (event, raw: unknown): Promise<InstructorHours[]> => {
+  // Inicia sesión y navega hasta Gestión de Ambientes.
+  ipcMain.handle('sofia:open-and-fill', async (event, raw: unknown) => {
     if (!isTrustedSender(event)) throw new Error('Origen no autorizado.');
 
     const credentials = parseSofiaCredentials(raw);
-    if (!credentials) throw new Error('Los datos de acceso no son válidos.');
+    const identifications = raw && typeof raw === 'object'
+      ? parseSofiaIdentifications((raw as Record<string, unknown>).identifications)
+      : null;
+    const startDate = raw && typeof raw === 'object'
+      ? parseSofiaStartDate((raw as Record<string, unknown>).startDate)
+      : null;
+    const endDate = raw && typeof raw === 'object'
+      ? parseSofiaEndDate((raw as Record<string, unknown>).endDate)
+      : null;
+    if (!credentials || !identifications || !startDate || !endDate) {
+      throw new Error('Los datos de acceso, las cédulas o las fechas no son válidos.');
+    }
 
     try {
-      return await openSofiaPlus(
-        credentials,
-        (identification, hours) => sendProgress(event.sender, identification, hours),
-      );
+      await openSofiaPlus({ ...credentials, identifications, startDate, endDate });
     } catch (error) {
       mainLogger.error('SofiaPlus', 'No se pudo completar el flujo de automatización', error);
-      throw error;
-    } finally {
-      // Al terminar (con éxito o con error) se cierra la ventana del portal y se borra su
-      // sesión: la próxima corrida vuelve a empezar desde el login, sin quedarse abierta.
       await resetSofiaSession();
+      throw error;
     }
   });
 

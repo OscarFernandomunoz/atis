@@ -2,12 +2,11 @@ import type { BrowserWindow } from 'electron';
 import { executeInEveryFrame } from './frames.js';
 import { patchBlockUiScript } from './block-ui-patch.js';
 import { patchWaitSaveScript } from './wait-save-patch.js';
-import { patchUserInputScript } from './input-guard-patch.js';
 import { patchOpenerShimScript } from './opener-shim-patch.js';
 import { mainLogger } from '../../../logger.js';
 
-// Aplica los parches de la página en TODOS los frames de la ventana: blockUI, esperaGuardar,
-// el shim de window.opener y el bloqueo de entrada del usuario (rueda, arrastre, etc.).
+// Aplica los parches de la página en TODOS los frames de la ventana: blockUI, esperaGuardar
+// y el shim de window.opener.
 // Volver a hacerlo tras cada carga es lo que permite que un iframe nuevo (el diálogo de
 // instructor) quede cubierto antes de que su propio jQuery intente llamar $.unblockUI().
 //
@@ -26,5 +25,4 @@ export async function patchSofiaPageGuards(window: BrowserWindow): Promise<void>
   }
   await executeInEveryFrame(window, patchWaitSaveScript(), 3);
   await executeInEveryFrame(window, patchOpenerShimScript(), 3);
-  await executeInEveryFrame(window, patchUserInputScript(), 3);
 }

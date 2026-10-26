@@ -2,6 +2,8 @@
 // Cada función es autocontenida porque se inyecta en la página con `.toString()`.
 export { findAmbientesOption } from './find-ambientes-option.js';
 export { findEnvironmentManagementOption } from './find-environment-management-option.js';
+export { clickInstructorsOption } from './click-instructors-option.js';
+export { clickInstructorAvailabilityOption } from './click-instructor-availability-option.js';
 export { findInstructorActivityTimeOption } from './find-instructor-activity-time-option.js';
 export { findProgramLookupButton } from './find-program-lookup-button.js';
 export { findReportsOption } from './find-reports-option.js';

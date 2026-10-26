@@ -3,7 +3,6 @@ import type { WebContents } from 'electron';
 import { sanitizeLogText } from '../../../../shared/index.js';
 import { registerRemoteWindow } from '../../../windows/index.js';
 import { trackChildWindow } from './frames.js';
-import { blockUserInput } from './input-guard.js';
 import { patchSofiaPageGuards } from './page-guards.js';
 import { mainLogger } from '../../../logger.js';
 
@@ -50,7 +49,6 @@ export function trackSofiaWindow(window: BrowserWindow): void {
 
   const track = (target: BrowserWindow): void => {
     const contents = target.webContents;
-    blockUserInput(target);
     forwardConsole(contents);
     // Se aplica sobre TODOS los frames, no solo el principal: el diálogo de instructor vive
     // en un iframe que el sitio crea más tarde y su jQuery necesita el shim de blockUI.

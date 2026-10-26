@@ -4,6 +4,9 @@
 // página de SofiaPlus, por lo que debe ser autocontenida: sin imports en tiempo de
 // ejecución, sin constantes de módulo y sin referencias a helpers externos.
 export { fillReportDates } from './dates.js';
+export { clickAvailabilitySubmit } from './availability-submit.js';
+export { clickAvailabilityResult } from './availability-result.js';
+export { readOrangeAvailability } from './availability-result.js';
 export { selectCitizenshipId, findIdentificationTypePoint } from './identification-type.js';
 export { fillInstructorIdentification } from './identification-field.js';
 export { clickInstructorSearchInput } from './search-button/index.js';

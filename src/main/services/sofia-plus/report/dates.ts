@@ -5,7 +5,7 @@
 // todo lo que use debe existir dentro del propio cuerpo de la función.
 
 // Busca los campos de fecha del formulario y les asigna el rango solicitado por el usuario.
-export async function fillReportDates(dates: { startDate: string; endDate: string }): Promise<boolean> {
+export async function fillReportDates(dates: { startDate: string; endDate?: string }): Promise<boolean> {
   const fields = Array.from(document.querySelectorAll<HTMLInputElement>('input'))
     .filter((field) => field.type !== 'hidden' && field.getClientRects().length > 0);
   const fieldText = (field: HTMLInputElement): string => [
@@ -27,9 +27,12 @@ export async function fillReportDates(dates: { startDate: string; endDate: strin
     field.blur();
   };
   const startDate = findField(['fecha inicio', 'fecha de inicio', 'inicio', 'desde']);
-  const endDate = findField(['fecha fin', 'fecha de fin', 'fin', 'hasta']);
-  if (!startDate || !endDate) return false;
+  if (!startDate) return false;
   setValue(startDate, dates.startDate);
-  setValue(endDate, dates.endDate);
+  if (dates.endDate) {
+    const endDate = findField(['fecha fin', 'fecha de fin', 'fin', 'hasta']);
+    if (!endDate) return false;
+    setValue(endDate, dates.endDate);
+  }
   return true;
 }

@@ -2,7 +2,6 @@ import { app, BrowserWindow, session } from 'electron';
 import { isSofiaPlusUrl, SOFIA_PARTITION, SOFIA_PUBLIC_URL } from '../../../../shared/index.js';
 import { getAppWindowOptions, getCurrentTitleBarTheme, registerRemoteWindow } from '../../../windows/index.js';
 import { getTrackedChildWindows, patchSofiaPageGuards, trackSofiaWindow, wait } from '../browser/index.js';
-import { lockSofiaWindow } from './window-lock.js';
 import { getSofiaWindowSize } from './window-size.js';
 import { mainLogger } from '../../../logger.js';
 
@@ -42,20 +41,16 @@ export async function loadWindow(): Promise<BrowserWindow> {
     return sofiaWindow;
   }
 
-  // Tamaño fijo: el usuario puede minimizar y cerrar la ventana.
+  // Tamaño inicial sugerido; el usuario puede redimensionar y maximizar la ventana.
   // Al cerrar, se limpia la sesión (cookies, caché, credenciales) para que la próxima
   // corrida empiece desde cero en la pantalla de login.
   const size = getSofiaWindowSize();
   const window = new BrowserWindow({
     width: size.width,
     height: size.height,
-    minWidth: size.width,
-    minHeight: size.height,
-    maxWidth: size.width,
-    maxHeight: size.height,
-    resizable: false,
-    maximizable: false,
-    fullscreenable: false,
+    resizable: true,
+    maximizable: true,
+    fullscreenable: true,
     minimizable: true,
     closable: true,
     ...getAppWindowOptions(getCurrentTitleBarTheme()),
@@ -69,7 +64,6 @@ export async function loadWindow(): Promise<BrowserWindow> {
     },
   });
   registerRemoteWindow(window);
-  lockSofiaWindow(window, size);
   sofiaWindow = window;
 
   // Al cerrar la ventana (botón X), limpiar la sesión del portal para que la próxima
