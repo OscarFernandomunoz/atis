@@ -1,5 +1,6 @@
 import {
   CONTRACT_START_COLUMN_NAME,
+  CONTRACT_REQUIRED_HOURS_COLUMN_NAME,
   HOURS_COLUMN_NAME,
   excelSerialToDate,
   isCedulaHeader,
@@ -13,6 +14,7 @@ export interface Instructor {
   name: string;
   program: string;
   hours: string;
+  requiredContractHours: string;
   additionalHoursByMonth: Record<number, string>;
   // Fecha de inicio del contrato tal como trae la celda (serial de Excel):
   // null si la hoja no trae la columna o la celda no es una fecha.
@@ -82,6 +84,11 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
     const nameCol = findColumn(rows, headerRow, (header) => header.toLocaleUpperCase().includes(NAME_HEADER_HINT));
     const programCol = findColumn(rows, headerRow, (header) => header.toLocaleUpperCase().includes(PROGRAM_HEADER_HINT));
     const hoursCol = findColumn(rows, headerRow, (header) => sameHeader(header, HOURS_COLUMN_NAME));
+    const requiredContractHoursCol = findColumn(
+      rows,
+      headerRow,
+      (header) => sameHeader(header, CONTRACT_REQUIRED_HOURS_COLUMN_NAME),
+    );
     const additionalHoursColumns = findMonthlyAdditionalHoursColumns(rows, headerRow);
     // La fecha de inicio del contrato puede quedar una o dos filas bajo la de la
     // cédula (encabezados fusionados); si no existe, el instructor no se marca.
@@ -95,6 +102,7 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
         name: nameCol === -1 ? SIN_NOMBRE : clean(cells[nameCol]) || SIN_NOMBRE,
         program: programCol === -1 ? 'Sin programa' : clean(cells[programCol]) || 'Sin programa',
         hours: hoursCol === -1 ? '' : clean(cells[hoursCol]),
+        requiredContractHours: requiredContractHoursCol === -1 ? '' : clean(cells[requiredContractHoursCol]),
         additionalHoursByMonth: Object.fromEntries(
           [...additionalHoursColumns].map(([month, column]) => [month, clean(cells[column])]),
         ),
@@ -102,7 +110,13 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
       };
       // Clave por fila completa: dos filas idénticas se colapsan, pero la misma
       // persona en dos programas distintos conserva su carnet.
-      const signature = [instructor.identification, instructor.name, instructor.program, instructor.hours].join('\u0000');
+      const signature = [
+        instructor.identification,
+        instructor.name,
+        instructor.program,
+        instructor.hours,
+        instructor.requiredContractHours,
+      ].join('\u0000');
       const existing = seen.get(signature);
       if (existing) {
         Object.entries(instructor.additionalHoursByMonth).forEach(([month, hours]) => {

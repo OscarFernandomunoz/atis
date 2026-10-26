@@ -3,6 +3,7 @@ const CEDULA_COLUMN_NAMES = ['Columna 3', '# DE DOCUMENTO'];
 // Fecha cuyo adelanto marca al "instructor nuevo" y ventana del aviso, en días
 // desde hoy de la máquina del usuario.
 export const CONTRACT_START_COLUMN_NAME = 'INICIO DEL CONTRATO';
+export const CONTRACT_REQUIRED_HOURS_COLUMN_NAME = 'Horas requeridas por contrato';
 export const CONTRACT_START_WINDOW_DAYS = 30;
 export const HOURS_THRESHOLD = 160;
 export const GREEN_FILL = 'FF00B050';

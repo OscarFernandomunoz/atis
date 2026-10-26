@@ -82,10 +82,17 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   // avance al pasar el cursor, sin volver a interpretar la insignia.
   card.dataset.hours = hours;
   card.dataset.baseHours = hours;
+  card.dataset.requiredContractHours = instructor.requiredContractHours;
   const meta = el('div', 'carnet-meta');
   meta.appendChild(el('span', 'carnet-doc', `C.C. ${instructor.identification}`));
   meta.appendChild(createHoursBadge(hours));
   card.appendChild(meta);
+
+  if (instructor.requiredContractHours) {
+    const requiredHours = el('span', 'carnet-contract-hours');
+    requiredHours.textContent = `Horas requeridas por contrato: ${instructor.requiredContractHours} h`;
+    card.appendChild(requiredHours);
+  }
 
   const monthlyHours = el('div', 'carnet-monthly-hours');
   monthlyHours.hidden = true;
