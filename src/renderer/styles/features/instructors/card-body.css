@@ -143,6 +143,15 @@
   color: #b42318;
 }
 
+.carnet-hours.is-over {
+  border-color: color-mix(in srgb, #eab308 45%, transparent);
+  background: color-mix(in srgb, #eab308 14%, transparent);
+}
+
+.carnet-hours.is-over .carnet-hours-value {
+  color: #a16207;
+}
+
 .carnet-hours.is-none .carnet-hours-value {
   color: var(--text-muted);
 }

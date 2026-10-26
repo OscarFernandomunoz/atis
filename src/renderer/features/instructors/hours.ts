@@ -3,6 +3,7 @@ import type { Instructor } from './parse.js';
 
 // Clasificación de un valor de horas respecto al umbral del reporte.
 type HoursKind = 'ok' | 'low' | 'none';
+export type ContractHoursKind = 'equal' | 'low' | 'over' | 'none';
 
 interface HoursView {
   /** Texto a mostrar: las horas o un guion cuando no hay dato. */
@@ -25,6 +26,16 @@ export function hoursView(hours: string): HoursView {
 
 export function hoursKind(hours: string): HoursKind {
   return hoursView(hours).kind;
+}
+
+export function contractHoursKind(hours: string, requiredHours: string): ContractHoursKind {
+  const value = parseHoursValue(hours);
+  const required = parseHoursValue(requiredHours);
+  if (!Number.isFinite(value) || !Number.isFinite(required)) return 'none';
+  const roundedValue = Math.round(value * 100);
+  const roundedRequired = Math.round(required * 100);
+  if (roundedValue === roundedRequired) return 'equal';
+  return roundedValue < roundedRequired ? 'low' : 'over';
 }
 
 // Horas leídas en vivo desde SofiaPlus (el span del reporte), por cédula. Mandan

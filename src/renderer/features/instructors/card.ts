@@ -1,7 +1,7 @@
 import type { Instructor } from './parse.js';
 import { isContractStartNearToday } from '../spreadsheet/helpers.js';
 import { createSelectionCheckbox } from './selection.js';
-import { effectiveHours, hoursView } from './hours.js';
+import { contractHoursKind, effectiveHours, hoursView } from './hours.js';
 import { refreshHoursHint } from './hours-hint.js';
 import { parseHoursValue } from '../spreadsheet/helpers.js';
 
@@ -26,10 +26,12 @@ function el(tag: string, className: string, text?: string): HTMLElement {
   return node;
 }
 
-// Insignia de horas con su color según el umbral; un guion si no hay dato.
-function createHoursBadge(hours: string, total = false): HTMLElement {
+// Insignia de horas con color según el cumplimiento del contrato.
+function createHoursBadge(hours: string, total = false, requiredHours = ''): HTMLElement {
   const view = hoursView(hours);
-  const badge = el('span', `carnet-hours is-${view.kind}`);
+  const kind = contractHoursKind(hours, requiredHours);
+  const colorKind = kind === 'equal' ? 'ok' : kind === 'over' ? 'over' : kind === 'low' ? 'low' : view.kind;
+  const badge = el('span', `carnet-hours is-${colorKind}`);
   badge.classList.add('carnet-total-hours');
   if (total) badge.appendChild(el('span', 'carnet-hours-label', 'Total'));
   badge.appendChild(el('span', 'carnet-hours-value', view.text));
@@ -85,7 +87,7 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   card.dataset.requiredContractHours = instructor.requiredContractHours;
   const meta = el('div', 'carnet-meta');
   meta.appendChild(el('span', 'carnet-doc', `C.C. ${instructor.identification}`));
-  meta.appendChild(createHoursBadge(hours));
+  meta.appendChild(createHoursBadge(hours, false, instructor.requiredContractHours));
   card.appendChild(meta);
 
   if (instructor.requiredContractHours) {
@@ -120,7 +122,13 @@ export function updateCardAdditionalHours(grid: HTMLElement, months: readonly nu
       if (monthlyHours) monthlyHours.hidden = true;
       if (baseHours) baseHours.hidden = true;
       const badge = node.querySelector('.carnet-total-hours');
-      if (badge) badge.replaceWith(createHoursBadge(node.dataset.baseHours ?? ''));
+      if (badge) {
+        badge.replaceWith(createHoursBadge(
+          node.dataset.baseHours ?? '',
+          false,
+          node.dataset.requiredContractHours ?? '',
+        ));
+      }
       node.dataset.hours = node.dataset.baseHours ?? '';
       return;
     }
@@ -130,7 +138,13 @@ export function updateCardAdditionalHours(grid: HTMLElement, months: readonly nu
       monthlyHours.hidden = true;
       baseHours.hidden = true;
       const badge = node.querySelector('.carnet-total-hours');
-      if (badge) badge.replaceWith(createHoursBadge(node.dataset.baseHours ?? ''));
+      if (badge) {
+        badge.replaceWith(createHoursBadge(
+          node.dataset.baseHours ?? '',
+          false,
+          node.dataset.requiredContractHours ?? '',
+        ));
+      }
       node.dataset.hours = node.dataset.baseHours ?? '';
       return;
     }
@@ -156,9 +170,12 @@ export function updateCardAdditionalHours(grid: HTMLElement, months: readonly nu
     const total = Number.isFinite(baseTotal) ? baseTotal + additionalTotal : Number.NaN;
     const totalText = Number.isFinite(total) ? HOURS_FORMAT.format(total) : base;
     const badge = node.querySelector('.carnet-total-hours');
-    if (badge) badge.replaceWith(createHoursBadge(totalText, true));
+    if (badge) {
+      badge.replaceWith(createHoursBadge(totalText, true, node.dataset.requiredContractHours ?? ''));
+    }
   });
   refreshHoursHint();
+  grid.dispatchEvent(new Event('carnet-hours-updated'));
 }
 
 // Repinta las horas de las credenciales de una cédula (puede haber varias por programa).

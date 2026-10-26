@@ -1,6 +1,6 @@
 import { createInstructorCard } from './card.js';
 import { buildProgramFilter } from './filter.js';
-import { effectiveHours, hoursKind } from './hours.js';
+import { contractHoursKind } from './hours.js';
 import { buildHoursFilter, type HoursFilter } from './hours-filter.js';
 import { forgetHoursHint, refreshHoursHint } from './hours-hint.js';
 import { FALLBACK_COLOR, programColors } from './palette.js';
@@ -10,6 +10,8 @@ import { forgetInstructors, rememberInstructors } from './roster.js';
 import { bindSearch, normalizeText } from './search.js';
 import { bindSelection, refreshSelectAll, resetSelection, selectedIdentifications } from './selection.js';
 import { isContractStartNearToday } from '../spreadsheet/helpers.js';
+
+const filterUpdateControllers = new WeakMap<HTMLElement, AbortController>();
 
 // Partes del tablero de carnets que el render necesita tocar.
 export interface CardBoard {
@@ -31,6 +33,7 @@ export function renderInstructorCards(
   sheets: unknown[][][],
   onVisibleChange?: (identifications: string[] | null) => void,
 ): void {
+  filterUpdateControllers.get(board.grid)?.abort();
   // La pista del pie apunta a fichas que están a punto de reemplazarse.
   forgetHoursHint();
   const instructors = parseInstructors(sheets);
@@ -46,7 +49,6 @@ export function renderInstructorCards(
   cards.forEach((card) => fragment.appendChild(card));
   board.grid.replaceChildren(fragment);
 
-  const kinds = instructors.map((instructor) => hoursKind(effectiveHours(instructor)));
   // La ventana de "nuevo instructor" (contrato cerca de arrancar o recién
   // empezado) es un filtro más, así que se calcula al armar las fichas.
   const esNuevo = instructors.map((instructor) => isContractStartNearToday(instructor.contractStart));
@@ -68,8 +70,12 @@ export function renderInstructorCards(
     let visible = 0;
     const visibleIdentifications = new Set<string>();
     cards.forEach((card, position) => {
+      const kind = contractHoursKind(
+        card.dataset.hours ?? '',
+        card.dataset.requiredContractHours ?? '',
+      );
       const shown = (program === null || card.dataset.program === program)
-        && (hours === 'all' || kinds[position] === hours)
+        && (hours === 'all' || kind === hours)
         && (!nuevos || (esNuevo[position] ?? false))
         && (query === '' || (index[position] ?? '').includes(query));
       card.hidden = !shown;
@@ -109,6 +115,10 @@ export function renderInstructorCards(
     });
   };
 
+  const controller = new AbortController();
+  filterUpdateControllers.set(board.grid, controller);
+  board.grid.addEventListener('carnet-hours-updated', scheduleApply, { signal: controller.signal });
+
   // La casilla "seleccionar todo" actúa sobre las credenciales visibles de cada
   // filtro. Al marcar una casilla se agenda un repintado: la vista previa muestra
   // solo lo marcado y el trabajo se agrupa con el de los demás filtros.
@@ -135,6 +145,8 @@ export function renderInstructorCards(
 }
 
 export function clearInstructorCards(board: CardBoard): void {
+  filterUpdateControllers.get(board.grid)?.abort();
+  filterUpdateControllers.delete(board.grid);
   forgetInstructors();
   forgetHoursHint();
   forgetCardReveal(board.grid);
