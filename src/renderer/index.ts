@@ -2,6 +2,7 @@ import type { AppElements, FileUploadState } from './app/types.js';
 import { initPlayerBar } from './features/automation/player-bar/index.js';
 import { initSubmit } from './features/automation/submit.js';
 import { initAvailabilityResults } from './features/automation/availability-results.js';
+import { initConsulting } from './features/automation/consulting.js';
 import { initHoursHint } from './features/instructors/index.js';
 import { initNotificationConsent } from './features/notifications/index.js';
 import { initMonthsShowcase } from './features/scheduling/index.js';
@@ -28,6 +29,7 @@ function getElements(): AppElements {
     availabilityResultsList: document.getElementById('availabilityResultsList') as HTMLElement,
     playerTableButton: document.getElementById('playerTableButton') as HTMLButtonElement,
     playerLocateButton: document.getElementById('playerLocateButton') as HTMLButtonElement,
+    playerStopButton: document.getElementById('playerStopButton') as HTMLButtonElement,
     cardsGrid: document.getElementById('cardsGrid') as HTMLElement,
     programFilter: document.getElementById('programFilter') as HTMLElement,
     hoursFilter: document.getElementById('hoursFilter') as HTMLElement,
@@ -99,6 +101,7 @@ function initApp(): void {
   });
   initPlayerBar(elements);
   initAvailabilityResults(elements);
+  initConsulting(elements.cardsGrid, elements.excelPreview);
   initHoursHint(elements);
   initDropzoneSpotlight(elements.dropzone);
   initFileHandling(elements, state);

@@ -1,4 +1,4 @@
-import type { AppLogEntry, SofiaAvailabilityEntry, TitleBarPlatform } from '../shared/index.js';
+import type { AppLogEntry, SofiaIdentificationAvailability, TitleBarPlatform } from '../shared/index.js';
 import type { NotificationPermission, SystemNotification } from '../shared/index.js';
 
 // Define la forma del API expuesto desde el preload para que TypeScript reconozca window.electronAPI.
@@ -6,17 +6,20 @@ export interface IElectronAPI {
   // Envía un log del renderer al proceso principal para verlo en la terminal.
   log: (entry: AppLogEntry) => void;
 
-  // Inicia sesión y navega hasta Gestión de Ambientes.
+  // Inicia sesión en SofiaPlus y consulta cada identificación recibida.
   openSofiaAndFill: (credentials: {
     username: string;
     password: string;
     identifications: string[];
     startDate: string;
     endDate: string;
-  }) => Promise<SofiaAvailabilityEntry[]>;
+  }) => Promise<SofiaIdentificationAvailability[]>;
 
   // Pausa o reanuda la automatización en curso; al reanudar continúa donde quedó.
   setAutomationPaused: (paused: boolean) => void;
+  // Detiene la corrida actual; al iniciar de nuevo se abre una sesión limpia.
+  stopAutomation: () => void;
+  onSofiaConsulting: (callback: (identification: string | null) => void) => () => void;
 
   // Aplica las horas al Excel con Excel real, conservando diseño y filtros.
   // Devuelve null si Excel no está disponible (se puede usar el fallback).

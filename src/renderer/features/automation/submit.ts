@@ -1,7 +1,12 @@
 import type { AppElements } from '../../app/types.js';
 import { logger } from '../../app/logger.js';
 import { notify } from '../notifications/index.js';
-import { setPlayerState } from './player-bar/index.js';
+import {
+  setLocateAvailable,
+  setPlayerProgress,
+  setPlayerState,
+  setPlayerTrack,
+} from './player-bar/index.js';
 import {
   identificationsForAutomation,
   rememberAvailabilityHours,
@@ -12,7 +17,9 @@ import { getCurrentMonths, updatePreviewAvailabilityHours } from '../spreadsheet
 import { MONTH_BLOCK_LABELS } from '../spreadsheet/preview/constants.js';
 
 type SubmitElements = Pick<AppElements,
-  'playButton' | 'playerTrack' | 'statusMessage' | 'inputUser' | 'inputPass'
+  'playButton' | 'playerStopButton' | 'playerTrack' | 'statusMessage' | 'inputUser' | 'inputPass'
+  | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent'
+  | 'playerProgressTotal' | 'playerProgressFill' | 'playerLocateButton'
   | 'inputStartDate' | 'inputEndDate' | 'cardsGrid'
   | 'excelPreview'
   | 'availabilityResultsButton' | 'availabilityResultsModal' | 'availabilityResultsBackdrop'
@@ -32,6 +39,7 @@ export function initSubmit(elements: SubmitElements): void {
   let running = false;
   let pausable = false;
   let isPaused = false;
+  let stopRequested = false;
   let statusBeforePause = '';
 
   const applyPause = (value: boolean): void => {
@@ -92,52 +100,62 @@ export function initSubmit(elements: SubmitElements): void {
     pausable = true;
     isPaused = false;
     setPlayerState(elements, 'loading');
-    elements.statusMessage.textContent = 'Abriendo SofiaPlus y navegando hasta Gestión de Ambientes...';
+    elements.statusMessage.textContent = `Abriendo SofiaPlus para consultar ${identifications.length} cédula(s)...`;
 
     try {
-      const availabilityEntries = await window.electronAPI.openSofiaAndFill({
+      const availabilityResults = await window.electronAPI.openSofiaAndFill({
         username: elements.inputUser.value,
         password: elements.inputPass.value,
         identifications,
         startDate: elements.inputStartDate.value,
         endDate: elements.inputEndDate.value,
       });
+      if (stopRequested) return;
       pausable = false;
-      setPlayerState(elements, 'success');
-      const identification = identifications[0];
-      const totalMinutes = availabilityEntries.reduce(
-        (total, entry) => total + (entry.durationMinutes ?? 0),
-        0,
-      );
-      const totalHours = totalMinutes / 60;
-      const recognizedHours = availabilityEntries.some((entry) => entry.durationMinutes !== null);
-      if (identification && recognizedHours) {
+      const completed = availabilityResults.filter((result) => result.error === null).length;
+      const failed = availabilityResults.length - completed;
+      setPlayerState(elements, failed === 0 ? 'success' : 'error');
+      const targetMonth = selectedMonths[0];
+      if (targetMonth === undefined) throw new Error('No se pudo determinar el mes seleccionado.');
+      const monthName = MONTH_BLOCK_LABELS[targetMonth]?.toLocaleLowerCase() ?? `mes ${targetMonth + 1}`;
+      availabilityResults.forEach(({ identification, entries, error }) => {
+        if (error) {
+          logger.warn('SofiaPlus', `Falló la consulta de la cédula ${identification}: ${error}`);
+          return;
+        }
+        const totalMinutes = entries.reduce((total, entry) => total + (entry.durationMinutes ?? 0), 0);
+        const totalHours = totalMinutes / 60;
+        const hasRecognizedHours = entries.length === 0
+          || entries.some((entry) => entry.durationMinutes !== null);
+        if (!hasRecognizedHours) return;
         const formattedHours = String(Number(totalHours.toFixed(2)));
-        const targetMonth = selectedMonths[0];
-        if (targetMonth === undefined) throw new Error('No se pudo determinar el mes seleccionado.');
         rememberAvailabilityHours(identification, targetMonth, formattedHours);
-        updateCardAdditionalHours(elements.cardsGrid, selectedMonths);
         const updatedRows = updatePreviewAvailabilityHours(
           elements.excelPreview,
           identification,
           totalHours,
           targetMonth,
         );
-        const monthName = MONTH_BLOCK_LABELS[targetMonth]?.toLocaleLowerCase() ?? `mes ${targetMonth + 1}`;
         if (updatedRows === 0) {
-          logger.warn('SofiaPlus', `No se actualizó Horas Adicionales de ${monthName}; verifica la cédula y el encabezado mensual.`);
+          logger.warn('SofiaPlus', `No se actualizaron Horas Adicionales de ${monthName} para la cédula ${identification}; verifica el Excel.`);
+        } else if (entries.length === 0) {
+          logger.info('SofiaPlus', `No se encontraron bloques naranjas para la cédula ${identification}; se registraron 0 Horas Adicionales de ${monthName}.`);
         } else {
-          logger.info('SofiaPlus', `Se actualizaron ${updatedRows} fila(s) de Horas Adicionales de ${monthName}.`);
+          logger.info('SofiaPlus', `Se actualizaron ${updatedRows} fila(s) de Horas Adicionales de ${monthName} para la cédula ${identification}.`);
         }
-      }
-      elements.statusMessage.textContent = `Se leyeron ${availabilityEntries.length} bloques naranjas de disponibilidad.`;
-      showAvailabilityResults(elements, availabilityEntries);
-      logger.info('SofiaPlus', 'Navegación completada hasta Gestión de Ambientes.');
+      });
+      updateCardAdditionalHours(elements.cardsGrid, selectedMonths);
+      const blockCount = availabilityResults.reduce((total, result) => total + result.entries.length, 0);
+      elements.statusMessage.textContent = `Consultadas ${completed} de ${availabilityResults.length} cédulas; `
+        + `${blockCount} bloques naranjas leídos${failed > 0 ? `; ${failed} consulta(s) fallida(s), revisa el detalle.` : '.'}`;
+      showAvailabilityResults(elements, availabilityResults);
+      logger.info('SofiaPlus', `Consultas finalizadas: ${completed}/${availabilityResults.length} cédulas.`);
       await notify(
         'Consulta de disponibilidad completada',
-        `Se encontraron ${availabilityEntries.length} bloques naranjas. Consulta el detalle en la ventana principal.`,
+        `Se encontraron ${blockCount} bloques naranjas. Consulta el detalle en la ventana principal.`,
       );
     } catch (error) {
+      if (stopRequested) return;
       const message = error instanceof Error ? error.message : String(error);
       const userMessage = message.includes('rol necesario')
         || message.includes('No se encontraron bloques naranjas')
@@ -147,6 +165,7 @@ export function initSubmit(elements: SubmitElements): void {
       setPlayerState(elements, 'error');
       await notify('Error en la automatización', userMessage);
     } finally {
+      const wasStopped = stopRequested;
       running = false;
       pausable = false;
       if (isPaused) {
@@ -154,7 +173,26 @@ export function initSubmit(elements: SubmitElements): void {
         window.electronAPI.setAutomationPaused(false);
       }
       elements.playerTrack.classList.remove('is-paused');
-      window.setTimeout(() => setPlayerState(elements, 'idle'), 2800);
+      if (wasStopped) {
+        setPlayerState(elements, 'idle');
+        setPlayerTrack(elements, null);
+        setPlayerProgress(elements, 0, 0);
+        setLocateAvailable(elements.playerLocateButton, false);
+        elements.statusMessage.textContent = 'Automatización detenida. Pulsa reproducir para comenzar desde cero.';
+        stopRequested = false;
+      } else {
+        window.setTimeout(() => setPlayerState(elements, 'idle'), 2800);
+      }
     }
+  });
+
+  elements.playerStopButton.addEventListener('click', () => {
+    if (!running || stopRequested) return;
+    stopRequested = true;
+    pausable = false;
+    elements.playerStopButton.disabled = true;
+    elements.playerStopButton.setAttribute('aria-label', 'Deteniendo automatización...');
+    elements.statusMessage.textContent = 'Deteniendo SofiaPlus. Al volver a reproducir, comenzará desde cero...';
+    window.electronAPI.stopAutomation();
   });
 }

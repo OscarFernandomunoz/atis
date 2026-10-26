@@ -10,6 +10,13 @@ const CARD_CONSULTING_CLASS = 'is-consulting';
 const ROW_CONSULTING_CLASS = 'excel-row-consulting';
 const BADGE_CLASS = 'excel-consulting-badge';
 
+export function initConsulting(grid: HTMLElement, preview: HTMLElement): void {
+  window.electronAPI.onSofiaConsulting((identification) => {
+    if (identification) startConsulting(grid, preview, identification);
+    else stopConsulting(grid, preview);
+  });
+}
+
 function createBadge(identification: string): HTMLElement {
   const badge = document.createElement('span');
   badge.className = BADGE_CLASS;

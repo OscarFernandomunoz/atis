@@ -120,7 +120,9 @@ export async function executeInFrames<T>(
   beforeAttempt?: () => Promise<void>,
 ): Promise<T | undefined> {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (window.isDestroyed()) return undefined;
     if (beforeAttempt) await beforeAttempt();
+    if (window.isDestroyed()) return undefined;
     const frames = collectFrames(window);
     for (const frame of frames) {
       try {
@@ -130,6 +132,7 @@ export async function executeInFrames<T>(
         // El frame puede cambiar durante una redirección o una carga parcial.
       }
     }
+    if (window.isDestroyed()) return undefined;
     await wait(300);
   }
   return undefined;

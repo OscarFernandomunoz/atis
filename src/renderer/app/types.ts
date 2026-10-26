@@ -19,6 +19,7 @@ export interface AppElements {
   availabilityResultsList: HTMLElement;
   playerTableButton: HTMLButtonElement;
   playerLocateButton: HTMLButtonElement;
+  playerStopButton: HTMLButtonElement;
   cardsGrid: HTMLElement;
   programFilter: HTMLElement;
   hoursFilter: HTMLElement;

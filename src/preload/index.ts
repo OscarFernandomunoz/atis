@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import {
   getTitleBarPlatform,
   type AppLogEntry,
-  type SofiaAvailabilityEntry,
+  type SofiaIdentificationAvailability,
   type TitleBarTheme,
 } from '../shared/index.js';
 import type { NotificationPermission, SystemNotification } from '../shared/index.js';
@@ -16,16 +16,26 @@ const electronAPI = {
   // proceso principal, que los imprime en la terminal.
   log: (entry: AppLogEntry): void => ipcRenderer.send('app:log', entry),
 
+  // Inicia sesión en SofiaPlus y consulta cada identificación recibida.
   openSofiaAndFill: (credentials: {
     username: string;
     password: string;
     identifications: string[];
     startDate: string;
     endDate: string;
-  }): Promise<SofiaAvailabilityEntry[]> => ipcRenderer.invoke('sofia:open-and-fill', credentials),
+  }): Promise<SofiaIdentificationAvailability[]> => ipcRenderer.invoke('sofia:open-and-fill', credentials),
 
   // Pausa o reanuda la automatización en curso; reanuda justo donde quedó.
   setAutomationPaused: (paused: boolean): void => ipcRenderer.send('sofia:set-paused', paused),
+  // Detiene la corrida actual; al iniciar de nuevo se abre una sesión limpia.
+  stopAutomation: (): void => ipcRenderer.send('sofia:stop'),
+  onSofiaConsulting: (callback: (identification: string | null) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, identification: unknown): void => {
+      if (identification === null || typeof identification === 'string') callback(identification);
+    };
+    ipcRenderer.on('sofia:consulting', listener);
+    return () => ipcRenderer.removeListener('sofia:consulting', listener);
+  },
 
   // Aplica las horas a TODAS las cédulas en una sola pasada con Excel real (COM).
   applyHoursMultipleToExcel: (payload: { data: ArrayBuffer; fileName: string; targets: Array<{ identification: string; totalHours: string }> }): Promise<ArrayBuffer | null> =>

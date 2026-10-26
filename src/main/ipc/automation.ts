@@ -6,14 +6,15 @@ import {
   parseSofiaStartDate,
 } from '../services/sofia-plus/credentials.js';
 import { openSofiaPlus } from '../services/sofia-plus/index.js';
-import { setAutomationPaused } from '../services/sofia-plus/workflow/pause-gate.js';
+import { cancelAutomation, isAutomationCancelled, setAutomationPaused } from '../services/sofia-plus/workflow/pause-gate.js';
 import { resetSofiaSession } from '../services/sofia-plus/workflow/session-reset.js';
+import { closeSofiaPopups, closeSofiaWindow } from '../services/sofia-plus/workflow/window-loader.js';
 import { isTrustedSender } from './trusted-sender.js';
 import { mainLogger } from '../logger.js';
 
 // Canales de la automatización de SofiaPlus.
 export function registerAutomationHandlers(): void {
-  // Inicia sesión y navega hasta Gestión de Ambientes.
+  // Consulta en SofiaPlus la disponibilidad de todas las cédulas recibidas.
   ipcMain.handle('sofia:open-and-fill', async (event, raw: unknown) => {
     if (!isTrustedSender(event)) throw new Error('Origen no autorizado.');
 
@@ -32,11 +33,20 @@ export function registerAutomationHandlers(): void {
     }
 
     try {
-      await openSofiaPlus({ ...credentials, identifications, startDate, endDate });
+      return await openSofiaPlus(
+        { ...credentials, identifications, startDate, endDate },
+        (identification) => event.sender.send('sofia:consulting', identification),
+      );
     } catch (error) {
+      if (isAutomationCancelled()) {
+        await resetSofiaSession();
+        return;
+      }
       mainLogger.error('SofiaPlus', 'No se pudo completar el flujo de automatización', error);
       await resetSofiaSession();
       throw error;
+    } finally {
+      if (!event.sender.isDestroyed()) event.sender.send('sofia:consulting', null);
     }
   });
 
@@ -46,5 +56,13 @@ export function registerAutomationHandlers(): void {
     if (!isTrustedSender(event)) return;
     if (typeof paused !== 'boolean') return;
     setAutomationPaused(paused);
+  });
+
+  ipcMain.on('sofia:stop', (event) => {
+    if (!isTrustedSender(event)) return;
+    cancelAutomation();
+    event.sender.send('sofia:consulting', null);
+    closeSofiaPopups();
+    closeSofiaWindow();
   });
 }

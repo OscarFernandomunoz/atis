@@ -4,3 +4,9 @@ export interface SofiaAvailabilityEntry {
   details: string;
   durationMinutes: number | null;
 }
+
+export interface SofiaIdentificationAvailability {
+  identification: string;
+  entries: SofiaAvailabilityEntry[];
+  error: string | null;
+}
