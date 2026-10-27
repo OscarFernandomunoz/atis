@@ -1,27 +1,30 @@
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 22px;
+  gap: 20px;
 }
 
-/* Credencial clara con acentos verdes de la identidad institucional. */
 .carnet {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px 18px 16px;
+  min-height: 318px;
+  padding: 22px;
   overflow: hidden;
-  /* Aísla el layout de cada credencial del resto de la rejilla. */
   contain: layout style;
   background-color: var(--surface);
   background-image:
-    radial-gradient(130% 100% at 100% 0%, color-mix(in srgb, var(--card-accent) 44%, transparent) 0%, transparent 62%),
-    linear-gradient(158deg, #ffffff 0%, var(--surface-muted) 100%);
+    radial-gradient(100% 75% at 100% 0%, color-mix(in srgb, var(--card-accent) 12%, transparent) 0%, transparent 72%),
+    linear-gradient(145deg, var(--surface) 8%, var(--surface-muted) 100%);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 22px;
   box-shadow: var(--shadow-soft);
-  transition: transform 320ms var(--ease-out), border-color 320ms var(--ease-smooth), box-shadow 320ms var(--ease-smooth);
+  transition:
+    transform 280ms var(--ease-out),
+    border-color 280ms var(--ease-smooth),
+    box-shadow 280ms var(--ease-smooth),
+    background-color 280ms var(--ease-smooth);
 }
 
 .carnet[hidden] {
@@ -52,10 +55,17 @@
 }
 
 .carnet:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
   border-color: color-mix(in srgb, var(--card-accent) 46%, transparent);
-  box-shadow: var(--shadow),
-    0 0 0 1px color-mix(in srgb, var(--card-accent) 30%, transparent);
+  box-shadow:
+    0 20px 42px color-mix(in srgb, var(--card-accent) 13%, transparent),
+    var(--shadow),
+    0 0 0 1px color-mix(in srgb, var(--card-accent) 25%, transparent);
+}
+
+.carnet:focus-within {
+  outline: 2px solid color-mix(in srgb, var(--card-accent) 72%, transparent);
+  outline-offset: 3px;
 }
 
 /* Destino del atajo del reproductor: un anillo con el color del programa señala
@@ -83,6 +93,9 @@
 /* La selección tiñe la ficha entera, no solo la casilla. */
 .carnet:has(.carnet-check:checked) {
   border-color: color-mix(in srgb, var(--card-accent) 56%, transparent);
+  background-image:
+    radial-gradient(100% 75% at 100% 0%, color-mix(in srgb, var(--card-accent) 18%, transparent) 0%, transparent 72%),
+    linear-gradient(145deg, var(--surface) 8%, var(--surface-muted) 100%);
   box-shadow: var(--shadow),
     0 0 0 1px color-mix(in srgb, var(--card-accent) 36%, transparent);
 }

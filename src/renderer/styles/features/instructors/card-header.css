@@ -2,13 +2,13 @@
 .carnet-band {
   position: absolute;
   inset: 0 0 auto;
-  height: 2px;
+  height: 4px;
   background: linear-gradient(90deg,
       var(--card-accent) 0%,
       color-mix(in srgb, var(--card-accent) 55%, transparent) 38%,
       transparent 88%);
-  opacity: 0.85;
-  transition: opacity 320ms var(--ease-smooth);
+  opacity: 0.9;
+  transition: opacity 280ms var(--ease-smooth);
 }
 
 .carnet:hover .carnet-band,
@@ -18,9 +18,10 @@
 
 .carnet-top {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 15px;
   min-width: 0;
+  padding: 2px 0 5px;
 }
 
 /* Marca de "instructor nuevo": contrato que arranca dentro de la ventana de
