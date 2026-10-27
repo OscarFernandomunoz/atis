@@ -2,7 +2,12 @@ import type { Instructor } from './parse.js';
 import { isContractStartNearToday } from '../spreadsheet/helpers.js';
 import { createSelectionCheckbox } from './selection.js';
 import { effectiveHours } from './hours.js';
-import { createInstructorHoursBadge, rememberCardAdditionalHours } from './card-hours.js';
+import {
+  createInstructorHoursBadge,
+  rememberCardAdditionalHours,
+  rememberCardCompensationHours,
+  rememberCardRequiredHours,
+} from './card-hours.js';
 
 // Retrato genérico para credenciales sin foto de perfil (estilo intranet).
 const PHOTO_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
@@ -30,7 +35,21 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   card.dataset.program = instructor.program;
   // La cédula queda a mano para refrescar las horas del portal en vivo.
   card.dataset.identification = instructor.identification;
-  rememberCardAdditionalHours(card, instructor.additionalHoursByMonth);
+  rememberCardAdditionalHours(
+    card,
+    instructor.additionalHoursByMonth,
+    instructor.academicHoursByMonth,
+  );
+  rememberCardCompensationHours(
+    card,
+    instructor.hoursToCompensateByMonth,
+    instructor.hoursToCompensate,
+  );
+  rememberCardRequiredHours(
+    card,
+    instructor.requiredContractHoursByMonth,
+    instructor.requiredContractHours,
+  );
   card.appendChild(el('span', 'carnet-band'));
 
   const top = el('div', 'carnet-top');
@@ -73,11 +92,13 @@ export function createInstructorCard(instructor: Instructor, accent: string): HT
   meta.appendChild(createInstructorHoursBadge(hours, instructor.requiredContractHours));
   card.appendChild(meta);
 
-  if (instructor.requiredContractHours) {
-    const requiredHours = el('span', 'carnet-contract-hours');
-    requiredHours.textContent = `Horas requeridas por contrato: ${instructor.requiredContractHours} h`;
-    card.appendChild(requiredHours);
-  }
+  const requiredHours = el('span', 'carnet-contract-hours');
+  requiredHours.hidden = true;
+  card.appendChild(requiredHours);
+
+  const compensationHours = el('span', 'carnet-compensation-hours');
+  compensationHours.hidden = true;
+  card.appendChild(compensationHours);
 
   const monthlyHours = el('div', 'carnet-monthly-hours');
   monthlyHours.hidden = true;

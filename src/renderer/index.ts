@@ -3,7 +3,7 @@ import { initPlayerBar } from './features/automation/player-bar/index.js';
 import { initSubmit } from './features/automation/submit.js';
 import { initAvailabilityResults } from './features/automation/availability-results.js';
 import { initConsulting } from './features/automation/consulting.js';
-import { initHoursHint } from './features/instructors/index.js';
+import { initHoursHint, updateCardAdditionalHours } from './features/instructors/index.js';
 import { initNotificationConsent } from './features/notifications/index.js';
 import { initMonthsShowcase } from './features/scheduling/index.js';
 import { applyMonthWindow, initDropzoneSpotlight, initFileHandling } from './features/spreadsheet/index.js';
@@ -96,7 +96,8 @@ function initApp(): void {
   initTitleBar();
   initNotificationConsent();
   initMonthsShowcase((months) => {
-    // El preview sigue la selección del carrusel: solo los bloques de esos meses.
+    // Los carnets y el preview deben mostrar siempre los datos del mismo mes.
+    updateCardAdditionalHours(elements.cardsGrid, months);
     applyMonthWindow(elements, months);
   });
   initPlayerBar(elements);
