@@ -2,6 +2,11 @@ import { logger } from '../../app/logger.js';
 import { notificationsAllowed } from './permission.js';
 import { showInAppNotice } from './toast.js';
 
+/** Muestra un aviso animado dentro de la app, sin usar notificaciones del sistema. */
+export function notifyInApp(title: string, body: string): void {
+  showInAppNotice(title, body);
+}
+
 /**
  * Avisa al usuario de que algo salió mal.
  *

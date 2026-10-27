@@ -8,7 +8,7 @@ import {
   renderInstructorCards,
   updateCardAdditionalHours,
 } from '../../instructors/index.js';
-import { notify } from '../../notifications/index.js';
+import { logger } from '../../../app/logger.js';
 import { normalizeIdentification } from '../helpers.js';
 import { cardBoard, type FileElements } from './card-board.js';
 import { findRequiredColumnIndex, getAllIdentifications, validateRequiredColumn } from './column.js';
@@ -60,7 +60,7 @@ function validateAndSetFile(file: File, elements: FileElements, state: FileUploa
   elements.dropzone.classList.remove('dropzone-valid', 'dropzone-error');
   const extension = file.name.split('.').pop()?.toLowerCase();
   if (extension !== 'xls' && extension !== 'xlsx') {
-    void notify('Archivo no válido', 'Solo se permiten archivos Excel en formato .xls o .xlsx');
+    logger.warn('Excel', `Se rechazó "${file.name}": solo se permiten archivos .xls o .xlsx.`);
     return;
   }
   // El nombre lo elige el sistema de archivos, no la app: se inserta como texto
@@ -98,7 +98,10 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     const validationResults = sheetFilterInfos.map(({ sheetName, rows }) => validateRequiredColumn(rows, sheetName));
     const validSheetCount = validationResults.filter((result) => result === null).length;
     if (validSheetCount === 0) {
-      rejectFile(elements, state, validationResults.find(Boolean) ?? `Ninguna hoja contiene ${REQUIRED_COLUMN_LABEL} con datos válidos.`);
+      const message = validationResults.find(Boolean)
+        ?? `Ninguna hoja contiene ${REQUIRED_COLUMN_LABEL} con datos válidos.`;
+      logger.warn('Excel', `Se rechazó "${file.name}": ${message}`);
+      rejectFile(elements, state, message);
       return;
     }
     const identifications = [...new Set(sheetFilterInfos
@@ -164,8 +167,9 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     if (!firstIdentification) {
       elements.statusMessage.textContent = `Información de ${file.name} lista para revisar. ${REQUIRED_COLUMN_LABEL} presente, pero no se encontraron cédulas válidas.`;
     }
-  } catch {
+  } catch (error) {
     forgetSheets();
+    logger.error('Excel', 'No se pudo leer el archivo Excel.', error);
     rejectFile(elements, state, 'No se pudo leer este archivo Excel.');
   }
 }
@@ -179,5 +183,4 @@ function rejectFile(elements: FileElements, state: FileUploadState, message: str
   elements.excelPreview.textContent = message;
   clearInstructorCards(cardBoard(elements));
   elements.statusMessage.textContent = message;
-  void notify('No se pudo leer el archivo', message);
 }

@@ -1,6 +1,6 @@
 import type { AppElements } from '../../app/types.js';
 import { logger } from '../../app/logger.js';
-import { notify } from '../notifications/index.js';
+import { notify, notifyInApp } from '../notifications/index.js';
 import {
   setLocateAvailable,
   setPlayerProgress,
@@ -63,36 +63,38 @@ export function initSubmit(elements: SubmitElements): void {
 
     if (!elements.inputUser.value || !elements.inputPass.value) {
       elements.statusMessage.textContent = 'Faltan las credenciales de acceso a SofiaPlus.';
-      await notify('Faltan las credenciales', 'Ingresa el usuario y la contraseña de SofiaPlus para iniciar la automatización.');
+      logger.warn('SofiaPlus', 'No se inició la automatización: faltan las credenciales.');
+      notifyInApp('Faltan las credenciales', 'Ingresa el usuario y la contraseña de SofiaPlus para iniciar la automatización.');
       return;
     }
 
     if (!elements.inputStartDate.value) {
       elements.statusMessage.textContent = 'Selecciona una fecha de inicio antes de iniciar la automatización.';
-      await notify('Falta la fecha de inicio', 'Selecciona la fecha de inicio para consultar la disponibilidad del instructor.');
+      logger.warn('SofiaPlus', 'No se inició la automatización: falta la fecha de inicio.');
+      notifyInApp('Falta la fecha de inicio', 'Selecciona la fecha de inicio para consultar la disponibilidad.');
       return;
     }
 
     if (!elements.inputEndDate.value) {
       elements.statusMessage.textContent = 'Selecciona una fecha de fin antes de iniciar la automatización.';
-      await notify('Falta la fecha de fin', 'Selecciona la fecha de fin para consultar la disponibilidad del instructor.');
+      logger.warn('SofiaPlus', 'No se inició la automatización: falta la fecha de fin.');
+      notifyInApp('Falta la fecha de fin', 'Selecciona la fecha de fin para consultar la disponibilidad.');
       return;
     }
 
     const selectedMonths = getCurrentMonths();
     if (selectedMonths?.length !== 1) {
       elements.statusMessage.textContent = 'Selecciona un solo mes para consultar y actualizar sus horas adicionales.';
-      await notify(
-        'Selecciona un solo mes',
-        'La consulta devuelve un total para todo el rango. Elige un único mes en el carrusel para actualizar la columna de ese mes.',
-      );
+      logger.warn('SofiaPlus', 'No se inició la automatización: debe seleccionarse un solo mes.');
+      notifyInApp('Selecciona un solo mes', 'Elige un único mes en el carrusel antes de iniciar la consulta.');
       return;
     }
 
     const identifications = identificationsForAutomation(elements.cardsGrid);
     if (identifications.length === 0) {
       elements.statusMessage.textContent = 'Carga un Excel con cédulas válidas antes de iniciar la automatización.';
-      await notify('No hay cédulas para consultar', 'Carga un Excel con cédulas válidas antes de iniciar la automatización.');
+      logger.warn('SofiaPlus', 'No se inició la automatización: no hay cédulas válidas para consultar.');
+      notifyInApp('No hay cédulas para consultar', 'Carga un Excel con cédulas válidas antes de iniciar la automatización.');
       return;
     }
 
@@ -150,10 +152,6 @@ export function initSubmit(elements: SubmitElements): void {
         + `${blockCount} bloques naranjas leídos${failed > 0 ? `; ${failed} consulta(s) fallida(s), revisa el detalle.` : '.'}`;
       showAvailabilityResults(elements, availabilityResults);
       logger.info('SofiaPlus', `Consultas finalizadas: ${completed}/${availabilityResults.length} cédulas.`);
-      await notify(
-        'Consulta de disponibilidad completada',
-        `Se encontraron ${blockCount} bloques naranjas. Consulta el detalle en la ventana principal.`,
-      );
     } catch (error) {
       if (stopRequested) return;
       const message = error instanceof Error ? error.message : String(error);
@@ -161,6 +159,7 @@ export function initSubmit(elements: SubmitElements): void {
         || message.includes('No se encontraron bloques naranjas')
         ? message
         : 'No se pudo abrir SofiaPlus. Revisa tu conexión e inténtalo nuevamente.';
+      logger.error('SofiaPlus', 'Error importante durante la automatización.', error);
       elements.statusMessage.textContent = userMessage;
       setPlayerState(elements, 'error');
       await notify('Error en la automatización', userMessage);
