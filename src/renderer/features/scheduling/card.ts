@@ -19,7 +19,7 @@ export function createMonthCard(month: MonthCard): MonthCardView {
   const card = document.createElement('button');
   card.type = 'button';
   card.className = 'month-card';
-  card.setAttribute('role', 'checkbox');
+  card.setAttribute('role', 'radio');
   card.setAttribute('aria-checked', 'false');
   card.setAttribute('aria-label', `Seleccionar ${month.label}`);
 
