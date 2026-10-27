@@ -3,7 +3,7 @@ import { initPlayerBar } from './features/automation/player-bar/index.js';
 import { initSubmit } from './features/automation/submit.js';
 import { initAvailabilityResults } from './features/automation/availability-results.js';
 import { initConsulting } from './features/automation/consulting.js';
-import { initHoursHint, updateCardAdditionalHours } from './features/instructors/index.js';
+import { updateCardAdditionalHours } from './features/instructors/index.js';
 import { initNotificationConsent } from './features/notifications/index.js';
 import { initMonthsShowcase } from './features/scheduling/index.js';
 import { applyMonthWindow, initDropzoneSpotlight, initFileHandling } from './features/spreadsheet/index.js';
@@ -44,7 +44,6 @@ function getElements(): AppElements {
     playerProgressTotal: document.getElementById('playerProgressTotal') as HTMLElement,
     playerTrack: document.getElementById('playerTrack') as HTMLElement,
     playerProgressFill: document.getElementById('playerProgressFill') as HTMLElement,
-    playerHoursHint: document.getElementById('playerHoursHint') as HTMLElement,
     statusMessage: document.getElementById('statusMessage') as HTMLElement,
     inputUser: document.getElementById('usuario') as HTMLInputElement,
     inputPass: document.getElementById('password') as HTMLInputElement,
@@ -103,7 +102,6 @@ function initApp(): void {
   initPlayerBar(elements);
   initAvailabilityResults(elements);
   initConsulting(elements.cardsGrid, elements.excelPreview);
-  initHoursHint(elements);
   initDropzoneSpotlight(elements.dropzone);
   initFileHandling(elements, state);
   initPreviewModal(elements);

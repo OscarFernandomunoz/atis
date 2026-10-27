@@ -1,6 +1,5 @@
 import { parseHoursValue } from '../spreadsheet/helpers.js';
 import { availabilityHours, contractHoursKind, hoursView } from './hours.js';
-import { refreshHoursHint } from './hours-hint.js';
 
 const additionalHoursByCard = new WeakMap<HTMLElement, Readonly<Record<number, string>>>();
 const academicHoursByCard = new WeakMap<HTMLElement, Readonly<Record<number, string>>>();
@@ -109,7 +108,6 @@ export function updateCardAdditionalHours(grid: HTMLElement, months: readonly nu
     }
     node.dataset.hours = totalText;
   });
-  refreshHoursHint();
   grid.dispatchEvent(new Event('carnet-hours-updated'));
 }
 
@@ -160,7 +158,6 @@ export function updateCardHours(grid: HTMLElement, identification: string, hours
     node.dataset.hoursSource = 'sofiaplus';
   });
   updateCardAdditionalHours(grid, selectedMonths);
-  refreshHoursHint();
 }
 
 export function createInstructorHoursBadge(hours: string, requiredHours: string): HTMLElement {

@@ -34,7 +34,6 @@ export interface AppElements {
   playerProgressTotal: HTMLElement;
   playerTrack: HTMLElement;
   playerProgressFill: HTMLElement;
-  playerHoursHint: HTMLElement;
   statusMessage: HTMLElement;
   inputUser: HTMLInputElement;
   inputPass: HTMLInputElement;

@@ -14,7 +14,7 @@
 
 @media (max-width: 900px) {
   .player-bar {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
     gap: 14px;
     padding-inline: 12px;
   }
@@ -23,11 +23,6 @@
 @media (max-width: 760px) {
   .form-grid {
     grid-template-columns: 1fr;
-  }
-
-  /* En pantallas estrechas la pista conserva el dato de horas y suelta el nombre. */
-  .player-hours-who {
-    display: none;
   }
 
   /* Sin espacio para la píldora: la tarjeta completa ya abre el selector. */
