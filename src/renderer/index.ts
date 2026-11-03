@@ -1,7 +1,9 @@
 import type { AppElements, FileUploadState } from './app/types.js';
 import { initPlayerBar } from './features/automation/player-bar/index.js';
 import { initSubmit } from './features/automation/submit.js';
-import { initHoursHint } from './features/instructors/index.js';
+import { initAvailabilityResults } from './features/automation/availability-results.js';
+import { initConsulting } from './features/automation/consulting.js';
+import { updateCardAdditionalHours } from './features/instructors/index.js';
 import { initNotificationConsent } from './features/notifications/index.js';
 import { initMonthsShowcase } from './features/scheduling/index.js';
 import { applyMonthWindow, initDropzoneSpotlight, initFileHandling } from './features/spreadsheet/index.js';
@@ -19,8 +21,15 @@ function getElements(): AppElements {
     previewModal: document.getElementById('previewModal') as HTMLElement,
     previewBackdrop: document.getElementById('previewBackdrop') as HTMLElement,
     previewCloseButton: document.getElementById('previewCloseButton') as HTMLButtonElement,
+    availabilityResultsButton: document.getElementById('availabilityResultsButton') as HTMLButtonElement,
+    availabilityResultsModal: document.getElementById('availabilityResultsModal') as HTMLElement,
+    availabilityResultsBackdrop: document.getElementById('availabilityResultsBackdrop') as HTMLElement,
+    availabilityResultsCloseButton: document.getElementById('availabilityResultsCloseButton') as HTMLButtonElement,
+    availabilityResultsCount: document.getElementById('availabilityResultsCount') as HTMLElement,
+    availabilityResultsList: document.getElementById('availabilityResultsList') as HTMLElement,
     playerTableButton: document.getElementById('playerTableButton') as HTMLButtonElement,
     playerLocateButton: document.getElementById('playerLocateButton') as HTMLButtonElement,
+    playerStopButton: document.getElementById('playerStopButton') as HTMLButtonElement,
     cardsGrid: document.getElementById('cardsGrid') as HTMLElement,
     programFilter: document.getElementById('programFilter') as HTMLElement,
     hoursFilter: document.getElementById('hoursFilter') as HTMLElement,
@@ -35,7 +44,6 @@ function getElements(): AppElements {
     playerProgressTotal: document.getElementById('playerProgressTotal') as HTMLElement,
     playerTrack: document.getElementById('playerTrack') as HTMLElement,
     playerProgressFill: document.getElementById('playerProgressFill') as HTMLElement,
-    playerHoursHint: document.getElementById('playerHoursHint') as HTMLElement,
     statusMessage: document.getElementById('statusMessage') as HTMLElement,
     inputUser: document.getElementById('usuario') as HTMLInputElement,
     inputPass: document.getElementById('password') as HTMLInputElement,
@@ -87,15 +95,17 @@ function initApp(): void {
   initTitleBar();
   initNotificationConsent();
   initMonthsShowcase((months) => {
-    // El preview sigue la selección del carrusel: solo los bloques de esos meses.
+    // Los carnets y el preview deben mostrar siempre los datos del mismo mes.
+    updateCardAdditionalHours(elements.cardsGrid, months);
     applyMonthWindow(elements, months);
   });
   initPlayerBar(elements);
-  initHoursHint(elements);
+  initAvailabilityResults(elements);
+  initConsulting(elements.cardsGrid, elements.excelPreview);
   initDropzoneSpotlight(elements.dropzone);
   initFileHandling(elements, state);
   initPreviewModal(elements);
-  initSubmit(elements, state);
+  initSubmit(elements);
   initIconScrollAnimations();
 }
 

@@ -83,7 +83,7 @@
   background: var(--card-accent);
 }
 
-/* Realce de la tarjeta cuyo mes entra en el rango. */
+/* Realce de la tarjeta del mes seleccionado. */
 .month-card.is-selected {
   border-color: var(--card-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--card-accent) 60%, transparent), var(--shadow);

@@ -1,5 +1,8 @@
+import * as XLSX from 'xlsx';
 import type { FileElements } from './card-board.js';
 import { mountSheetSections, type SheetSectionInfo } from './sections.js';
+import { isCedulaHeader, normalizeIdentification, sameHeader } from '../helpers.js';
+import { MONTH_BLOCK_LABELS } from './constants.js';
 
 // Ventana de meses del preview: el carrusel de arriba elige qué bloques del
 // Excel se ven ("Febrero" → solo la parte común y su bloque de 5 columnas).
@@ -39,4 +42,68 @@ export function applyMonthWindow(elements: FileElements, months: readonly number
   if (!cached) return;
   paintPreview(elements);
   onRepaint?.();
+}
+
+export function updatePreviewAvailabilityHours(
+  preview: HTMLElement,
+  identification: string,
+  hours: number,
+  monthIndex: number,
+): number {
+  if (!cached) return 0;
+  const displayHours = String(Number(hours.toFixed(2)));
+  let updatedRows = 0;
+
+  cached.forEach(({ rows, sheet }, sectionIndex) => {
+    const headerRow = rows.findIndex((row) => row.some((cell) => isCedulaHeader(String(cell ?? '').trim())));
+    if (headerRow < 0) return;
+    const headers = rows.slice(headerRow, headerRow + 3);
+    const identificationColumn = headers
+      .flatMap((row) => row.map((cell, column) => isCedulaHeader(String(cell ?? '').trim()) ? column : -1))
+      .find((column) => column >= 0);
+    if (identificationColumn === undefined) return;
+
+    const monthStarts = (rows[0] ?? []).flatMap((cell, column) => {
+      const month = MONTH_BLOCK_LABELS.findIndex((label) => sameHeader(String(cell ?? '').trim(), label));
+      return month < 0 ? [] : [{ month, column }];
+    });
+    const selectedMonth = monthStarts.find((entry) => entry.month === monthIndex);
+    if (monthStarts.length > 0 && !selectedMonth) return;
+    const nextMonth = selectedMonth
+      ? monthStarts.find((entry) => entry.column > selectedMonth.column)?.column ?? Number.POSITIVE_INFINITY
+      : Number.POSITIVE_INFINITY;
+    let hoursColumn = -1;
+    for (let row = headerRow; row < Math.min(headerRow + 3, rows.length) && hoursColumn < 0; row += 1) {
+      hoursColumn = (rows[row] ?? []).findIndex((cell, column) => (
+        (!selectedMonth || (column >= selectedMonth.column && column < nextMonth))
+        && sameHeader(String(cell ?? '').trim(), 'Horas Adicionales')
+      ));
+    }
+    if (hoursColumn < 0) return;
+    const section = preview.querySelectorAll<HTMLElement>(':scope > section')[sectionIndex];
+    const tableRows = section?.querySelectorAll<HTMLTableRowElement>('tbody tr[data-identification]');
+
+    rows.forEach((row, rowIndex) => {
+      if (rowIndex <= headerRow || normalizeIdentification(row[identificationColumn]) !== identification) return;
+      row[hoursColumn] = hours;
+      if (sheet) {
+        const address = XLSX.utils.encode_cell({ r: rowIndex, c: hoursColumn });
+        const cell = sheet[address] ?? { t: 'n' as const, v: hours };
+        cell.t = 'n';
+        cell.v = hours;
+        cell.w = displayHours;
+        delete cell.f;
+        sheet[address] = cell;
+      }
+      tableRows?.forEach((tableRow) => {
+        if (normalizeIdentification(tableRow.dataset.identification) !== identification) return;
+        const cell = tableRow.querySelector<HTMLTableCellElement>(`td[data-c="${hoursColumn}"]`)
+          ?? tableRow.cells[hoursColumn];
+        if (cell) cell.textContent = displayHours;
+      });
+      updatedRows += 1;
+    });
+  });
+
+  return updatedRows;
 }

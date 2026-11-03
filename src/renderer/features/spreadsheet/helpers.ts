@@ -1,4 +1,5 @@
 export const HOURS_COLUMN_NAME = 'Horas académicas';
+export const HOURS_TO_COMPENSATE_COLUMN_NAME = 'Horas por compensar';
 const CEDULA_COLUMN_NAMES = ['Columna 3', '# DE DOCUMENTO'];
 // Fecha cuyo adelanto marca al "instructor nuevo" y ventana del aviso, en días
 // desde hoy de la máquina del usuario.

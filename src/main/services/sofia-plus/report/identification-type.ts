@@ -52,13 +52,15 @@ export async function selectCitizenshipId(): Promise<boolean> {
   const normalize = (text: string): string => text.trim().toLocaleLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const targets = ['cedula de ciudadania', 'cedula ciudadania', 'cedula', 'cc', 'c.c.', 'documento de identidad'];
+  const identificationTypeValues = ['CC', 'CE', 'TI', 'PEP', 'DNI', 'NCS', 'PPT'];
 
   // NUNCA se recurre a un `<select>` arbitrario. La página del portal tiene otros desplegables
   // —en concreto el de rol, con "Aprendiz", "Aspirante", "Equipo de Diseño Curricular"— y
   // modificar uno de esos le cambia el rol al usuario. El fallback solo acepta un desplegable
   // cuyas opciones sean de verdad tipos de identificación.
-  const esTipoIdentificacion = (candidate: HTMLSelectElement): boolean => Array.from(candidate.options)
-    .some((option) => targets.includes(normalize(option.textContent ?? '')));
+  const isIdentificationTypeSelect = (candidate: HTMLSelectElement): boolean => Array.from(candidate.options)
+    .some((option) => identificationTypeValues.includes(option.value.toUpperCase())
+      || targets.includes(normalize(option.textContent ?? '')));
 
   // ⚠️ Helper duplicado a propósito: esta función se serializa con `.toString()` y se
   // ejecuta DENTRO de la página de SofiaPlus; no puede usar helpers de módulo.
@@ -75,7 +77,7 @@ export async function selectCitizenshipId(): Promise<boolean> {
   const select = findIdentificationTypeSelect()
     ?? document.querySelector<HTMLSelectElement>('select[id$=":inputTipoIdentificacion"]')
     ?? document.querySelector<HTMLSelectElement>('select[id*="inputTipoIdentificacion"]')
-    ?? Array.from(document.querySelectorAll<HTMLSelectElement>('select')).find(esTipoIdentificacion);
+    ?? Array.from(document.querySelectorAll<HTMLSelectElement>('select')).find(isIdentificationTypeSelect);
   if (!(select instanceof HTMLSelectElement)) {
     console.error('[Reporte] No se encontró el selector de tipo de identificación.');
     return false;
@@ -84,10 +86,13 @@ export async function selectCitizenshipId(): Promise<boolean> {
   Array.from(select.options).forEach((opt, i) => {
     console.log(`[Reporte] Opción ${i}: valor="${opt.value}", texto="${opt.textContent?.trim()}", texto normalizado="${normalize(opt.textContent ?? '')}"`);
   });
-  let optionIndex = -1;
-  for (const target of targets) {
-    const found = Array.from(select.options).findIndex((item) => normalize(item.textContent ?? '') === target);
-    if (found !== -1) { optionIndex = found; break; }
+  let optionIndex = Array.from(select.options).findIndex((option) => option.value.trim().toUpperCase() === 'CC');
+  if (optionIndex !== -1 && !isIdentificationTypeSelect(select)) optionIndex = -1;
+  if (optionIndex === -1) {
+    for (const target of targets) {
+      const found = Array.from(select.options).findIndex((item) => normalize(item.textContent ?? '') === target);
+      if (found !== -1) { optionIndex = found; break; }
+    }
   }
   if (optionIndex === -1) {
     for (const target of targets) {

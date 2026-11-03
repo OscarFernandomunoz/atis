@@ -1,2 +1,2 @@
 export { initNotificationConsent } from './consent.js';
-export { notify } from './notify.js';
+export { notify, notifyInApp } from './notify.js';

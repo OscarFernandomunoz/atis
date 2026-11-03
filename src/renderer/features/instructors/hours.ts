@@ -38,12 +38,24 @@ export function contractHoursKind(hours: string, requiredHours: string): Contrac
   return roundedValue < roundedRequired ? 'low' : 'over';
 }
 
-// Horas leídas en vivo desde SofiaPlus (el span del reporte), por cédula. Mandan
-// sobre las de la nómina para que el carnet muestre lo que reporta el portal.
+// Horas leídas en vivo desde SofiaPlus por cédula y mes. Solo reemplazan las
+// horas adicionales de ese mes; las horas académicas permanecen intactas.
 const liveHours = new Map<string, string>();
+const liveAdditionalHours = new Map<string, Map<number, string>>();
 
 export function rememberLiveHours(identification: string, hours: string): void {
   if (identification && hours) liveHours.set(identification, hours);
+}
+
+export function rememberAvailabilityHours(identification: string, month: number, hours: string): void {
+  if (!identification || !hours) return;
+  const hoursByMonth = liveAdditionalHours.get(identification) ?? new Map<number, string>();
+  hoursByMonth.set(month, hours);
+  liveAdditionalHours.set(identification, hoursByMonth);
+}
+
+export function availabilityHours(identification: string, month: number): string | null {
+  return liveAdditionalHours.get(identification)?.get(month) ?? null;
 }
 
 /** Horas efectivas: las del portal si ya se leyeron, si no las del Excel. */
@@ -53,4 +65,5 @@ export function effectiveHours(instructor: Instructor): string {
 
 export function forgetLiveHours(): void {
   liveHours.clear();
+  liveAdditionalHours.clear();
 }

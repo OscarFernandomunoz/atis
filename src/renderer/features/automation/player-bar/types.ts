@@ -1,7 +1,7 @@
 import type { AppElements } from '../../../app/types.js';
 
 // Piezas del DOM que necesita cada responsabilidad de la barra del reproductor.
-export type PlayerButtonElements = Pick<AppElements, 'playButton'>;
+export type PlayerButtonElements = Pick<AppElements, 'playButton' | 'playerStopButton'>;
 export type PlayerTrackElements = Pick<AppElements, 'playerIdentification' | 'playerInstructorName'>;
 export type PlayerProgressElements = Pick<
   AppElements,

@@ -1,6 +1,4 @@
-  <!-- Barra tipo reproductor (estilo Spotify): a la izquierda la cédula en curso,
-       al centro el play y el progreso de SofiaPlus, y a la derecha el avance del
-       carnet que el usuario está señalando. -->
+  <!-- Barra de reproducción y progreso de SofiaPlus. -->
   <footer class="player-bar" aria-label="Automatización de horas de instructores">
     <div class="player-left">
       <span class="player-artwork" aria-hidden="true">
@@ -40,6 +38,12 @@
             <path class="player-glyph player-glyph-error" d="M12 7.4v5.8M12 16.6h.01" />
           </svg>
         </button>
+        <button class="player-stop" id="playerStopButton" type="button" hidden disabled
+          title="Detener y empezar desde cero" aria-label="Detener automatización y empezar desde cero">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="6.5" y="6.5" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="2" />
+          </svg>
+        </button>
         <button class="player-table" id="playerTableButton" type="button" aria-haspopup="dialog"
           title="Ver tabla del archivo cargado" aria-label="Ver la tabla del archivo cargado">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -56,13 +60,6 @@
           <span class="player-track-fill" id="playerProgressFill"></span>
         </div>
         <span class="player-time player-time-total" id="playerProgressTotal">0</span>
-      </div>
-    </div>
-
-    <div class="player-right">
-      <div class="player-hours" id="playerHoursHint" role="status" aria-live="polite" hidden>
-        <span class="player-hours-main"></span>
-        <span class="player-hours-who"></span>
       </div>
     </div>
   </footer>

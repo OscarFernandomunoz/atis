@@ -1,0 +1,45 @@
+.player-stop {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 78px);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: #c42b1c;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 180ms var(--ease-smooth), transform 200ms var(--ease-out), opacity 180ms var(--ease-smooth);
+}
+
+.player-stop[hidden] {
+  display: none;
+}
+
+.player-stop svg {
+  width: 21px;
+  height: 21px;
+}
+
+.player-stop:hover:not(:disabled) {
+  color: #a51f14;
+  transform: translateY(-50%) scale(1.12);
+}
+
+.player-stop:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.player-stop:disabled {
+  cursor: wait;
+  opacity: 0.45;
+}
+
+.player-stop:focus-visible {
+  outline: 2px solid color-mix(in srgb, #c42b1c 48%, transparent);
+  outline-offset: 2px;
+}

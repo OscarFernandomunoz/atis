@@ -1,18 +1,32 @@
-import type { AppElements, FileUploadState } from '../../app/types.js';
+import type { AppElements } from '../../app/types.js';
 import { logger } from '../../app/logger.js';
-import { colorHoursCellInPreview, getVisibleIdentifications, highlightRow, writeHoursIntoExcel } from '../spreadsheet/index.js';
-import { findInstructorName, rememberLiveHours, selectedIdentifications, updateCardHours } from '../instructors/index.js';
-import { notify } from '../notifications/index.js';
-import { startConsulting, stopConsulting } from './consulting.js';
-import { setLocateAvailable, setPlayerProgress, setPlayerState, setPlayerTrack } from './player-bar/index.js';
+import { notify, notifyInApp } from '../notifications/index.js';
+import {
+  setLocateAvailable,
+  setPlayerProgress,
+  setPlayerState,
+  setPlayerTrack,
+} from './player-bar/index.js';
+import {
+  identificationsForAutomation,
+  rememberAvailabilityHours,
+  updateCardAdditionalHours,
+} from '../instructors/index.js';
+import { showAvailabilityResults } from './availability-results.js';
+import { getCurrentMonths, updatePreviewAvailabilityHours } from '../spreadsheet/index.js';
+import { MONTH_BLOCK_LABELS } from '../spreadsheet/preview/constants.js';
 
 type SubmitElements = Pick<AppElements,
-  | 'playButton' | 'playerLocateButton' | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent' | 'playerProgressTotal' | 'playerTrack' | 'playerProgressFill'
-  | 'statusMessage' | 'dropzone' | 'dropzoneText' | 'fileInput' | 'excelPreview' | 'cardsGrid'
-  | 'programFilter' | 'hoursFilter' | 'cardsSearch' | 'cardsSelectAll' | 'cardsCount' | 'cardsEmpty'
-  | 'inputUser' | 'inputPass' | 'inputStartDate' | 'inputEndDate'>;
+  'playButton' | 'playerStopButton' | 'playerTrack' | 'statusMessage' | 'inputUser' | 'inputPass'
+  | 'playerIdentification' | 'playerInstructorName' | 'playerProgressCurrent'
+  | 'playerProgressTotal' | 'playerProgressFill' | 'playerLocateButton'
+  | 'inputStartDate' | 'inputEndDate' | 'cardsGrid'
+  | 'excelPreview'
+  | 'availabilityResultsButton' | 'availabilityResultsModal' | 'availabilityResultsBackdrop'
+  | 'availabilityResultsCloseButton' | 'availabilityResultsCount' | 'availabilityResultsList'
+>;
 
-export function initSubmit(elements: SubmitElements, state: FileUploadState): void {
+export function initSubmit(elements: SubmitElements): void {
   // El formulario no se envía: la automatización se dispara con el botón de la
   // barra inferior. Evita que Enter recargue la interfaz y borre el estado.
   document.getElementById('accessForm')?.addEventListener('submit', (event) => {
@@ -20,14 +34,12 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
   });
 
   const button = elements.playButton;
-  // La barra del reproductor monta el botón; si aún no está, no hay nada que inicializar.
   if (!button) return;
 
-  // Mientras la automatización corre el botón no se deshabilita: pasa a pausar y reanudar.
   let running = false;
-  // Solo el flujo de SofiaPlus es pausable; el volcado posterior al Excel no.
   let pausable = false;
   let isPaused = false;
+  let stopRequested = false;
   let statusBeforePause = '';
 
   const applyPause = (value: boolean): void => {
@@ -44,7 +56,6 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
   };
 
   button.addEventListener('click', async () => {
-    // Con la automatización en marcha el botón pausa o reanuda en lugar de reiniciar.
     if (running) {
       if (pausable) applyPause(!isPaused);
       return;
@@ -52,121 +63,135 @@ export function initSubmit(elements: SubmitElements, state: FileUploadState): vo
 
     if (!elements.inputUser.value || !elements.inputPass.value) {
       elements.statusMessage.textContent = 'Faltan las credenciales de acceso a SofiaPlus.';
-      await notify('Faltan las credenciales', 'Ingresa el usuario y la contraseña de SofiaPlus para iniciar la automatización.');
-      return;
-    }
-    if (!state.file) {
-      elements.dropzone.classList.add('dropzone-error');
-      elements.statusMessage.textContent = 'Debes subir un archivo Excel de nómina (.xls o .xlsx) para continuar.';
-      await notify('Falta el archivo de nómina', 'Sube el archivo Excel antes de iniciar sesión.');
-      return;
-    }
-    const visibleIdentifications = getVisibleIdentifications(elements);
-    if (visibleIdentifications.length === 0) {
-      elements.statusMessage.textContent = 'No hay cédulas visibles en la vista previa. Ajusta el filtro de búsqueda.';
-      await notify('Sin cédulas visibles', 'No hay cédulas visibles con el filtro actual. Ajusta o limpia el filtro para continuar.');
+      logger.warn('SofiaPlus', 'No se inició la automatización: faltan las credenciales.');
+      notifyInApp('Faltan las credenciales', 'Ingresa el usuario y la contraseña de SofiaPlus para iniciar la automatización.');
       return;
     }
 
-    // La automatización solo procesa lo marcado con las casillas (dentro de lo visible).
-    const selected = selectedIdentifications(elements.cardsGrid);
-    const targets = visibleIdentifications.filter((identification) => selected.has(identification));
-    if (targets.length === 0) {
-      elements.statusMessage.textContent = 'Marca con la casilla los instructores que quieres procesar.';
-      await notify('Sin instructores seleccionados', 'Selecciona al menos un instructor para iniciar la automatización.');
+    if (!elements.inputStartDate.value) {
+      elements.statusMessage.textContent = 'Selecciona una fecha de inicio antes de iniciar la automatización.';
+      logger.warn('SofiaPlus', 'No se inició la automatización: falta la fecha de inicio.');
+      notifyInApp('Falta la fecha de inicio', 'Selecciona la fecha de inicio para consultar la disponibilidad.');
       return;
     }
 
-    // El progreso se cuenta por cédula única: onProgress avisa dos veces por instructor.
-    const total = targets.length;
-    const processedIds = new Set<string>();
-    setPlayerTrack(elements, null);
-    setPlayerProgress(elements, 0, total);
+    if (!elements.inputEndDate.value) {
+      elements.statusMessage.textContent = 'Selecciona una fecha de fin antes de iniciar la automatización.';
+      logger.warn('SofiaPlus', 'No se inició la automatización: falta la fecha de fin.');
+      notifyInApp('Falta la fecha de fin', 'Selecciona la fecha de fin para consultar la disponibilidad.');
+      return;
+    }
+
+    const selectedMonths = getCurrentMonths();
+    if (selectedMonths?.length !== 1) {
+      elements.statusMessage.textContent = 'Selecciona un solo mes para consultar y actualizar sus horas adicionales.';
+      logger.warn('SofiaPlus', 'No se inició la automatización: debe seleccionarse un solo mes.');
+      notifyInApp('Selecciona un solo mes', 'Elige un único mes en el carrusel antes de iniciar la consulta.');
+      return;
+    }
+
+    const identifications = identificationsForAutomation(elements.cardsGrid);
+    if (identifications.length === 0) {
+      elements.statusMessage.textContent = 'Carga un Excel con cédulas válidas antes de iniciar la automatización.';
+      logger.warn('SofiaPlus', 'No se inició la automatización: no hay cédulas válidas para consultar.');
+      notifyInApp('No hay cédulas para consultar', 'Carga un Excel con cédulas válidas antes de iniciar la automatización.');
+      return;
+    }
 
     running = true;
     pausable = true;
     isPaused = false;
     setPlayerState(elements, 'loading');
-    elements.statusMessage.textContent = 'Abriendo SofiaPlus, llenando los campos e iniciando sesión...';
+    elements.statusMessage.textContent = `Abriendo SofiaPlus para consultar ${identifications.length} cédula(s)...`;
+
     try {
-      const results = await window.electronAPI.openSofiaAndFill({
+      const availabilityResults = await window.electronAPI.openSofiaAndFill({
         username: elements.inputUser.value,
         password: elements.inputPass.value,
+        identifications,
         startDate: elements.inputStartDate.value,
         endDate: elements.inputEndDate.value,
-        identification: targets[0] ?? '',
-        identifications: targets,
-      }, (identification, hours) => {
-        setPlayerTrack(elements, identification, identification ? findInstructorName(identification) : null);
-        highlightRow(elements, identification);
-        if (identification) {
-          // onProgress avisa dos veces por cédula: al empezar la consulta (sin horas)
-          // y al terminar (con las horas, o con null si el portal no las devolvió).
-          if (processedIds.has(identification)) {
-            stopConsulting(elements.cardsGrid, elements.excelPreview);
-            setLocateAvailable(elements.playerLocateButton, false);
-          } else {
-            startConsulting(elements.cardsGrid, elements.excelPreview, identification);
-            setLocateAvailable(elements.playerLocateButton, true);
-            processedIds.add(identification);
-            setPlayerProgress(elements, processedIds.size, total);
-          }
+      });
+      if (stopRequested) return;
+      pausable = false;
+      const completed = availabilityResults.filter((result) => result.error === null).length;
+      const failed = availabilityResults.length - completed;
+      setPlayerState(elements, failed === 0 ? 'success' : 'error');
+      const targetMonth = selectedMonths[0];
+      if (targetMonth === undefined) throw new Error('No se pudo determinar el mes seleccionado.');
+      const monthName = MONTH_BLOCK_LABELS[targetMonth]?.toLocaleLowerCase() ?? `mes ${targetMonth + 1}`;
+      availabilityResults.forEach(({ identification, entries, error }) => {
+        if (error) {
+          logger.warn('SofiaPlus', `Falló la consulta de la cédula ${identification}: ${error}`);
+          return;
         }
-        if (identification && hours) {
-          // El carnet pasa a mostrar las horas que reporta SofiaPlus (el span del reporte).
-          rememberLiveHours(identification, hours);
-          updateCardHours(elements.cardsGrid, identification, hours);
-          colorHoursCellInPreview(elements);
+        const totalMinutes = entries.reduce((total, entry) => total + (entry.durationMinutes ?? 0), 0);
+        const totalHours = totalMinutes / 60;
+        const hasRecognizedHours = entries.length === 0
+          || entries.some((entry) => entry.durationMinutes !== null);
+        if (!hasRecognizedHours) return;
+        const formattedHours = String(Number(totalHours.toFixed(2)));
+        rememberAvailabilityHours(identification, targetMonth, formattedHours);
+        const updatedRows = updatePreviewAvailabilityHours(
+          elements.excelPreview,
+          identification,
+          totalHours,
+          targetMonth,
+        );
+        if (updatedRows === 0) {
+          logger.warn('SofiaPlus', `No se actualizaron Horas Adicionales de ${monthName} para la cédula ${identification}; verifica el Excel.`);
+        } else if (entries.length === 0) {
+          logger.info('SofiaPlus', `No se encontraron bloques naranjas para la cédula ${identification}; se registraron 0 Horas Adicionales de ${monthName}.`);
+        } else {
+          logger.info('SofiaPlus', `Se actualizaron ${updatedRows} fila(s) de Horas Adicionales de ${monthName} para la cédula ${identification}.`);
         }
       });
-      // Terminó el flujo de SofiaPlus: se cierra la pausa mientras se vuelca al Excel.
-      pausable = false;
-      button.disabled = true;
-      setPlayerState(elements, 'success');
-      const found = results.filter((r) => r.totalHours);
-      logger.info('Excel', 'Resultados SofiaPlus.', results);
-      elements.statusMessage.textContent = found.length > 0
-        ? `Horas leídas para ${found.length} de ${results.length} instructores. Actualizando el Excel...`
-        : 'Sin horas del portal. No se modificó el Excel.';
-      try {
-        const updated = await writeHoursIntoExcel(results, elements, state);
-        logger.info('Excel', `writeHoursIntoExcel devolvió: ${String(updated)}`);
-        if (!updated && found.length > 0) {
-          elements.statusMessage.textContent = 'No se encontraron cédulas coincidentes en el Excel.';
-        }
-        if (found.length > 0) {
-          // La automatización y la escritura en Excel terminaron bien.
-          await notify(
-            'Automatización completada',
-            `Horas actualizadas para ${found.length} de ${results.length} instructores.`,
-          );
-        }
-      } catch (updateError) {
-        logger.error('Excel', 'No se pudo actualizar el Excel.', updateError);
-        const updateMessage = `No se pudo actualizar el Excel: ${updateError instanceof Error ? updateError.message : String(updateError)}`;
-        elements.statusMessage.textContent = updateMessage;
-        await notify('No se pudo actualizar el Excel', updateMessage);
-      }
+      updateCardAdditionalHours(elements.cardsGrid, selectedMonths);
+      const blockCount = availabilityResults.reduce((total, result) => total + result.entries.length, 0);
+      elements.statusMessage.textContent = `Consultadas ${completed} de ${availabilityResults.length} cédulas; `
+        + `${blockCount} bloques naranjas leídos${failed > 0 ? `; ${failed} consulta(s) fallida(s), revisa el detalle.` : '.'}`;
+      showAvailabilityResults(elements, availabilityResults);
+      logger.info('SofiaPlus', `Consultas finalizadas: ${completed}/${availabilityResults.length} cédulas.`);
     } catch (error) {
+      if (stopRequested) return;
       const message = error instanceof Error ? error.message : String(error);
-      const userMessage = message.includes('rol necesario') ? message : 'No se pudo abrir SofiaPlus. Revisa tu conexión e inténtalo nuevamente.';
+      const userMessage = message.includes('rol necesario')
+        || message.includes('No se encontraron bloques naranjas')
+        ? message
+        : 'No se pudo abrir SofiaPlus. Revisa tu conexión e inténtalo nuevamente.';
+      logger.error('SofiaPlus', 'Error importante durante la automatización.', error);
       elements.statusMessage.textContent = userMessage;
       setPlayerState(elements, 'error');
       await notify('Error en la automatización', userMessage);
     } finally {
-      // Al terminar (o fallar) ningún instructor queda marcado como en consulta.
-      stopConsulting(elements.cardsGrid, elements.excelPreview);
-      setLocateAvailable(elements.playerLocateButton, false);
+      const wasStopped = stopRequested;
       running = false;
       pausable = false;
-      button.disabled = false;
-      // Si algo termina con la automatización en pausa, se libera la puerta del proceso principal.
       if (isPaused) {
         isPaused = false;
         window.electronAPI.setAutomationPaused(false);
       }
       elements.playerTrack.classList.remove('is-paused');
-      window.setTimeout(() => setPlayerState(elements, 'idle'), 2800);
+      if (wasStopped) {
+        setPlayerState(elements, 'idle');
+        setPlayerTrack(elements, null);
+        setPlayerProgress(elements, 0, 0);
+        setLocateAvailable(elements.playerLocateButton, false);
+        elements.statusMessage.textContent = 'Automatización detenida. Pulsa reproducir para comenzar desde cero.';
+        stopRequested = false;
+      } else {
+        window.setTimeout(() => setPlayerState(elements, 'idle'), 2800);
+      }
     }
+  });
+
+  elements.playerStopButton.addEventListener('click', () => {
+    if (!running || stopRequested) return;
+    stopRequested = true;
+    pausable = false;
+    elements.playerStopButton.disabled = true;
+    elements.playerStopButton.setAttribute('aria-label', 'Deteniendo automatización...');
+    elements.statusMessage.textContent = 'Deteniendo SofiaPlus. Al volver a reproducir, comenzará desde cero...';
+    window.electronAPI.stopAutomation();
   });
 }

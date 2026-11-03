@@ -4,12 +4,14 @@ import {
   clearInstructorCards,
   forgetLiveHours,
   newInstructorIdentifications,
+  refreshInstructorCards,
   renderInstructorCards,
   updateCardAdditionalHours,
 } from '../../instructors/index.js';
-import { notify } from '../../notifications/index.js';
+import { logger } from '../../../app/logger.js';
+import { normalizeIdentification } from '../helpers.js';
 import { cardBoard, type FileElements } from './card-board.js';
-import { getAllIdentifications, validateRequiredColumn } from './column.js';
+import { findRequiredColumnIndex, getAllIdentifications, validateRequiredColumn } from './column.js';
 import { DROPZONE_HINT, REQUIRED_COLUMN_LABEL, REQUIRED_COLUMN_NAME } from './constants.js';
 import {
   forgetSheets,
@@ -20,6 +22,8 @@ import {
 } from './months.js';
 import type { SheetSectionInfo } from './sections.js';
 import { applyCardFilter, markNewInstructorRows } from './view.js';
+
+const editControllers = new WeakMap<HTMLElement, AbortController>();
 
 export function initFileHandling(elements: FileElements, state: FileUploadState): void {
   elements.dropzone.addEventListener('click', () => elements.fileInput.click());
@@ -56,7 +60,7 @@ function validateAndSetFile(file: File, elements: FileElements, state: FileUploa
   elements.dropzone.classList.remove('dropzone-valid', 'dropzone-error');
   const extension = file.name.split('.').pop()?.toLowerCase();
   if (extension !== 'xls' && extension !== 'xlsx') {
-    void notify('Archivo no válido', 'Solo se permiten archivos Excel en formato .xls o .xlsx');
+    logger.warn('Excel', `Se rechazó "${file.name}": solo se permiten archivos .xls o .xlsx.`);
     return;
   }
   // El nombre lo elige el sistema de archivos, no la app: se inserta como texto
@@ -94,7 +98,10 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     const validationResults = sheetFilterInfos.map(({ sheetName, rows }) => validateRequiredColumn(rows, sheetName));
     const validSheetCount = validationResults.filter((result) => result === null).length;
     if (validSheetCount === 0) {
-      rejectFile(elements, state, validationResults.find(Boolean) ?? `Ninguna hoja contiene ${REQUIRED_COLUMN_LABEL} con datos válidos.`);
+      const message = validationResults.find(Boolean)
+        ?? `Ninguna hoja contiene ${REQUIRED_COLUMN_LABEL} con datos válidos.`;
+      logger.warn('Excel', `Se rechazó "${file.name}": ${message}`);
+      rejectFile(elements, state, message);
       return;
     }
     const identifications = [...new Set(sheetFilterInfos
@@ -117,6 +124,38 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
       lastVisible = visible;
       applyCardFilter(elements, visible);
     });
+    editControllers.get(elements.excelPreview)?.abort();
+    const editController = new AbortController();
+    editControllers.set(elements.excelPreview, editController);
+    elements.excelPreview.addEventListener('excel-cell-updated', () => {
+      sheetFilterInfos.forEach((info) => {
+        if (info.sheet) {
+          info.rows = XLSX.utils.sheet_to_json<unknown[]>(info.sheet, { header: 1, defval: '' });
+        }
+      });
+      Array.from(elements.excelPreview.querySelectorAll<HTMLElement>(':scope > section')).forEach((section, index) => {
+        const info = sheetFilterInfos[index];
+        const required = info ? findRequiredColumnIndex(info.rows) : null;
+        if (!info || !required) return;
+        section.querySelectorAll<HTMLTableRowElement>('tbody tr').forEach((row) => {
+          const firstCell = row.querySelector<HTMLTableCellElement>('td[data-r]');
+          const rowIndex = firstCell ? Number(firstCell.dataset.r) : Number.NaN;
+          if (!Number.isInteger(rowIndex)) return;
+          const identification = normalizeIdentification(info.rows[rowIndex]?.[required.columnIndex]);
+          if (identification.length >= 6) row.dataset.identification = identification;
+          else delete row.dataset.identification;
+        });
+      });
+      refreshInstructorCards(
+        cardBoard(elements),
+        sheetFilterInfos.map(({ rows }) => rows),
+        (visible) => {
+          lastVisible = visible;
+          applyCardFilter(elements, visible);
+        },
+      );
+      updateCardAdditionalHours(elements.cardsGrid, getCurrentMonths());
+    }, { signal: editController.signal });
     onPreviewRepainted(() => {
       // El repintado por meses monta filas nuevas: se reponen el filtro de
       // carnets sobre ellas y las marcas de "instructor nuevo".
@@ -128,8 +167,9 @@ export async function refreshExcelPreview(file: File, elements: FileElements, st
     if (!firstIdentification) {
       elements.statusMessage.textContent = `Información de ${file.name} lista para revisar. ${REQUIRED_COLUMN_LABEL} presente, pero no se encontraron cédulas válidas.`;
     }
-  } catch {
+  } catch (error) {
     forgetSheets();
+    logger.error('Excel', 'No se pudo leer el archivo Excel.', error);
     rejectFile(elements, state, 'No se pudo leer este archivo Excel.');
   }
 }
@@ -143,5 +183,4 @@ function rejectFile(elements: FileElements, state: FileUploadState, message: str
   elements.excelPreview.textContent = message;
   clearInstructorCards(cardBoard(elements));
   elements.statusMessage.textContent = message;
-  void notify('No se pudo leer el archivo', message);
 }

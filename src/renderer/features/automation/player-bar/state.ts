@@ -17,4 +17,7 @@ export function setPlayerState(elements: PlayerButtonElements, state: PlayerStat
   button.dataset.state = state;
   button.setAttribute('aria-label', LABELS[state]);
   button.setAttribute('aria-busy', state === 'loading' ? 'true' : 'false');
+  elements.playerStopButton.hidden = state !== 'loading' && state !== 'paused';
+  elements.playerStopButton.disabled = state !== 'loading' && state !== 'paused';
+  elements.playerStopButton.setAttribute('aria-label', 'Detener automatización y empezar desde cero');
 }

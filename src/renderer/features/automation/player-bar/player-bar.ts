@@ -8,6 +8,7 @@ import { setPlayerTrack } from './track.js';
 export function initPlayerBar(elements: Pick<
   AppElements,
   | 'playButton'
+  | 'playerStopButton'
   | 'playerIdentification'
   | 'playerInstructorName'
   | 'playerProgressCurrent'

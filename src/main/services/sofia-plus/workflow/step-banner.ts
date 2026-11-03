@@ -3,8 +3,6 @@ import { executeInFrames } from '../browser/index.js';
 import { TITLE_BAR_HEIGHT } from '../../../../shared/index.js';
 import { mainLogger } from '../../../logger.js';
 
-const TOTAL_STEPS = 16;
-
 // Quita los emojis del título: la tarjeta usa la tipografía de la app, que no los necesita.
 function cleanStepTitle(stepTitle: string): string {
   return stepTitle
@@ -15,7 +13,12 @@ function cleanStepTitle(stepTitle: string): string {
 }
 
 // Muestra el contador de progreso del flujo dentro de la página de SofiaPlus.
-export function showStepBanner(window: BrowserWindow, stepNumber: number, stepTitle: string): Promise<void> {
+export function showStepBanner(
+  window: BrowserWindow,
+  stepNumber: number,
+  totalSteps: number,
+  stepTitle: string,
+): Promise<void> {
   const title = cleanStepTitle(stepTitle);
   const script = `
     (() => {
@@ -155,7 +158,7 @@ export function showStepBanner(window: BrowserWindow, stepNumber: number, stepTi
       }
 
       const step = ${stepNumber};
-      const total = ${TOTAL_STEPS};
+      const total = ${totalSteps};
       const pct = Math.round((step / total) * 100);
 
       banner.querySelector('[data-role="label"]').textContent = 'Paso ' + step + ' de ' + total;
@@ -171,6 +174,6 @@ export function showStepBanner(window: BrowserWindow, stepNumber: number, stepTi
     })();
   `;
   return executeInFrames<boolean>(window, script, Boolean, 5).then(() => {
-    mainLogger.info('SofiaPlus', `Paso ${stepNumber}/${TOTAL_STEPS}: ${title}`);
+    mainLogger.info('SofiaPlus', `Paso ${stepNumber}/${totalSteps}: ${title}`);
   });
 }

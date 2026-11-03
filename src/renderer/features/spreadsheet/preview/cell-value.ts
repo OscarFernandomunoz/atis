@@ -104,4 +104,5 @@ export function confirmCellValue(
   const recalculated = recalcSheet(sheet);
   // Las celdas tapadas por una fusión no tienen celda propia en la tabla: no se tocan.
   repaintCalculatedCells(table, sheet, [{ row, column }, ...recalculated]);
+  table.dispatchEvent(new CustomEvent('excel-cell-updated', { bubbles: true }));
 }

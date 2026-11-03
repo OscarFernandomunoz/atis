@@ -43,6 +43,15 @@ export function selectedIdentifications(grid: HTMLElement): Set<string> {
   return identifications;
 }
 
+export function identificationsForAutomation(grid: HTMLElement): string[] {
+  const selected = selectedIdentifications(grid);
+  if (selected.size > 0) return [...selected];
+  return [...new Set(Array.from(
+    grid.querySelectorAll<HTMLElement>('.carnet[data-identification]'),
+    (card) => card.dataset.identification,
+  ).filter((identification): identification is string => Boolean(identification)))];
+}
+
 // Engancha la casilla "seleccionar todo" y el recuento de las credenciales visibles.
 // `onChange` avisa de cada cambio de selección para que la vista previa pueda
 // mostrar solo las cédulas marcadas, igual que hace con los filtros del tablero.

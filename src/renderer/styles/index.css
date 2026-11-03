@@ -16,4 +16,5 @@
 @import "./components/notifications/index.css";
 @import "./features/instructors/index.css";
 @import "./features/automation/player-bar/index.css";
+@import "./features/automation/availability-results.css";
 @import "./foundation/responsive.css";

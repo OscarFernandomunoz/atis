@@ -2,6 +2,7 @@ import {
   CONTRACT_START_COLUMN_NAME,
   CONTRACT_REQUIRED_HOURS_COLUMN_NAME,
   HOURS_COLUMN_NAME,
+  HOURS_TO_COMPENSATE_COLUMN_NAME,
   excelSerialToDate,
   isCedulaHeader,
   normalizeIdentification,
@@ -15,7 +16,11 @@ export interface Instructor {
   name: string;
   program: string;
   hours: string;
+  academicHoursByMonth: Record<number, string>;
   requiredContractHours: string;
+  requiredContractHoursByMonth: Record<number, string>;
+  hoursToCompensate: string;
+  hoursToCompensateByMonth: Record<number, string>;
   additionalHoursByMonth: Record<number, string>;
   // Fecha de inicio del contrato tal como trae la celda (serial de Excel):
   // null si la hoja no trae la columna o la celda no es una fecha.
@@ -48,7 +53,7 @@ function findHeaderRow(rows: unknown[][]): number {
   return rows.findIndex((row) => (row ?? []).some((cell) => isCedulaHeader(clean(cell))));
 }
 
-function findMonthlyAdditionalHoursColumns(rows: unknown[][], headerRow: number): Map<number, number> {
+function findMonthlyColumns(rows: unknown[][], headerRow: number, headerName: string): Map<number, number> {
   const monthStarts = (rows[0] ?? []).flatMap((cell, column) => {
     const month = MONTH_BLOCK_LABELS.findIndex((label) => sameHeader(clean(cell), label));
     return month < 0 ? [] : [{ month, column }];
@@ -61,7 +66,7 @@ function findMonthlyAdditionalHoursColumns(rows: unknown[][], headerRow: number)
       const additionalColumn = (rows[row] ?? []).findIndex((cell, currentColumn) => (
         currentColumn >= column
         && currentColumn < nextMonthColumn
-        && sameHeader(clean(cell), 'Horas Adicionales')
+        && sameHeader(clean(cell), headerName)
       ));
       if (additionalColumn !== -1) {
         columns.set(month, additionalColumn);
@@ -84,13 +89,19 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
     if (cedulaCol === -1) continue;
     const nameCol = findColumn(rows, headerRow, (header) => header.toLocaleUpperCase().includes(NAME_HEADER_HINT));
     const programCol = findColumn(rows, headerRow, (header) => header.toLocaleUpperCase().includes(PROGRAM_HEADER_HINT));
-    const hoursCol = findColumn(rows, headerRow, (header) => sameHeader(header, HOURS_COLUMN_NAME));
-    const requiredContractHoursCol = findColumn(
-      rows,
-      headerRow,
-      (header) => sameHeader(header, CONTRACT_REQUIRED_HOURS_COLUMN_NAME),
-    );
-    const additionalHoursColumns = findMonthlyAdditionalHoursColumns(rows, headerRow);
+    const requiredContractHoursColumns = findMonthlyColumns(rows, headerRow, CONTRACT_REQUIRED_HOURS_COLUMN_NAME);
+    const requiredContractHoursCol = requiredContractHoursColumns.size > 0
+      ? -1
+      : findColumn(rows, headerRow, (header) => sameHeader(header, CONTRACT_REQUIRED_HOURS_COLUMN_NAME));
+    const additionalHoursColumns = findMonthlyColumns(rows, headerRow, 'Horas Adicionales');
+    const academicHoursColumns = findMonthlyColumns(rows, headerRow, HOURS_COLUMN_NAME);
+    const compensationHoursColumns = findMonthlyColumns(rows, headerRow, HOURS_TO_COMPENSATE_COLUMN_NAME);
+    const hoursCol = academicHoursColumns.size > 0
+      ? -1
+      : findColumn(rows, headerRow, (header) => sameHeader(header, HOURS_COLUMN_NAME));
+    const hoursToCompensateCol = compensationHoursColumns.size > 0
+      ? -1
+      : findColumn(rows, headerRow, (header) => sameHeader(header, HOURS_TO_COMPENSATE_COLUMN_NAME));
     // La fecha de inicio del contrato puede quedar una o dos filas bajo la de la
     // cédula (encabezados fusionados); si no existe, el instructor no se marca.
     const startCol = findColumn(rows, headerRow, (header) => sameHeader(header, CONTRACT_START_COLUMN_NAME));
@@ -103,7 +114,17 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
         name: nameCol === -1 ? SIN_NOMBRE : clean(cells[nameCol]) || SIN_NOMBRE,
         program: programCol === -1 ? 'Sin programa' : clean(cells[programCol]) || 'Sin programa',
         hours: hoursCol === -1 ? '' : clean(cells[hoursCol]),
+        academicHoursByMonth: Object.fromEntries(
+          [...academicHoursColumns].map(([month, column]) => [month, clean(cells[column])]),
+        ),
         requiredContractHours: requiredContractHoursCol === -1 ? '' : clean(cells[requiredContractHoursCol]),
+        requiredContractHoursByMonth: Object.fromEntries(
+          [...requiredContractHoursColumns].map(([month, column]) => [month, clean(cells[column])]),
+        ),
+        hoursToCompensate: hoursToCompensateCol === -1 ? '' : clean(cells[hoursToCompensateCol]),
+        hoursToCompensateByMonth: Object.fromEntries(
+          [...compensationHoursColumns].map(([month, column]) => [month, clean(cells[column])]),
+        ),
         additionalHoursByMonth: Object.fromEntries(
           [...additionalHoursColumns].map(([month, column]) => [month, clean(cells[column])]),
         ),
@@ -125,6 +146,24 @@ export function parseInstructors(sheets: unknown[][][]): Instructor[] {
             existing.additionalHoursByMonth[Number(month)] = hours;
           }
         });
+        Object.entries(instructor.academicHoursByMonth).forEach(([month, hours]) => {
+          if (!existing.academicHoursByMonth[Number(month)]?.trim()) {
+            existing.academicHoursByMonth[Number(month)] = hours;
+          }
+        });
+        Object.entries(instructor.requiredContractHoursByMonth).forEach(([month, hours]) => {
+          if (!existing.requiredContractHoursByMonth[Number(month)]?.trim()) {
+            existing.requiredContractHoursByMonth[Number(month)] = hours;
+          }
+        });
+        Object.entries(instructor.hoursToCompensateByMonth).forEach(([month, hours]) => {
+          if (!existing.hoursToCompensateByMonth[Number(month)]?.trim()) {
+            existing.hoursToCompensateByMonth[Number(month)] = hours;
+          }
+        });
+        if (!existing.hoursToCompensate) {
+          existing.hoursToCompensate = instructor.hoursToCompensate;
+        }
         continue;
       }
       seen.set(signature, instructor);
